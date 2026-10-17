@@ -1,6 +1,6 @@
-const appModule = require('../backend/dist/app');
+const appModule = require('../server-dist/app');
 const app = appModule.default || appModule;
-const { connectDatabase } = require('../backend/dist/config/db');
+const { connectDatabase } = require('../server-dist/config/db');
 
 module.exports = async (req, res) => {
   try {
