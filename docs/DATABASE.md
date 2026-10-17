@@ -1,6 +1,6 @@
-# BinFareedStore — Database Architecture & Mongoose Models Documentation
+# MS Velora — Database Architecture & Mongoose Models Documentation
 
-BinFareedStore uses **MongoDB Atlas** with **Mongoose** (`backend/src/models/`) for strongly typed schema definitions, compound and text indexing, and auditable inventory and order state management.
+MS Velora uses **MongoDB Atlas** with **Mongoose** (`backend/src/models/`) for strongly typed schema definitions, compound and text indexing, and auditable inventory and order state management.
 
 ---
 
@@ -22,25 +22,25 @@ Stores customer and administrator accounts, saved Pakistani delivery addresses, 
 ---
 
 ## 2. `Product` (`backend/src/models/Product.ts`)
-Stores luxury watch catalog items, horological specifications, variants, pricing, cost valuation, and real-time stock quantities.
+Stores jewellery catalog items, specifications, variants, pricing, cost valuation, and real-time stock quantities.
 
 | Field | Type | Constraints / Indexes | Description |
 |---|---|---|---|
-| `name` | `String` | `required`, `index`, `text` | Full timepiece title |
+| `name` | `String` | `required`, `index`, `text` | Full product title |
 | `slug` | `String` | `required`, `unique`, `index` | SEO-friendly URL slug |
-| `brand` | `String` | `required`, `index`, `text` | Watchmaker / Maison name |
+| `brand` | `String` | `required`, `index`, `text` | Brand name |
 | `model` | `String` | `required`, `text` | Model reference code |
 | `sku` | `String` | `required`, `unique`, `uppercase`, `index` | Unique Stock Keeping Unit |
-| `category` | `ObjectId` | `ref: 'Category'`, `index` | Primary watch category |
+| `category` | `ObjectId` | `ref: 'Category'`, `index` | Primary jewellery category |
 | `collections` | `ObjectId[]` | `ref: 'Collection'`, `index` | Assigned curated collections |
 | `gender` | `'Men' \| 'Women' \| 'Unisex'` | `index` | Target fit |
 | `price` | `Number` | `required`, `min: 0`, `index` | Regular retail price in PKR |
 | `salePrice` | `Number \| null` | `min: 0` | Promotional sale price when applicable |
 | `costPrice` | `Number` | `min: 0` | Unit acquisition cost for admin inventory valuation reports |
-| `mainImage` | `String` | `required` | Primary watch image URL |
+| `mainImage` | `String` | `required` | Primary product image URL |
 | `images` | `IProductImage[]` | `{ url, alt, isMain }[]` | Gallery images |
-| `specifications` | `IWatchSpecifications` | Indexed sub-fields | `movement`, `caseMaterial`, `caseDiameter`, `caseThickness`, `strapMaterial`, `strapWidth`, `dialColor`, `crystal`, `waterResistance`, `warranty`, `origin` |
-| `variants` | `IProductVariant[]` | `{ sku, name, dialColor, strapMaterial, price, salePrice, stock, image }` | Configurable strap/dial editions |
+| `specifications` | `IProductSpecifications` | Indexed sub-fields | `movement`, `caseMaterial`, `caseDiameter`, `caseThickness`, `strapMaterial`, `strapWidth`, `dialColor`, `crystal`, `waterResistance`, `warranty`, `origin` |
+| `variants` | `IProductVariant[]` | `{ sku, name, dialColor, strapMaterial, price, salePrice, stock, image }` | Configurable product options |
 | `stock` | `Number` | `required`, `min: 0`, `index` | Current available stock (protected against negative values) |
 | `lowStockThreshold` | `Number` | default `5` | Triggers admin low-stock alerts |
 | `soldCount` | `Number` | default `0`, `index` | Total units sold |
@@ -55,7 +55,7 @@ Immutable audit ledger recording every stock addition, reduction, manual adjustm
 
 | Field | Type | Description |
 |---|---|---|
-| `product` | `ObjectId` (`ref: 'Product'`) | Target timepiece |
+| `product` | `ObjectId` (`ref: 'Product'`) | Target product |
 | `sku` / `variantSku` | `String` | SKU of product/variant |
 | `type` | `'addition' \| 'reduction' \| 'order_placed' \| 'order_cancelled' \| 'manual_adjustment' \| 'initial_seed'` | Movement classification |
 | `quantityChange` | `Number` | Signed delta (`+5`, `-2`, etc.) |
@@ -74,7 +74,7 @@ Stores customer orders, itemized price snapshots, shipping details, payment stat
 | `orderNumber` | `String` | `required`, `unique`, `index` | Human-readable reference (e.g., `BFS-261010-A101`) |
 | `idempotencyKey` | `String` | `unique`, `sparse`, `index` | Prevents duplicate orders on network retry or double-click |
 | `user` | `ObjectId \| null` | `ref: 'User'`, `index` | Linked customer account (or `null` for guest checkout) |
-| `items` | `IOrderItem[]` | Required | Snapshot of purchased watches, SKUs, unit prices, and quantities |
+| `items` | `IOrderItem[]` | Required | Snapshot of purchased items, SKUs, unit prices, and quantities |
 | `shippingAddress` | `IShippingAddress` | Required | Recipient name, email, Pakistani phone, street, city, province, postalCode |
 | `subtotal`, `discountAmount`, `shippingCost`, `taxAmount`, `totalAmount` | `Number` | Server-calculated | Authoritative financial breakdown in PKR |
 | `paymentMethod` | `'cod' \| 'online_card' \| 'bank_transfer'` | Required | Chosen payment method |

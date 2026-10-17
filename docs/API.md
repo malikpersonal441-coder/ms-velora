@@ -1,7 +1,7 @@
-# BinFareedStore — REST API Documentation
+# MS Velora — REST API Documentation
 
 All API routes are prefixed with `/api` and return JSON responses in the format `{ success: boolean, message?: string, ... }`.
-State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) are protected by CSRF origin/header validation (`X-Requested-With: BinFareedStore-Client`), NoSQL operator sanitization, Zod schema validation, and HTTP-only cookie authentication (`bfs_auth_token`).
+State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) are protected by CSRF origin/header validation (`X-Requested-With: MSVelora-Client`), NoSQL operator sanitization, Zod schema validation, and HTTP-only cookie authentication (`bfs_auth_token`).
 
 ---
 
@@ -35,7 +35,7 @@ State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) are protected by CSRF
 | `GET` | `/api/content/storefront` | Public | Fetch consolidated homepage CMS content, store settings, active categories, collections, best sellers, new arrivals, and verified reviews. |
 | `GET` | `/api/content/collections/:slug` | Public | Fetch collection metadata and published products in that collection. |
 | `POST` | `/api/content/newsletter` | Public | Subscribe an email address to the collector newsletter. |
-| `GET` | `/sitemap.xml` | Public | Dynamic XML sitemap of all public pages, collections, and published watches. |
+| `GET` | `/sitemap.xml` | Public | Dynamic XML sitemap of all public pages, collections, and published products. |
 | `GET` | `/robots.txt` | Public | Search crawler directives disallowing `/admin` and `/account`. |
 
 ---
@@ -60,8 +60,8 @@ State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) are protected by CSRF
 |---|---|---|
 | `GET` | `/api/admin/overview` | Revenue KPIs (paid vs pending vs cancelled), order counts, 14-day sales trend, recent orders, best sellers, and low-stock/out-of-stock alerts. |
 | `GET` | `/api/admin/products` | Paginated admin product list with search and status/stock filters. |
-| `POST` | `/api/admin/products` | Create a new watch product and initial `StockMovement` entry. |
-| `PUT` | `/api/admin/products/:id` | Update a watch product, specifications, gallery, or variants. |
+| `POST` | `/api/admin/products` | Create a new jewellery product and initial `StockMovement` entry. |
+| `PUT` | `/api/admin/products/:id` | Update a jewellery product, specifications, gallery, or variants. |
 | `DELETE` | `/api/admin/products/:id` | Archive (`?permanent=false`) or permanently delete (`?permanent=true`) a product. |
 | `POST` | `/api/admin/products/bulk` | Bulk publish, draft, archive, or delete multiple products. |
 | `GET` | `/api/admin/inventory` | View stock balances and recent `StockMovement` audit history. |
