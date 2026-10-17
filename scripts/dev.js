@@ -1,0 +1,39 @@
+// Runs backend (port 5001) and frontend (port 5174) together: `npm run dev`.
+// Ctrl+C stops both. If either one exits, the other is stopped too, so a dead
+// backend never leaves the storefront silently failing with 500 errors.
+const { spawn } = require('child_process');
+const path = require('path');
+
+const root = path.resolve(__dirname, '..');
+const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
+const procs = [
+  { name: 'backend ', color: '\x1b[33m', cwd: path.join(root, 'backend') },
+  { name: 'frontend', color: '\x1b[36m', cwd: path.join(root, 'frontend') },
+].map(({ name, color, cwd }) => {
+  const child = spawn(npm, ['run', 'dev'], { cwd, shell: process.platform === 'win32', env: process.env });
+  const prefix = `${color}[${name}]\x1b[0m `;
+  const pipe = (stream, out) =>
+    stream.on('data', (buf) => buf.toString().split(/\r?\n/).filter(Boolean).forEach((l) => out.write(prefix + l + '\n')));
+  pipe(child.stdout, process.stdout);
+  pipe(child.stderr, process.stderr);
+  child.on('exit', (code) => {
+    console.log(`${prefix}stopped (exit ${code}). Stopping everything — fix the error above and run "npm run dev" again.`);
+    shutdown(code || 1);
+  });
+  return child;
+});
+
+let stopping = false;
+function shutdown(code) {
+  if (stopping) return;
+  stopping = true;
+  for (const p of procs) {
+    if (p.exitCode !== null) continue;
+    if (process.platform === 'win32') spawn('taskkill', ['/pid', String(p.pid), '/T', '/F']);
+    else p.kill('SIGTERM');
+  }
+  setTimeout(() => process.exit(code), 500);
+}
+process.on('SIGINT', () => shutdown(0));
+process.on('SIGTERM', () => shutdown(0));
