@@ -58,8 +58,8 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     if (category && category.trim()) {
-      if (mongoose.Types.ObjectId.isValid(category)) {
-        filter.category = new mongoose.Types.ObjectId(category);
+      if (mongoose.isValidObjectId(category)) {
+        filter.category = new (mongoose.Types.ObjectId as any)(category);
       } else {
         const catDoc = await Category.findOne({ slug: category.toLowerCase().trim() });
         if (catDoc) {
@@ -72,8 +72,8 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     if (collection && collection.trim()) {
-      if (mongoose.Types.ObjectId.isValid(collection)) {
-        filter.collections = new mongoose.Types.ObjectId(collection);
+      if (mongoose.isValidObjectId(collection)) {
+        filter.collections = new (mongoose.Types.ObjectId as any)(collection);
       } else {
         const colDoc = await Collection.findOne({ slug: collection.toLowerCase().trim() });
         if (colDoc) {
@@ -235,7 +235,7 @@ router.get('/:slug', async (req: Request, res: Response, next: NextFunction) => 
       .populate('category', 'name slug description')
       .populate('collections', 'name slug subtitle');
 
-    if (!product && mongoose.Types.ObjectId.isValid(slug)) {
+    if (!product && mongoose.isValidObjectId(slug)) {
       product = await Product.findOne({ _id: slug, status: 'published' })
         .populate('category', 'name slug description')
         .populate('collections', 'name slug subtitle');

@@ -91,7 +91,7 @@ router.post(
       let subtotal = 0;
 
       for (const reqItem of data.items) {
-        if (!mongoose.Types.ObjectId.isValid(reqItem.productId)) continue;
+        if (!mongoose.isValidObjectId(reqItem.productId)) continue;
         const product = await Product.findOne({
           _id: reqItem.productId,
           status: 'published',
@@ -196,7 +196,7 @@ router.post(
             items: validatedItems
               .filter((i) => i.quantity > 0)
               .map((i) => ({
-                product: new mongoose.Types.ObjectId(i.productId),
+                product: new (mongoose.Types.ObjectId as any)(i.productId),
                 variantSku: i.variantSku,
                 quantity: i.quantity,
               })),
@@ -351,7 +351,7 @@ router.post(
       let subtotal = 0;
 
       for (const item of data.items) {
-        if (!mongoose.Types.ObjectId.isValid(item.productId)) {
+        if (!mongoose.isValidObjectId(item.productId)) {
           throw new AppError('Invalid product identifier in cart.', 400);
         }
 

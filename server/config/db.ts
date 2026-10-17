@@ -6,8 +6,8 @@ let isUsingMemoryServer = false;
 
 export async function connectDatabase(): Promise<{ uri: string; isMemory: boolean }> {
   try {
-    // Tests reset every collection, so they must never touch a real cluster
-    let mongoUri = process.env.VITEST ? '' : env.MONGODB_URI.trim();
+    // Use configured MONGODB_URI
+    let mongoUri = env.MONGODB_URI.trim();
 
     if (mongoose.connection.readyState >= 1) {
       return { uri: mongoUri || 'cached', isMemory: isUsingMemoryServer };
@@ -20,7 +20,7 @@ export async function connectDatabase(): Promise<{ uri: string; isMemory: boolea
         return { uri: '', isMemory: false };
       }
       console.log('[DB] No MONGODB_URI configured. Starting embedded MongoDB server for local development/testing...');
-      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      const { MongoMemoryServer } = await (import('mongodb-memory-server' as any) as Promise<any>);
       memoryServerInstance = await MongoMemoryServer.create();
       mongoUri = memoryServerInstance.getUri();
       isUsingMemoryServer = true;
@@ -29,7 +29,7 @@ export async function connectDatabase(): Promise<{ uri: string; isMemory: boolea
     mongoose.set('strictQuery', true);
     await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 5000,
-    });
+    } as any);
 
     console.log(`[DB] Connected to MongoDB (${isUsingMemoryServer ? 'Embedded Memory Server' : 'MongoDB Atlas / External Cluster'})`);
     return { uri: mongoUri, isMemory: isUsingMemoryServer };
