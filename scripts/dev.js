@@ -1,6 +1,5 @@
-// Runs backend (port 5001) and frontend (port 5174) together: `npm run dev`.
-// Ctrl+C stops both. If either one exits, the other is stopped too, so a dead
-// backend never leaves the storefront silently failing with 500 errors.
+// Runs API server (port 5001) and Vite frontend (port 5174) concurrently: `npm run dev`.
+// Ctrl+C stops both. If either exits, the other is stopped cleanly.
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -8,17 +7,17 @@ const root = path.resolve(__dirname, '..');
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 const procs = [
-  { name: 'backend ', color: '\x1b[33m', cwd: path.join(root, 'backend') },
-  { name: 'frontend', color: '\x1b[36m', cwd: path.join(root, 'frontend') },
-].map(({ name, color, cwd }) => {
-  const child = spawn(npm, ['run', 'dev'], { cwd, shell: process.platform === 'win32', env: process.env });
+  { name: 'server  ', color: '\x1b[33m', script: 'dev:server' },
+  { name: 'frontend', color: '\x1b[36m', script: 'dev:frontend' },
+].map(({ name, color, script }) => {
+  const child = spawn(npm, ['run', script], { cwd: root, shell: process.platform === 'win32', env: process.env });
   const prefix = `${color}[${name}]\x1b[0m `;
   const pipe = (stream, out) =>
     stream.on('data', (buf) => buf.toString().split(/\r?\n/).filter(Boolean).forEach((l) => out.write(prefix + l + '\n')));
   pipe(child.stdout, process.stdout);
   pipe(child.stderr, process.stderr);
   child.on('exit', (code) => {
-    console.log(`${prefix}stopped (exit ${code}). Stopping everything — fix the error above and run "npm run dev" again.`);
+    console.log(`${prefix}stopped (exit ${code}). Stopping everything...`);
     shutdown(code || 1);
   });
   return child;
