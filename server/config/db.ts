@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
 import { env } from './env';
 
-let memoryServerInstance: any = null;
-let isUsingMemoryServer = false;
+let cached = (global as any).mongoose;
+if (!cached) {
+  cached = (global as any).mongoose = { conn: null, promise: null };
+}
 
 export async function connectDatabase(): Promise<{ uri: string; isMemory: boolean }> {
   try {
-    // Use configured MONGODB_URI
-    let mongoUri = env.MONGODB_URI.trim();
+    let mongoUri = (process.env.MONGODB_URI || env.MONGODB_URI || '').trim();
 
-    if (mongoose.connection.readyState >= 1) {
+    if (mongoose.connection.readyState === 1) {
       return { uri: mongoUri || 'cached', isMemory: isUsingMemoryServer };
     }
 
@@ -24,10 +25,17 @@ export async function connectDatabase(): Promise<{ uri: string; isMemory: boolea
       isUsingMemoryServer = true;
     }
 
-    mongoose.set('strictQuery', true);
-    await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 5000,
-    } as any);
+    if (!cached.promise) {
+      mongoose.set('strictQuery', true);
+      cached.promise = mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 15000,
+        connectTimeoutMS: 15000,
+        maxPoolSize: 10,
+      } as any);
+    }
+
+    await cached.promise;
+    cached.conn = mongoose.connection;
 
     console.log(`[DB] Connected to MongoDB (${isUsingMemoryServer ? 'Embedded Memory Server' : 'MongoDB Atlas / External Cluster'})`);
 
@@ -56,6 +64,7 @@ export async function connectDatabase(): Promise<{ uri: string; isMemory: boolea
 
     return { uri: mongoUri, isMemory: isUsingMemoryServer };
   } catch (error) {
+    cached.promise = null;
     console.error('[DB] Database connection error:', error);
     throw error;
   }
