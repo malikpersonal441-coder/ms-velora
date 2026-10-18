@@ -28,9 +28,16 @@ export async function connectDatabase(): Promise<{ uri: string; isMemory: boolea
       isUsingMemoryServer = true;
     }
 
+    // In serverless environments (Vercel/AWS Lambda), mongodb+srv DNS lookups frequently fail or timeout.
+    // If targeting the MS Velora Atlas cluster, resolve directly to the 3 replica set shard nodes.
+    let targetUri = mongoUri;
+    if (mongoUri.includes('cluster0.oxyrdzc.mongodb.net')) {
+      targetUri = 'mongodb://hassanpersonal441_db_user:3VDEHYwQVZxjodjB@ac-zhpdddx-shard-00-00.oxyrdzc.mongodb.net:27017,ac-zhpdddx-shard-00-01.oxyrdzc.mongodb.net:27017,ac-zhpdddx-shard-00-02.oxyrdzc.mongodb.net:27017/msvelora?ssl=true&replicaSet=atlas-3ja1k7-shard-0&authSource=admin&retryWrites=true&w=majority';
+    }
+
     if (!cached.promise) {
       mongoose.set('strictQuery', true);
-      cached.promise = mongoose.connect(mongoUri, {
+      cached.promise = mongoose.connect(targetUri, {
         serverSelectionTimeoutMS: 15000,
         connectTimeoutMS: 15000,
         maxPoolSize: 10,
