@@ -93,7 +93,7 @@ const AppShell: React.FC = () => {
       {/* Gold route-change progress line */}
       <div key={`bar-${location.pathname}`} className="route-progress" aria-hidden />
 
-      <main className="flex-1">
+      <main className={`flex-1 ${!isAdminRoute ? 'pb-16 lg:pb-0' : ''}`}>
         <Suspense
           fallback={
             <div className="py-32 text-center text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">

@@ -10,6 +10,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  Home,
+  Sparkles,
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
@@ -81,11 +83,11 @@ export const Navbar: React.FC = () => {
                   className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover"
                 />
               </div>
-              <div className="hidden sm:flex flex-col">
-                <span className="font-serif-luxury text-lg sm:text-xl font-bold tracking-[0.18em] text-[#FAF8F5] leading-none group-hover:text-[#DFBD78] transition-colors">
+              <div className="flex flex-col">
+                <span className="font-serif-luxury text-base sm:text-xl font-bold tracking-[0.16em] sm:tracking-[0.18em] text-[#FAF8F5] leading-none group-hover:text-[#DFBD78] transition-colors">
                   MS VELORA
                 </span>
-                <span className="text-[9px] uppercase tracking-[0.32em] text-[#C5A059] font-medium mt-0.5">
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.26em] sm:tracking-[0.32em] text-[#C5A059] font-medium mt-0.5">
                   Fine Jewellery
                 </span>
               </div>
@@ -240,6 +242,83 @@ export const Navbar: React.FC = () => {
           </>
         )}
       </AnimatePresence>
+
+      {/* Mobile Sticky Bottom Navigation Bar */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0D0D0D]/95 backdrop-blur-md border-t border-[#C5A059]/25 px-2 py-1.5 shadow-[0_-8px_25px_rgba(0,0,0,0.5)] flex items-center justify-around"
+      >
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium transition-colors ${
+              isActive ? 'text-[#C5A059]' : 'text-[#FAF8F5]/70 hover:text-[#C5A059]'
+            }`
+          }
+        >
+          <Home className="w-5 h-5 mb-0.5" />
+          <span>Home</span>
+        </NavLink>
+
+        <NavLink
+          to="/shop"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium transition-colors ${
+              isActive ? 'text-[#C5A059]' : 'text-[#FAF8F5]/70 hover:text-[#C5A059]'
+            }`
+          }
+        >
+          <Sparkles className="w-5 h-5 mb-0.5" />
+          <span>Shop</span>
+        </NavLink>
+
+        <button
+          type="button"
+          onClick={() => setIsSearchOpen(true)}
+          className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium text-[#FAF8F5]/70 hover:text-[#C5A059] transition-colors"
+          aria-label="Search catalogue"
+        >
+          <Search className="w-5 h-5 mb-0.5" />
+          <span>Search</span>
+        </button>
+
+        <NavLink
+          to="/wishlist"
+          className={({ isActive }) =>
+            `relative flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium transition-colors ${
+              isActive ? 'text-[#C5A059]' : 'text-[#FAF8F5]/70 hover:text-[#C5A059]'
+            }`
+          }
+        >
+          <div className="relative">
+            <Heart className="w-5 h-5 mb-0.5" />
+            {wishlistIds.length > 0 && (
+              <span className="absolute -top-1 -right-2 w-4 h-4 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[9px] font-bold flex items-center justify-center">
+                {wishlistIds.length}
+              </span>
+            )}
+          </div>
+          <span>Wishlist</span>
+        </NavLink>
+
+        <button
+          type="button"
+          onClick={() => setIsCartOpen(true)}
+          className="relative flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium text-[#FAF8F5]/70 hover:text-[#C5A059] transition-colors"
+          aria-label="Shopping bag"
+        >
+          <div className="relative">
+            <ShoppingBag className="w-5 h-5 mb-0.5" />
+            {totalBagQuantity > 0 && (
+              <span className="absolute -top-1 -right-2 w-4 h-4 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[9px] font-bold flex items-center justify-center">
+                {totalBagQuantity}
+              </span>
+            )}
+          </div>
+          <span>Bag</span>
+        </button>
+      </nav>
     </>
   );
 };

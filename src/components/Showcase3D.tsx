@@ -43,7 +43,7 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
   const active = items[front];
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       <div
         className="relative -mt-4 h-[320px] sm:h-[380px] lg:h-[400px] [perspective:1800px] select-none"
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}

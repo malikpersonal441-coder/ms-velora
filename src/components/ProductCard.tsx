@@ -134,10 +134,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             type="button"
             onClick={() => toggleWishlist(product)}
             aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm ${
+            className={`w-9 h-9 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all shadow-sm ${
               wished
                 ? 'bg-[#0D0D0D] text-[#C5A059]'
-                : 'bg-white/90 text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#C5A059]'
+                : 'bg-white/95 text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#C5A059]'
             }`}
           >
             <Heart key={String(wished)} className={`w-4 h-4 ${wished ? 'fill-current heart-beat' : ''}`} />
@@ -147,7 +147,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             type="button"
             onClick={() => setQuickViewProduct(product)}
             aria-label={`Quick view ${product.name}`}
-            className="w-8 h-8 rounded-full bg-white/90 text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#C5A059] flex items-center justify-center transition-all shadow-sm"
+            className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white/95 text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#C5A059] flex items-center justify-center transition-all shadow-sm"
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -155,10 +155,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Quick Add Overlay Bar */}
         <div
-          className={`absolute inset-x-3 bottom-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-10 ${
+          className={`absolute inset-x-2.5 sm:inset-x-3 bottom-2.5 sm:bottom-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-10 ${
             addState !== 'idle'
               ? 'translate-y-0 opacity-100'
-              : 'translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100'
+              : 'translate-y-0 opacity-100 sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 sm:group-focus-within:translate-y-0 sm:group-focus-within:opacity-100'
           }`}
         >
           <button

@@ -155,17 +155,17 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/collections/pearl-edit" className="hover:text-[#C5A059] transition-colors">
-                  Luxury Mechanical
+                  Pearl Edit
                 </Link>
               </li>
               <li>
                 <Link to="/collections/festive-glow" className="hover:text-[#C5A059] transition-colors">
-                  Minimalist & Dress
+                  Festive Glow
                 </Link>
               </li>
               <li>
                 <Link to="/collections/gift-picks" className="hover:text-[#C5A059] transition-colors">
-                  Diver & Sports
+                  Gift Picks
                 </Link>
               </li>
               <li>

@@ -146,8 +146,17 @@ export const ProductDetailPage: React.FC = () => {
       ? product.images
       : [{ url: product.mainImage, alt: product.name }];
 
+  const handleAddToCart = async () => {
+    if (!product || availableStock <= 0 || addState !== 'idle') return;
+    setAddState('flying');
+    await flyToCart(mainImageRef.current);
+    addToCart(product, quantity, selectedVariantSku, false);
+    setAddState('added');
+    setTimeout(() => setAddState('idle'), 2400);
+  };
+
   const handleBuyNow = () => {
-    if (availableStock <= 0) return;
+    if (!product || availableStock <= 0) return;
     addToCart(product, quantity, selectedVariantSku, false);
     navigate('/checkout');
   };
@@ -473,14 +482,7 @@ export const ProductDetailPage: React.FC = () => {
                 <button
                   type="button"
                   disabled={availableStock <= 0}
-                  onClick={async () => {
-                    if (addState !== 'idle') return;
-                    setAddState('flying');
-                    await flyToCart(mainImageRef.current);
-                    addToCart(product, quantity, selectedVariantSku, false);
-                    setAddState('added');
-                    setTimeout(() => setAddState('idle'), 2400);
-                  }}
+                  onClick={handleAddToCart}
                   aria-live="polite"
                   className={`flex-1 min-w-[160px] py-3 px-5 font-semibold text-xs uppercase tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50 ${
                     addState === 'added'
@@ -815,6 +817,38 @@ export const ProductDetailPage: React.FC = () => {
           />
         </div>
       )}
+
+      {/* Mobile Sticky Bottom Purchase Bar */}
+      <div className="lg:hidden fixed bottom-[52px] left-0 right-0 z-30 bg-[#0D0D0D]/95 backdrop-blur-md border-t border-[#C5A059]/30 p-2.5 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <img
+            src={activeImage || product.mainImage}
+            alt=""
+            className="w-10 h-10 rounded-md object-cover border border-[#C5A059]/30 shrink-0"
+          />
+          <div className="min-w-0">
+            <p className="font-serif-luxury text-sm font-bold text-[#FAF8F5] truncate leading-tight">{product.name}</p>
+            <p className="font-mono-code text-xs font-bold text-[#DFBD78]">
+              {formatProductPrice(product.salePrice ?? product.price, symbol)}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            disabled={availableStock <= 0}
+            onClick={handleAddToCart}
+            className={`px-4 py-2.5 active:scale-95 text-xs font-bold uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 shadow-md disabled:opacity-50 ${
+              addState === 'added'
+                ? 'bg-[#DFBD78] text-[#0D0D0D]'
+                : 'bg-[#C5A059] text-[#0D0D0D]'
+            }`}
+          >
+            {addState === 'added' ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+            <span>{availableStock <= 0 ? 'Sold Out' : addState === 'added' ? 'Added' : 'Add to Bag'}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

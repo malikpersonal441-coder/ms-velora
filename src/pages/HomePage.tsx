@@ -65,23 +65,23 @@ export const HomePage: React.FC = () => {
 
       {/* C2. Quick Shop by Category */}
       {categories && categories.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-14 relative z-20">
-          <div className="bg-[#111215]/95 backdrop-blur-md rounded-2xl border border-[#C5A059]/30 p-5 sm:p-7 shadow-2xl">
-            <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#C5A059]/15">
+        <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:-mt-14 relative z-20">
+          <div className="bg-[#111215]/95 backdrop-blur-md rounded-2xl border border-[#C5A059]/30 p-4 sm:p-7 shadow-2xl">
+            <div className="flex items-center justify-between mb-4 sm:mb-5 pb-3 border-b border-[#C5A059]/15">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.24em] text-[#C5A059] font-semibold block">Explore By Maison</span>
-                <h3 className="font-serif-luxury text-xl sm:text-2xl font-semibold text-[#FAF8F5]">Shop By Category</h3>
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] text-[#C5A059] font-semibold block">Explore By Maison</span>
+                <h3 className="font-serif-luxury text-lg sm:text-2xl font-semibold text-[#FAF8F5]">Shop By Category</h3>
               </div>
-              <Link to="/shop" className="text-xs uppercase tracking-widest text-[#C5A059] hover:text-[#DFBD78] font-semibold flex items-center gap-1">
+              <Link to="/shop" className="text-[11px] sm:text-xs uppercase tracking-widest text-[#C5A059] hover:text-[#DFBD78] font-semibold flex items-center gap-1">
                 View All <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-4">
               {categories.map((cat) => (
                 <Link
                   key={cat._id}
                   to={`/shop?category=${cat.slug}`}
-                  className="group relative rounded-xl overflow-hidden aspect-[4/5] border border-white/10 hover:border-[#C5A059] transition-all duration-300 shadow-md flex flex-col justify-end p-3 sm:p-4"
+                  className="group relative rounded-xl overflow-hidden aspect-[4/5] border border-white/10 hover:border-[#C5A059] transition-all duration-300 shadow-md flex flex-col justify-end p-2.5 sm:p-4"
                 >
                   <img
                     src={cat.image}
