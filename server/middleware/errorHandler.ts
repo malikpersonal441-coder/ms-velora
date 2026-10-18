@@ -61,8 +61,10 @@ export function errorHandler(
     console.error('[Server Error]:', err);
   }
 
+  const errorMessage = (err as any)?.message || 'An unexpected server error occurred. Please try again later.';
+
   res.status(500).json({
     success: false,
-    message: 'An unexpected server error occurred. Please try again later.',
+    message: errorMessage,
   });
 }
