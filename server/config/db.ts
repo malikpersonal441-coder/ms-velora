@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import { env } from './env';
 
+let memoryServerInstance: any = null;
+let isUsingMemoryServer = false;
+
 let cached = (global as any).mongoose;
 if (!cached) {
   cached = (global as any).mongoose = { conn: null, promise: null };
