@@ -70,7 +70,7 @@ export const SearchModal: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="relative z-10 w-full max-w-2xl bg-[#FAF8F5] rounded-xl shadow-2xl border border-[#C5A059]/40 overflow-hidden"
+            className="relative z-10 w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-[#C5A059]/30 overflow-hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Search jewellery"

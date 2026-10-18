@@ -60,21 +60,21 @@ export const CartDrawer: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.28 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-[#FAF8F5] text-[#0D0D0D] z-50 flex flex-col shadow-2xl border-l border-[#C5A059]/30"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white text-[#0D0D0D] z-50 flex flex-col shadow-2xl border-l border-[#C5A059]/30"
             aria-label="Shopping Bag Drawer"
           >
             {/* Header */}
-            <div className="p-5 bg-[#0D0D0D] text-[#FAF8F5] flex items-center justify-between border-b border-[#C5A059]/25">
+            <div className="p-5 bg-white text-[#0D0D0D] flex items-center justify-between border-b border-black/10">
               <div className="flex items-center gap-2.5">
-                <ShoppingBag className="w-5 h-5 text-[#C5A059]" />
-                <h2 className="font-serif-luxury text-xl tracking-wider uppercase">
+                <ShoppingBag className="w-5 h-5 text-[#9E7B36]" />
+                <h2 className="font-serif-luxury text-xl tracking-wider uppercase text-[#0D0D0D]">
                   Your Shopping Bag
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCartOpen(false)}
-                className="p-1.5 text-[#FAF8F5]/70 hover:text-[#C5A059] transition-colors"
+                className="p-1.5 text-neutral-500 hover:text-[#C5A059] transition-colors"
                 aria-label="Close shopping bag"
               >
                 <X className="w-5 h-5" />

@@ -903,25 +903,25 @@ export const OrderConfirmationPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
       <div className="bg-white rounded-2xl border border-[#C5A059]/40 shadow-xl overflow-hidden">
-        <div className="bg-[#0D0D0D] text-[#FAF8F5] p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C5A059]/30">
+        <div className="bg-[#FAF8F5] text-[#0D0D0D] p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C5A059]/20">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#C5A059] font-semibold">
+            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
               <CheckCircle2 className="w-4 h-4" />
               <span>Order Receipt</span>
             </div>
-            <h1 className="font-serif-luxury text-3xl sm:text-4xl font-semibold">
+            <h1 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#0D0D0D]">
               Thank You, {order.shippingAddress.fullName}
             </h1>
-            <p className="text-xs text-[#FAF8F5]/70">
+            <p className="text-xs text-neutral-500">
               Placed on {formatDateTime(order.createdAt)}
             </p>
           </div>
 
           <div className="text-left sm:text-right">
-            <span className="text-[10px] uppercase tracking-widest text-[#FAF8F5]/60 block">
+            <span className="text-[10px] uppercase tracking-widest text-neutral-500 block">
               Order Number
             </span>
-            <span className="font-mono-code text-xl font-bold text-[#C5A059]">
+            <span className="font-mono-code text-xl font-bold text-[#9E7B36]">
               {order.orderNumber}
             </span>
             <div className="mt-2 no-print">

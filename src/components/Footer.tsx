@@ -31,36 +31,36 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-[#0D0D0D] text-[#FAF8F5] border-t border-[#C5A059]/25 no-print">
+    <footer className="bg-white text-[#0D0D0D] border-t border-[#C5A059]/20 no-print">
       {/* App + new-arrival alerts */}
-      <div className="border-b border-white/10 bg-[radial-gradient(ellipse_at_20%_0%,rgba(197,160,89,0.12),transparent_60%)]">
+      <div className="border-b border-black/5 bg-[radial-gradient(ellipse_at_20%_0%,rgba(197,160,89,0.08),transparent_60%)] bg-[#FAF8F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <img src="/brand/icon-192.png" alt="" width={52} height={52} className="w-13 h-13 rounded-xl shrink-0" />
+            <img src="/brand/icon-192.png" alt="" width={52} height={52} className="w-13 h-13 rounded-xl shrink-0 shadow-xs" />
             <div>
-              <p className="font-serif-luxury text-2xl">Never miss a new arrival</p>
-              <p className="text-sm text-[#FAF8F5]/60">Get a notification when new jewellery arrives, and install our app for faster shopping.</p>
+              <p className="font-serif-luxury text-2xl text-[#0D0D0D]">Never miss a new arrival</p>
+              <p className="text-sm text-neutral-600">Get a notification when new jewellery arrives, and install our app for faster shopping.</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
             <PushToggleButton topic="new-arrivals" onLabel="Notify Me" offLabel="Notifications On" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-bold transition-colors disabled:opacity-60" />
-            <InstallAppButton className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#FAF8F5] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60" />
+            <InstallAppButton className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/60 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60" />
           </div>
         </div>
       </div>
 
       {/* Newsletter Collector Banner */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-black/5 bg-[#FCFBF8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-2">
-              <span className="text-xs uppercase tracking-[0.24em] text-[#C5A059] font-semibold">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
                 Newsletter
               </span>
-              <h3 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#FAF8F5]">
+              <h3 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#0D0D0D]">
                 Get News About New Arrivals & Offers
               </h3>
-              <p className="text-sm text-[#FAF8F5]/70 max-w-xl">
+              <p className="text-sm text-neutral-600 max-w-xl">
                 Be the first to hear about new arrivals and special offers.
               </p>
             </div>
@@ -72,12 +72,12 @@ export const Footer: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address"
-                  className="flex-1 px-4 py-3.5 bg-[#1A1A1E] border border-white/15 rounded text-sm text-[#FAF8F5] placeholder:text-white/40 focus:outline-none focus:border-[#C5A059]"
+                  className="flex-1 px-4 py-3.5 bg-white border border-black/15 rounded text-sm text-[#0D0D0D] placeholder:text-neutral-400 focus:outline-none focus:border-[#C5A059]"
                 />
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-3.5 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded inline-flex items-center justify-center gap-2 transition-colors shrink-0"
+                  className="px-6 py-3.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-white hover:text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded inline-flex items-center justify-center gap-2 transition-colors shrink-0"
                 >
                   <span>{submitting ? 'Joining...' : 'Subscribe'}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -94,7 +94,7 @@ export const Footer: React.FC = () => {
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="inline-flex items-center gap-3.5 group" aria-label="MS Velora — home">
-              <div className="rounded-full p-1 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-lg group-hover:shadow-[0_0_25px_rgba(197,160,89,0.4)] transition-all duration-300">
+              <div className="rounded-full p-1 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-sm group-hover:shadow-[0_0_20px_rgba(197,160,89,0.35)] transition-all duration-300">
                 <img
                   src="/brand/logo.jpg"
                   alt="MS Velora"
@@ -105,7 +105,7 @@ export const Footer: React.FC = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif-luxury text-2xl font-bold tracking-[0.2em] text-[#FAF8F5] group-hover:text-[#DFBD78] transition-colors">
+                <span className="font-serif-luxury text-2xl font-bold tracking-[0.2em] text-[#0D0D0D] group-hover:text-[#9E7B36] transition-colors">
                   MS VELORA
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.32em] text-[#C5A059] font-medium">
@@ -114,11 +114,11 @@ export const Footer: React.FC = () => {
               </div>
             </Link>
 
-            <p className="text-sm text-[#FAF8F5]/70 leading-relaxed max-w-sm">
+            <p className="text-sm text-neutral-600 leading-relaxed max-w-sm">
               Elegant jewellery for the modern woman — gift-boxed and delivered nationwide.
             </p>
 
-            <div className="space-y-2 pt-2 text-xs text-[#FAF8F5]/75">
+            <div className="space-y-2 pt-2 text-xs text-neutral-600">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-[#C5A059] shrink-0 mt-0.5" />
                 <span>
@@ -139,10 +139,10 @@ export const Footer: React.FC = () => {
 
           {/* Curated Collections */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-[#C5A059] font-semibold">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
               Collections
             </h4>
-            <ul className="space-y-2.5 text-sm text-[#FAF8F5]/75">
+            <ul className="space-y-2.5 text-sm text-neutral-600">
               <li>
                 <Link to="/collections/everyday-elegance" className="hover:text-[#C5A059] transition-colors">
                   Everyday Elegance
@@ -178,10 +178,10 @@ export const Footer: React.FC = () => {
 
           {/* Help */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-[#C5A059] font-semibold">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
               Help
             </h4>
-            <ul className="space-y-2.5 text-sm text-[#FAF8F5]/75">
+            <ul className="space-y-2.5 text-sm text-neutral-600">
               <li>
                 <Link to="/track-order" className="hover:text-[#C5A059] transition-colors">
                   Track Your Order
@@ -207,10 +207,10 @@ export const Footer: React.FC = () => {
 
           {/* Legal & Authenticity */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-[#C5A059] font-semibold">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
               Legal & Warranty
             </h4>
-            <ul className="space-y-2.5 text-sm text-[#FAF8F5]/75">
+            <ul className="space-y-2.5 text-sm text-neutral-600">
               <li>
                 <Link to="/privacy-policy" className="hover:text-[#C5A059] transition-colors">
                   Privacy Policy
@@ -228,12 +228,12 @@ export const Footer: React.FC = () => {
               </li>
             </ul>
 
-            <div className="pt-2 p-3.5 rounded-lg bg-[#1A1A1E] border border-white/10 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#C5A059]">
+            <div className="pt-2 p-3.5 rounded-lg bg-[#FAF8F5] border border-black/8 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#9E7B36]">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Verified Payment & Delivery</span>
               </div>
-              <p className="text-[11px] text-[#FAF8F5]/65 leading-relaxed">
+              <p className="text-[11px] text-neutral-600 leading-relaxed">
                 Cash on Delivery, Online Payment (JazzCash / EasyPaisa) and Bank Transfer — all in PKR.
               </p>
             </div>
@@ -242,17 +242,17 @@ export const Footer: React.FC = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10 bg-[#08080A] py-6 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#FAF8F5]/55">
+      <div className="border-t border-black/5 bg-[#F8F7F4] py-6 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p>© {new Date().getFullYear()} MS Velora. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <span className="px-2.5 py-1 rounded bg-white/5 border border-white/10 font-mono-code text-[11px]">
+            <span className="px-2.5 py-1 rounded bg-white border border-black/8 font-mono-code text-[11px] text-neutral-600">
               PKR (Rs.)
             </span>
-            <span className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[11px]">
+            <span className="px-2.5 py-1 rounded bg-white border border-black/8 text-[11px] text-neutral-600">
               Cash on Delivery
             </span>
-            <span className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[11px]">
+            <span className="px-2.5 py-1 rounded bg-white border border-black/8 text-[11px] text-neutral-600">
               JazzCash / EasyPaisa
             </span>
           </div>

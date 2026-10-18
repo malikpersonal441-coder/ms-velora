@@ -994,11 +994,11 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-[#0D0D0D] text-[#FAF8F5] p-8 rounded-2xl border border-[#C5A059]/30 space-y-6">
-            <h2 className="font-serif-luxury text-2xl font-semibold text-[#C5A059]">
+          <div className="bg-white text-[#0D0D0D] p-8 rounded-2xl border border-[#C5A059]/25 shadow-xl space-y-6">
+            <h2 className="font-serif-luxury text-2xl font-semibold text-[#9E7B36]">
               Visit MS Velora
             </h2>
-            <div className="space-y-4 text-sm text-[#FAF8F5]/80">
+            <div className="space-y-4 text-sm text-neutral-600">
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[#C5A059] shrink-0 mt-0.5" />
                 <span>
@@ -1008,7 +1008,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-[#C5A059] shrink-0" />
-                <a href={`tel:${(settings?.contactPhone || '+92 300 0000000').replace(/[^+\d]/g, '')}`} className="hover:text-[#C5A059] transition-colors">{settings?.contactPhone || '+92 300 0000000'}</a>
+                <a href={`tel:${(settings?.contactPhone || '+92 300 0000000').replace(/[^+\d]/g, '')}`} className="hover:text-[#9E7B36] transition-colors">{settings?.contactPhone || '+92 300 0000000'}</a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[#C5A059] shrink-0" />

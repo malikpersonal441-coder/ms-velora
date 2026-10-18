@@ -58,7 +58,7 @@ export const QuickViewModal: React.FC = () => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
           transition={{ duration: 0.22 }}
-          className="relative z-10 w-full max-w-4xl bg-[#FAF8F5] rounded-xl overflow-hidden shadow-2xl border border-[#C5A059]/30 max-h-[90vh] overflow-y-auto"
+          className="relative z-10 w-full max-w-4xl bg-white rounded-xl overflow-hidden shadow-2xl border border-[#C5A059]/30 max-h-[90vh] overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label={`Quick view ${quickViewProduct.name}`}
@@ -66,7 +66,7 @@ export const QuickViewModal: React.FC = () => {
           <button
             type="button"
             onClick={() => setQuickViewProduct(null)}
-            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-[#0D0D0D]/80 text-[#FAF8F5] hover:bg-[#C5A059] hover:text-[#0D0D0D] flex items-center justify-center transition-colors"
+            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/90 text-[#0D0D0D] border border-black/10 hover:bg-[#C5A059] hover:text-white flex items-center justify-center transition-colors shadow-sm"
             aria-label="Close quick view"
           >
             <X className="w-5 h-5" />
@@ -74,7 +74,7 @@ export const QuickViewModal: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2">
             {/* Gallery Column */}
-            <div className="bg-[#F3EFE6] p-6 flex flex-col justify-between">
+            <div className="bg-[#FAF8F5] p-6 flex flex-col justify-between">
               <div className="aspect-square rounded-lg overflow-hidden bg-white border border-black/5">
                 <img
                   src={selectedImage || quickViewProduct.mainImage}

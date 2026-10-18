@@ -29,7 +29,7 @@ export const AnnouncementBar: React.FC = () => {
             <Link
               to={msg.link}
               tabIndex={copy === 1 ? -1 : undefined}
-              className="px-8 hover:text-[#DFBD78] transition-colors"
+              className="px-8 hover:text-[#9E7B36] transition-colors"
             >
               {msg.text}
             </Link>
@@ -44,13 +44,13 @@ export const AnnouncementBar: React.FC = () => {
 
   return (
     <div
-      className="ticker group bg-[#0D0D0D] text-[#FAF8F5] border-b border-[#C5A059]/25 text-[11px] tracking-[0.2em] uppercase font-medium py-2.5 relative z-50 overflow-hidden"
+      className="ticker group bg-[#FAFAFA] text-[#0D0D0D] border-b border-[#C5A059]/20 text-[11px] tracking-[0.2em] uppercase font-medium py-2.5 relative z-50 overflow-hidden"
       role="region"
       aria-label="Store announcements"
     >
       {/* Soft fade at both edges */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0D0D0D] to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0D0D0D] to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#FAFAFA] to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#FAFAFA] to-transparent z-10" />
       <div
         className="ticker-track flex w-max"
         style={{ animationDuration: `${durationSec}s` }}

@@ -14,7 +14,6 @@ import { useStore } from '../context/StoreContext';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { ProductCard } from '../components/ProductCard';
 import { SectionHeading } from '../components/SectionHeading';
-import { FlipCollectionCard } from '../components/FlipCollectionCard';
 import { Showcase3D } from '../components/Showcase3D';
 import { Reveal } from '../components/Reveal';
 import { Product } from '../types';
@@ -66,13 +65,13 @@ export const HomePage: React.FC = () => {
       {/* C2. Quick Shop by Category */}
       {categories && categories.length > 0 && (
         <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:-mt-14 relative z-20">
-          <div className="bg-[#111215]/95 backdrop-blur-md rounded-2xl border border-[#C5A059]/30 p-4 sm:p-7 shadow-2xl">
+          <div className="bg-white rounded-2xl border border-[#C5A059]/25 p-4 sm:p-7 shadow-xl">
             <div className="flex items-center justify-between mb-4 sm:mb-5 pb-3 border-b border-[#C5A059]/15">
               <div>
-                <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] text-[#C5A059] font-semibold block">Explore By Maison</span>
-                <h3 className="font-serif-luxury text-lg sm:text-2xl font-semibold text-[#FAF8F5]">Shop By Category</h3>
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] text-[#9E7B36] font-semibold block">Explore By Maison</span>
+                <h3 className="font-serif-luxury text-lg sm:text-2xl font-semibold text-[#0D0D0D]">Shop By Category</h3>
               </div>
-              <Link to="/shop" className="text-[11px] sm:text-xs uppercase tracking-widest text-[#C5A059] hover:text-[#DFBD78] font-semibold flex items-center gap-1">
+              <Link to="/shop" className="text-[11px] sm:text-xs uppercase tracking-widest text-[#9E7B36] hover:text-[#0D0D0D] font-semibold flex items-center gap-1">
                 View All <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -81,7 +80,7 @@ export const HomePage: React.FC = () => {
                 <Link
                   key={cat._id}
                   to={`/shop?category=${cat.slug}`}
-                  className="group relative rounded-xl overflow-hidden aspect-[4/5] border border-white/10 hover:border-[#C5A059] transition-all duration-300 shadow-md flex flex-col justify-end p-2.5 sm:p-4"
+                  className="group relative rounded-xl overflow-hidden aspect-[4/5] border border-black/10 hover:border-[#C5A059] transition-all duration-300 shadow-sm flex flex-col justify-end p-2.5 sm:p-4"
                 >
                   <img
                     src={cat.image}
@@ -91,31 +90,12 @@ export const HomePage: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-colors" />
                   <div className="relative z-10 space-y-0.5">
-                    <span className="text-[10px] uppercase tracking-wider text-[#C5A059] font-medium block">Collection</span>
-                    <h4 className="font-serif-luxury text-sm sm:text-base font-bold text-[#FAF8F5] leading-tight group-hover:text-[#DFBD78] transition-colors">{cat.name}</h4>
+                    <span className="text-[10px] uppercase tracking-wider text-[#DFBD78] font-medium block">Category</span>
+                    <h4 className="font-serif-luxury text-sm sm:text-base font-bold text-white leading-tight group-hover:text-[#DFBD78] transition-colors">{cat.name}</h4>
                   </div>
                 </Link>
               ))}
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* D. Featured Collections — 3D flip cards */}
-      {visibility.featuredCollections && (
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="Curated Jewellery"
-            title="The Collections"
-            subtitle="Hover or tap a card to turn it over and discover the story behind each collection."
-            link={{ to: '/collections', label: 'All Collections' }}
-          />
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-            {collections.slice(0, 6).map((col, idx) => (
-              <Reveal key={col._id} delay={idx * 0.08}>
-                <FlipCollectionCard collection={col} index={idx} />
-              </Reveal>
-            ))}
           </div>
         </section>
       )}
@@ -158,11 +138,10 @@ export const HomePage: React.FC = () => {
 
       {/* The Rotunda — 3D rotating showcase */}
       {[...bestSellers, ...newArrivals].length >= 3 && (
-        <section className="relative bg-[#08090B] py-16 sm:py-20 overflow-hidden grain">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(197,160,89,0.12),transparent_60%)]" />
+        <section className="relative bg-[#FAF8F5] py-16 sm:py-20 overflow-hidden border-y border-[#C5A059]/20">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(197,160,89,0.1),transparent_60%)]" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeading
-              tone="dark"
               eyebrow="The Rotunda"
               title="A Turn Through the Vault"
               subtitle="Our most coveted pieces, presented in the round. Tap any piece to view it."
@@ -179,30 +158,30 @@ export const HomePage: React.FC = () => {
       {/* F. Promotional Banner */}
       {visibility.promoBanner && homepage?.promoBanner?.isActive && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl overflow-hidden bg-[#0D0D0D] text-[#FAF8F5] border border-[#C5A059]/35 shadow-2xl">
+          <div className="relative rounded-2xl overflow-hidden bg-white text-[#0D0D0D] border border-[#C5A059]/25 shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
               <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 space-y-6 relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#C5A059]/40 bg-[#C5A059]/10 text-[#DFBD78] text-[11px] uppercase tracking-[0.2em] font-semibold">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#C5A059]/40 bg-[#C5A059]/10 text-[#9E7B36] text-[11px] uppercase tracking-[0.2em] font-semibold">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{homepage.promoBanner.badgeText}</span>
                 </div>
 
-                <h2 className="font-serif-luxury text-3xl sm:text-5xl font-semibold leading-tight">
+                <h2 className="font-serif-luxury text-3xl sm:text-5xl font-semibold leading-tight text-[#0D0D0D]">
                   {homepage.promoBanner.title}
                 </h2>
 
-                <p className="text-base sm:text-lg text-[#C5A059] font-serif-luxury italic">
+                <p className="text-base sm:text-lg text-[#9E7B36] font-serif-luxury italic">
                   {homepage.promoBanner.subtitle}
                 </p>
 
-                <p className="text-sm text-[#FAF8F5]/75 leading-relaxed max-w-xl">
+                <p className="text-sm text-neutral-600 leading-relaxed max-w-xl">
                   {homepage.promoBanner.description}
                 </p>
 
                 <div className="pt-2 flex flex-wrap items-center gap-4">
                   <Link
                     to={homepage.promoBanner.ctaLink || '/shop'}
-                    className="px-7 py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded transition-colors"
+                    className="px-7 py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded transition-colors shadow-xs"
                   >
                     {homepage.promoBanner.ctaText || 'Explore Limited Edition'}
                   </Link>
@@ -211,10 +190,10 @@ export const HomePage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleCopyCoupon(homepage.promoBanner.couponHighlight!)}
-                      className="px-5 py-3.5 rounded border border-dashed border-[#C5A059]/60 bg-[#1A1A1E] hover:border-[#C5A059] text-xs font-mono-code text-[#FAF8F5] flex items-center gap-2.5 transition-colors"
+                      className="px-5 py-3.5 rounded border border-dashed border-[#C5A059]/60 bg-[#FAF8F5] hover:border-[#C5A059] text-xs font-mono-code text-[#0D0D0D] flex items-center gap-2.5 transition-colors"
                     >
                       <span>USE CODE: {homepage.promoBanner.couponHighlight}</span>
-                      <Copy className="w-3.5 h-3.5 text-[#C5A059]" />
+                      <Copy className="w-3.5 h-3.5 text-[#9E7B36]" />
                     </button>
                   )}
                 </div>
@@ -229,7 +208,7 @@ export const HomePage: React.FC = () => {
                   height={600}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-white via-white/30 to-transparent" />
               </div>
             </div>
           </div>
@@ -268,13 +247,13 @@ export const HomePage: React.FC = () => {
                     height={750}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-[#0D0D0D]/90 backdrop-blur-md text-[#FAF8F5] border border-[#C5A059]/30 flex items-center gap-3">
+                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-white/95 backdrop-blur-md text-[#0D0D0D] border border-[#C5A059]/30 shadow-lg flex items-center gap-3">
                     <Sparkles className="w-8 h-8 text-[#C5A059] shrink-0" />
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-[#C5A059] font-semibold">
+                      <p className="text-xs uppercase tracking-widest text-[#9E7B36] font-semibold">
                         Hand-Checked Quality
                       </p>
-                      <p className="text-xs text-[#FAF8F5]/80">
+                      <p className="text-xs text-neutral-600">
                         Checked for finish, stone setting and clasp strength.
                       </p>
                     </div>

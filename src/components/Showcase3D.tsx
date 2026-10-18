@@ -89,14 +89,14 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
 
       {/* Caption for the spotlit piece */}
       <div className="mt-1 text-center min-h-[88px]" aria-live="polite">
-        <p className="text-[10px] uppercase tracking-[0.4em] text-[#DFBD78]">{active.brand}</p>
+        <p className="text-[10px] uppercase tracking-[0.4em] text-[#9E7B36] font-semibold">{active.brand}</p>
         <Link
           to={`/product/${active.slug}`}
-          className="mt-2 inline-block font-serif-luxury text-2xl sm:text-3xl text-[#FAF8F5] hover:text-[#DFBD78] transition-colors"
+          className="mt-2 inline-block font-serif-luxury text-2xl sm:text-3xl text-[#0D0D0D] hover:text-[#9E7B36] transition-colors"
         >
           {active.name}
         </Link>
-        <p className="mt-1 text-sm text-[#FAF8F5]/60 tabular-nums">
+        <p className="mt-1 text-sm text-neutral-600 tabular-nums">
           {formatPrice(active.salePrice && active.salePrice < active.price ? active.salePrice : active.price, symbol)}
         </p>
       </div>
@@ -111,7 +111,7 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
             type="button"
             onClick={() => setAngle((a) => a + d)}
             aria-label={label}
-            className="w-12 h-12 rounded-full border border-[#C5A059]/40 text-[#FAF8F5] hover:bg-[#C5A059] hover:text-[#0D0D0D] flex items-center justify-center transition-colors duration-500"
+            className="w-12 h-12 rounded-full border border-[#C5A059]/50 bg-white/80 text-[#0D0D0D] hover:bg-[#C5A059] hover:text-white flex items-center justify-center transition-colors duration-500 shadow-xs"
           >
             <Icon className="w-5 h-5" />
           </button>

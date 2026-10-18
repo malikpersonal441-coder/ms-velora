@@ -4,8 +4,8 @@
   :root {
     --color-matte-black: #0D0D0D;
     --color-charcoal: #1A1A1E;
-    --color-ivory: #FAF8F5;
-    --color-ivory-warm: #F3EFE6;
+    --color-ivory: #FFFFFF;
+    --color-ivory-warm: #F8F7F4;
     --color-gold: #C5A059;
     --color-gold-light: #DFBD78;
     --color-gold-dark: #9E7B36;
@@ -13,7 +13,7 @@
 
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #FAF8F5;
+    background-color: #FFFFFF;
     color: #0D0D0D;
     overflow-x: hidden;
   }
@@ -36,14 +36,14 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #F3EFE6;
+  background: #F8F7F4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C5A059;
+  background: #DFBD78;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9E7B36;
+  background: #C5A059;
 }
 
 @media print {

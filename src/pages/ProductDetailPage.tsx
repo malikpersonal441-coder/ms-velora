@@ -595,12 +595,12 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Technical Specifications Table */}
-            <div className="bg-white rounded-xl border border-black/8 overflow-hidden">
-              <div className="px-5 py-3.5 bg-[#0D0D0D] text-[#FAF8F5] flex items-center justify-between">
-                <h2 className="font-serif-luxury text-lg tracking-wider uppercase text-[#C5A059]">
+            <div className="bg-white rounded-xl border border-black/8 overflow-hidden shadow-xs">
+              <div className="px-5 py-3.5 bg-[#FAF8F5] text-[#0D0D0D] border-b border-black/8 flex items-center justify-between">
+                <h2 className="font-serif-luxury text-lg tracking-wider uppercase text-[#9E7B36] font-semibold">
                   Specifications
                 </h2>
-                <span className="text-[11px] font-mono-code text-[#FAF8F5]/70">
+                <span className="text-[11px] font-mono-code text-neutral-500">
                   MODEL: {product.model}
                   </span>
               </div>
@@ -819,7 +819,7 @@ export const ProductDetailPage: React.FC = () => {
       )}
 
       {/* Mobile Sticky Bottom Purchase Bar */}
-      <div className="lg:hidden fixed bottom-[52px] left-0 right-0 z-30 bg-[#0D0D0D]/95 backdrop-blur-md border-t border-[#C5A059]/30 p-2.5 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-[52px] left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#C5A059]/25 p-2.5 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
           <img
             src={activeImage || product.mainImage}
@@ -827,8 +827,8 @@ export const ProductDetailPage: React.FC = () => {
             className="w-10 h-10 rounded-md object-cover border border-[#C5A059]/30 shrink-0"
           />
           <div className="min-w-0">
-            <p className="font-serif-luxury text-sm font-bold text-[#FAF8F5] truncate leading-tight">{product.name}</p>
-            <p className="font-mono-code text-xs font-bold text-[#DFBD78]">
+            <p className="font-serif-luxury text-sm font-bold text-[#0D0D0D] truncate leading-tight">{product.name}</p>
+            <p className="font-mono-code text-xs font-bold text-[#9E7B36]">
               {formatProductPrice(product.salePrice ?? product.price, symbol)}
             </p>
           </div>

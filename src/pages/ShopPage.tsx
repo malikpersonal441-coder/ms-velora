@@ -8,6 +8,7 @@ import {
   ChevronRight,
   RotateCcw,
   Gem,
+  ArrowRight,
 } from 'lucide-react';
 import { apiRequest, formatPrice } from '../lib/api';
 import { Product } from '../types';
@@ -385,20 +386,20 @@ export const ShopPage: React.FC = () => {
   return (
     <div className="min-h-screen pb-20">
       {/* Page Banner */}
-      <div className="bg-[#0D0D0D] text-[#FAF8F5] py-12 sm:py-16 border-b border-[#C5A059]/25">
+      <div className="bg-[#FAF8F5] text-[#0D0D0D] py-12 sm:py-16 border-b border-[#C5A059]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2 text-xs text-[#C5A059] uppercase tracking-[0.22em] mb-2">
+            <div className="flex items-center gap-2 text-xs text-[#9E7B36] uppercase tracking-[0.22em] mb-2 font-medium">
               <Link to="/" className="hover:underline">
                 Home
               </Link>
               <span>/</span>
               <span>Shop</span>
             </div>
-            <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold">
+            <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#0D0D0D]">
               All Jewellery
             </h1>
-            <p className="text-sm text-[#FAF8F5]/70 mt-2 max-w-xl">
+            <p className="text-sm text-neutral-600 mt-2 max-w-xl">
               Explore necklaces, earrings, rings, bangles and bridal sets with live availability.
             </p>
           </div>
@@ -416,11 +417,11 @@ export const ShopPage: React.FC = () => {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search jewellery..."
-              className="w-full pl-4 pr-10 py-3 rounded-lg bg-[#1A1A1E] border border-white/15 text-sm text-[#FAF8F5] placeholder:text-white/40 focus:outline-none focus:border-[#C5A059]"
+              className="w-full pl-4 pr-10 py-3 rounded-lg bg-white border border-black/15 text-sm text-[#0D0D0D] placeholder:text-neutral-400 focus:outline-none focus:border-[#C5A059] shadow-xs"
             />
             <button
               type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#C5A059]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9E7B36]"
               aria-label="Search catalog"
             >
               <Search className="w-4 h-4" />
@@ -431,15 +432,52 @@ export const ShopPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {/* Curated Collections Showcase */}
+        {collections && collections.length > 0 && !selectedCollection && (
+          <section className="mb-8 pb-6 border-b border-neutral-200">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.24em] text-[#9E7B36] font-semibold block">Curated Jewellery</span>
+                <h2 className="font-serif-luxury text-xl sm:text-2xl font-semibold text-[#0D0D0D]">Shop By Collection</h2>
+              </div>
+              <Link to="/collections" className="text-xs uppercase tracking-wider text-[#9E7B36] hover:text-[#0D0D0D] font-semibold flex items-center gap-1">
+                All Collections <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {collections.map((col) => (
+                <button
+                  key={col._id}
+                  type="button"
+                  onClick={() => updateParam('collection', col.slug)}
+                  className="group relative rounded-xl overflow-hidden aspect-[4/5] border border-black/10 hover:border-[#C5A059] transition-all duration-300 shadow-xs flex flex-col justify-end p-3 text-left cursor-pointer"
+                >
+                  <img
+                    src={col.image}
+                    alt={col.name}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                  <div className="relative z-10">
+                    <p className="text-[9px] uppercase tracking-wider text-[#DFBD78] font-medium truncate">{col.subtitle || 'Signature'}</p>
+                    <h3 className="font-serif-luxury text-sm font-bold text-white leading-tight truncate">{col.name}</h3>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Top Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-neutral-200">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden inline-flex items-center gap-2 px-4 py-2.5 rounded bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold"
+              className="lg:hidden inline-flex items-center gap-2 px-4 py-2.5 rounded bg-white border border-black/15 text-[#0D0D0D] hover:border-[#C5A059] text-xs uppercase tracking-wider font-semibold shadow-xs transition-colors"
             >
-              <SlidersHorizontal className="w-4 h-4 text-[#C5A059]" />
+              <SlidersHorizontal className="w-4 h-4 text-[#9E7B36]" />
               <span>Filters ({activeChips.length})</span>
             </button>
 
@@ -475,13 +513,13 @@ export const ShopPage: React.FC = () => {
             {activeChips.map((chip) => (
               <span
                 key={chip.key}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0D0D0D] text-[#FAF8F5] text-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#C5A059]/50 text-[#0D0D0D] text-xs shadow-2xs"
               >
                 <span>{chip.label}</span>
                 <button
                   type="button"
                   onClick={() => updateParam(chip.key, null)}
-                  className="text-[#C5A059] hover:text-white"
+                  className="text-[#9E7B36] hover:text-[#0D0D0D]"
                   aria-label={`Remove ${chip.label} filter`}
                 >
                   <X className="w-3.5 h-3.5" />
@@ -630,23 +668,23 @@ export const ShopPage: React.FC = () => {
             className="fixed inset-0 bg-black/70"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="relative z-10 w-[88%] max-w-sm bg-[#FAF8F5] h-full overflow-y-auto p-6 space-y-6">
+          <div className="relative z-10 w-[88%] max-w-sm bg-white h-full overflow-y-auto p-6 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
-              <h2 className="font-serif-luxury text-2xl font-semibold">Filter Jewellery</h2>
+              <h2 className="font-serif-luxury text-2xl font-semibold text-[#0D0D0D]">Filter Jewellery</h2>
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="p-1.5 text-neutral-500"
+                className="p-1.5 text-neutral-500 hover:text-[#C5A059]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             {renderFilterControls()}
-            <div className="pt-4 sticky bottom-0 bg-[#FAF8F5] pb-2">
+            <div className="pt-4 sticky bottom-0 bg-white pb-2">
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded"
+                className="w-full py-3 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] text-xs uppercase tracking-widest font-semibold rounded shadow-xs transition-colors"
               >
                 Apply Filters ({pagination.total})
               </button>
