@@ -56,13 +56,15 @@ export const AdminLoginPage: React.FC = () => {
         className="relative w-full max-w-sm bg-[#111215] border border-[#C5A059]/25 rounded-2xl p-8 space-y-6 shadow-2xl"
       >
         <div className="text-center space-y-2">
-          <img
-            src="/brand/logo.jpg"
-            alt="MS Velora"
-            width={112}
-            height={112}
-            className="h-28 w-28 mx-auto mb-2"
-          />
+          <div className="mx-auto mb-3 w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-lg shadow-[#C5A059]/20 flex items-center justify-center">
+            <img
+              src="/brand/logo.jpg"
+              alt="MS Velora"
+              width={96}
+              height={96}
+              className="h-full w-full rounded-full object-cover bg-black"
+            />
+          </div>
           <h1 className="font-serif-luxury text-3xl text-[#FAF8F5] font-semibold">Staff Console</h1>
           <p className="text-xs text-[#FAF8F5]/50">Authorized personnel only. Access is logged.</p>
         </div>

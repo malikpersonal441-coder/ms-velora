@@ -36,20 +36,36 @@
     <link rel="preload" as="image" href="/brand/logo.jpg" type="image/jpeg" />
   </head>
   <body class="bg-[#FAF8F5] text-[#0D0D0D] antialiased selection:bg-[#C5A059]/25 selection:text-[#0D0D0D]">
-    <!-- Opening loader: the MS Velora logo softly appears on black with a thin gold line
-         that opens from the centre, then everything fades. Silent, pure HTML/CSS/JS. -->
+    <!-- Opening loader: Round luxury gold medallion with rotating shimmer halo and breathing glow -->
     <div id="msv-loader" role="status" aria-live="polite" aria-label="Loading MS Velora">
-      <img class="msv-logo" src="/brand/logo.jpg" alt="MS Velora" width="300" height="300" />
-      <span class="msv-line" aria-hidden="true"></span>
+      <div class="msv-loader-container">
+        <div class="msv-halo-ring"></div>
+        <div class="msv-logo-disc">
+          <img class="msv-logo" src="/brand/logo.jpg" alt="MS Velora Fine Jewellery" width="160" height="160" />
+        </div>
+      </div>
+      <div class="msv-caption">
+        <span class="msv-brand-title">MS VELORA</span>
+        <span class="msv-brand-sub">FINE JEWELLERY</span>
+        <span class="msv-line" aria-hidden="true"></span>
+      </div>
     </div>
     <style>
-      #msv-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;background:#050505;transition:opacity .8s ease,visibility .8s ease}
-      .msv-logo{width:min(280px,64vw);height:auto;opacity:0;transform:scale(1.06);animation:msv-logo 1.4s cubic-bezier(.22,1,.36,1) .1s forwards}
-      .msv-line{display:block;height:1px;width:min(200px,50vw);background:linear-gradient(90deg,transparent,#C5A059 20%,#F4DFA8 50%,#C5A059 80%,transparent);transform:scaleX(0);animation:msv-line 1.2s cubic-bezier(.65,0,.35,1) .6s forwards}
+      #msv-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#08090B;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility .7s}
+      .msv-loader-container{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+      .msv-halo-ring{position:absolute;inset:-6px;border-radius:50%;padding:2px;background:conic-gradient(from 0deg,transparent 0%,#C5A059 25%,#F4DFA8 50%,#C5A059 75%,transparent 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:msv-spin 3.2s linear infinite}
+      .msv-logo-disc{width:140px;height:140px;border-radius:50%;overflow:hidden;padding:2px;background:linear-gradient(135deg,#DFBD78,#C5A059 50%,#9E7B36);box-shadow:0 0 35px rgba(197,160,89,.35),0 0 15px rgba(0,0,0,.8);position:relative;z-index:2;animation:msv-float 3s ease-in-out infinite alternate}
+      .msv-logo{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+      .msv-caption{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+      .msv-brand-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.28em;color:#DFBD78;text-transform:uppercase;animation:msv-fade 1.2s ease forwards}
+      .msv-brand-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:.32em;color:rgba(250,248,245,.65);text-transform:uppercase}
+      .msv-line{display:block;height:1px;width:140px;margin-top:4px;background:linear-gradient(90deg,transparent,#C5A059 30%,#F4DFA8 50%,#C5A059 70%,transparent);transform:scaleX(0);animation:msv-line 1.2s cubic-bezier(.65,0,.35,1) .4s forwards}
       #msv-loader.msv-done{opacity:0;visibility:hidden;pointer-events:none}
-      @keyframes msv-logo{to{opacity:1;transform:none}}
+      @keyframes msv-spin{to{transform:rotate(360deg)}}
+      @keyframes msv-float{0%{transform:scale(.98);box-shadow:0 0 25px rgba(197,160,89,.25)}100%{transform:scale(1.03);box-shadow:0 0 40px rgba(197,160,89,.5)}}
+      @keyframes msv-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
       @keyframes msv-line{to{transform:scaleX(1)}}
-      @media (prefers-reduced-motion:reduce){.msv-logo,.msv-line{animation:none;opacity:1;transform:none}}
+      @media (prefers-reduced-motion:reduce){.msv-halo-ring{animation:none}.msv-logo-disc{animation:none}.msv-line{transform:scaleX(1)}}
     </style>
     <script>
       (function () {

@@ -33,15 +33,15 @@ router.get('/storefront', async (_req: Request, res: Response, next: NextFunctio
       Product.find({ status: 'published', bestSeller: true })
         .populate('category', 'name slug')
         .sort({ soldCount: -1, createdAt: -1 })
-        .limit(8),
+        .limit(12),
       Product.find({ status: 'published', newArrival: true })
         .populate('category', 'name slug')
         .sort({ createdAt: -1 })
-        .limit(8),
+        .limit(12),
       Review.find({ status: 'approved', verifiedPurchase: true })
         .populate('product', 'name slug brand mainImage')
         .sort({ rating: -1, createdAt: -1 })
-        .limit(6),
+        .limit(8),
     ]);
 
     res.json({

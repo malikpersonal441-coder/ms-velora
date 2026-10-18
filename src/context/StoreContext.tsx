@@ -11,6 +11,7 @@ import {
   CartSummary,
 } from '../types';
 import { apiRequest } from '../lib/api';
+import { demoCategories, demoCollections, demoProducts, demoReviews } from '../lib/demoData';
 
 export interface ToastMessage {
   id: string;
@@ -95,11 +96,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [homepage, setHomepage] = useState<HomepageContent | null>(null);
   const [settings, setSettings] = useState<StoreSettings | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [bestSellers, setBestSellers] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [verifiedReviews, setVerifiedReviews] = useState<Review[]>([]);
+  const [categories, setCategories] = useState<Category[]>(() => demoCategories);
+  const [collections, setCollections] = useState<Collection[]>(() => demoCollections);
+  const [bestSellers, setBestSellers] = useState<Product[]>(() => demoProducts.filter((p) => p.bestSeller));
+  const [newArrivals, setNewArrivals] = useState<Product[]>(() => demoProducts.filter((p) => p.newArrival));
+  const [verifiedReviews, setVerifiedReviews] = useState<Review[]>(() => demoReviews);
 
   const [rawCart, setRawCart] = useState<RawCartItem[]>(() => {
     try {
@@ -160,11 +161,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (res.success) {
         setHomepage(res.homepage);
         setSettings(res.settings);
-        setCategories(res.categories || []);
-        setCollections(res.collections || []);
-        setBestSellers(res.bestSellers || []);
-        setNewArrivals(res.newArrivals || []);
-        setVerifiedReviews(res.verifiedReviews || []);
+        setCategories(res.categories?.length ? res.categories : demoCategories);
+        setCollections(res.collections?.length ? res.collections : demoCollections);
+        setBestSellers(res.bestSellers?.length ? res.bestSellers : demoProducts.filter((p) => p.bestSeller));
+        setNewArrivals(res.newArrivals?.length ? res.newArrivals : demoProducts.filter((p) => p.newArrival));
+        setVerifiedReviews(res.verifiedReviews?.length ? res.verifiedReviews : demoReviews);
       }
     } catch (err) {
       console.error('Failed to load storefront data:', err);

@@ -23,6 +23,7 @@ export const HomePage: React.FC = () => {
   const {
     homepage,
     collections,
+    categories,
     bestSellers,
     newArrivals,
     verifiedReviews,
@@ -62,6 +63,44 @@ export const HomePage: React.FC = () => {
         />
       )}
 
+      {/* C2. Quick Shop by Category */}
+      {categories && categories.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-14 relative z-20">
+          <div className="bg-[#111215]/95 backdrop-blur-md rounded-2xl border border-[#C5A059]/30 p-5 sm:p-7 shadow-2xl">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#C5A059]/15">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.24em] text-[#C5A059] font-semibold block">Explore By Maison</span>
+                <h3 className="font-serif-luxury text-xl sm:text-2xl font-semibold text-[#FAF8F5]">Shop By Category</h3>
+              </div>
+              <Link to="/shop" className="text-xs uppercase tracking-widest text-[#C5A059] hover:text-[#DFBD78] font-semibold flex items-center gap-1">
+                View All <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+              {categories.map((cat) => (
+                <Link
+                  key={cat._id}
+                  to={`/shop?category=${cat.slug}`}
+                  className="group relative rounded-xl overflow-hidden aspect-[4/5] border border-white/10 hover:border-[#C5A059] transition-all duration-300 shadow-md flex flex-col justify-end p-3 sm:p-4"
+                >
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-colors" />
+                  <div className="relative z-10 space-y-0.5">
+                    <span className="text-[10px] uppercase tracking-wider text-[#C5A059] font-medium block">Collection</span>
+                    <h4 className="font-serif-luxury text-sm sm:text-base font-bold text-[#FAF8F5] leading-tight group-hover:text-[#DFBD78] transition-colors">{cat.name}</h4>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* D. Featured Collections — 3D flip cards */}
       {visibility.featuredCollections && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,12 +126,13 @@ export const HomePage: React.FC = () => {
           <SectionHeading
             eyebrow="Most Coveted"
             title="Best Sellers"
+            subtitle="Our most sought-after handcrafted pieces, adored by women across Pakistan."
             link={{ to: '/shop?bestSeller=true', label: 'Shop All Best Sellers' }}
           />
 
           {storefrontLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((n) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+              {[1, 2, 3, 4, 5].map((n) => (
                 <div
                   key={n}
                   className="bg-white rounded-lg border border-black/5 overflow-hidden animate-pulse"
@@ -107,8 +147,8 @@ export const HomePage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
-              {bestSellers.slice(0, 4).map((product) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+              {bestSellers.slice(0, 10).map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
             </div>
@@ -206,7 +246,7 @@ export const HomePage: React.FC = () => {
           />
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
-            {newArrivals.slice(0, 4).map((product) => (
+            {newArrivals.slice(0, 10).map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

@@ -93,15 +93,25 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-4">
-            <Link to="/" className="inline-block" aria-label="MS Velora — home">
-              <img
-                src="/brand/logo.jpg"
-                alt="MS Velora"
-                width={128}
-                height={128}
-                loading="lazy"
-                className="h-32 w-32"
-              />
+            <Link to="/" className="inline-flex items-center gap-3.5 group" aria-label="MS Velora — home">
+              <div className="rounded-full p-1 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-lg group-hover:shadow-[0_0_25px_rgba(197,160,89,0.4)] transition-all duration-300">
+                <img
+                  src="/brand/logo.jpg"
+                  alt="MS Velora"
+                  width={64}
+                  height={64}
+                  loading="lazy"
+                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif-luxury text-2xl font-bold tracking-[0.2em] text-[#FAF8F5] group-hover:text-[#DFBD78] transition-colors">
+                  MS VELORA
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.32em] text-[#C5A059] font-medium">
+                  Timeless Elegance
+                </span>
+              </div>
             </Link>
 
             <p className="text-sm text-[#FAF8F5]/70 leading-relaxed max-w-sm">

@@ -71,8 +71,24 @@ export const Navbar: React.FC = () => {
             </button>
 
             {/* Brand Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group shrink-0" aria-label="MS Velora — home">
-              <img src="/brand/logo.jpg" alt="MS Velora" width={56} height={56} className="h-12 w-12 sm:h-14 sm:w-14 transition-transform duration-500 group-hover:scale-105" />
+            <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="MS Velora — home">
+              <div className="relative rounded-full p-0.5 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-md group-hover:shadow-[0_0_18px_rgba(197,160,89,0.45)] group-hover:scale-105 transition-all duration-300">
+                <img
+                  src="/brand/logo.jpg"
+                  alt="MS Velora"
+                  width={52}
+                  height={52}
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover"
+                />
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="font-serif-luxury text-lg sm:text-xl font-bold tracking-[0.18em] text-[#FAF8F5] leading-none group-hover:text-[#DFBD78] transition-colors">
+                  MS VELORA
+                </span>
+                <span className="text-[9px] uppercase tracking-[0.32em] text-[#C5A059] font-medium mt-0.5">
+                  Fine Jewellery
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -169,7 +185,15 @@ export const Navbar: React.FC = () => {
               className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-[#0D0D0D] text-[#FAF8F5] z-50 flex flex-col border-r border-[#C5A059]/30 lg:hidden"
             >
               <div className="p-5 border-b border-white/10 flex items-center justify-between">
-                <img src="/brand/logo.jpg" alt="MS Velora" width={56} height={56} className="h-14 w-14" />
+                <div className="flex items-center gap-3">
+                  <div className="rounded-full p-0.5 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-md">
+                    <img src="/brand/logo.jpg" alt="MS Velora" width={44} height={44} className="h-11 w-11 rounded-full object-cover" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-serif-luxury text-base font-bold tracking-[0.16em] text-[#FAF8F5]">MS VELORA</span>
+                    <span className="text-[8px] uppercase tracking-[0.28em] text-[#C5A059]">Fine Jewellery</span>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
