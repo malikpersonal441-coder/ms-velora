@@ -46,7 +46,7 @@ function seedOrders(cat: DemoCatalog): Order[] {
     const unit = prod.salePrice ?? prod.price;
     return {
       _id: `demo-order-${n}`,
-      orderNumber: status === "pending" || status === "cancelled" ? `REQ-DEMO${n}` : `MS-${String(n).padStart(3, "0")}`,
+      orderNumber: `MS-${String(n).padStart(3, "0")}`,
       isGuest: true,
       items: [{ product: prod._id, name: prod.name, slug: prod.slug, brand: prod.brand, sku: prod.sku, image: prod.mainImage, unitPrice: unit, quantity: 1, subtotal: unit }],
       shippingAddress: { fullName: name, email: 'customer@example.com', phone, streetAddress: 'House 12, Street 4', city, province: 'Punjab', postalCode: '54000', country: 'Pakistan' },
@@ -174,6 +174,45 @@ export function demoOrderResponse(path: string, q: URLSearchParams, options: Req
     o.statusHistory.push({ status: o.fulfillmentStatus, note: data.note || `Status set to ${o.fulfillmentStatus} (demo).`, updatedBy: 'Admin', timestamp: new Date().toISOString() });
     saveOrders(list);
     return { success: true, message: `Order ${o.orderNumber} updated.`, order: o };
+  }
+
+  const del = path.match(/^\/api\/admin\/orders\/([^/]+)$/);
+  if (del && method === 'DELETE') {
+    const list = orders();
+    const idx = list.findIndex((x) => x._id === del[1]);
+    if (idx === -1) return undefined;
+    const removed = list.splice(idx, 1)[0];
+    saveOrders(list);
+    return { success: true, message: `Order ${removed.orderNumber} deleted successfully (demo).`, orderId: removed._id, orderNumber: removed.orderNumber };
+  }
+
+  const force = path.match(/^\/api\/admin\/orders\/([^/]+)\/force-update$/);
+  if (force && (method === 'PATCH' || method === 'PUT')) {
+    const data = body();
+    const list = orders();
+    const o = list.find((x) => x._id === force[1]);
+    if (!o) return undefined;
+
+    if (data.orderNumber) o.orderNumber = data.orderNumber.toUpperCase();
+    if (data.fulfillmentStatus) o.fulfillmentStatus = data.fulfillmentStatus;
+    if (data.paymentStatus) o.paymentStatus = data.paymentStatus;
+    if (data.paymentMethod) o.paymentMethod = data.paymentMethod;
+    if (data.shippingMethod) o.shippingMethod = data.shippingMethod;
+    if (data.courierName !== undefined) o.courierName = data.courierName;
+    if (data.trackingNumber !== undefined) o.trackingNumber = data.trackingNumber;
+    if (data.customer) {
+      Object.assign(o.shippingAddress, data.customer);
+    }
+    if (data.financials) {
+      if (data.financials.subtotal !== undefined) o.subtotal = data.financials.subtotal;
+      if (data.financials.discountAmount !== undefined) o.discountAmount = data.financials.discountAmount;
+      if (data.financials.shippingCost !== undefined) o.shippingCost = data.financials.shippingCost;
+      if (data.financials.totalAmount !== undefined) o.totalAmount = data.financials.totalAmount;
+    }
+    const note = `Force update by admin (demo)${data.adminReason ? `: ${data.adminReason}` : ''}`;
+    o.statusHistory.push({ status: o.fulfillmentStatus, note, updatedBy: 'Admin', timestamp: new Date().toISOString() });
+    saveOrders(list);
+    return { success: true, message: `Order ${o.orderNumber} updated successfully.`, order: o };
   }
 
   const log = path.match(/^\/api\/admin\/orders\/([^/]+)\/whatsapp-log$/);

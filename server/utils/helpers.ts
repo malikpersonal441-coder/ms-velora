@@ -35,6 +35,7 @@ export const isApprovedOrderNumber = (n: string) => /^MS-\d+$/.test(n);
 
 /** Formats an approved sequence number: 1 -> MS-001, 1234 -> MS-1234. */
 export const formatApprovedOrderNumber = (seq: number) => `MS-${String(seq).padStart(3, '0')}`;
+export const formatOrderNumber = formatApprovedOrderNumber;
 
 export async function logAudit(params: {
   user?: IUser;

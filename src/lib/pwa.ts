@@ -76,10 +76,16 @@ export async function subscribePush(topic: PushTopic): Promise<void> {
   if (!pushSupported()) {
     throw new Error(
       isIOS()
-        ? 'On iPhone, first add this site to your Home Screen (Share → Add to Home Screen), then turn on notifications from the app.'
+        ? 'On iPhone/iPad: 1) Open in Safari 2) Tap Share → Add to Home Screen 3) Open the app from Home Screen 4) Then enable notifications.'
         : 'This browser does not support notifications.'
     );
   }
+
+  // iOS requires the app to be in standalone mode (added to home screen)
+  if (isIOS() && !isStandalone()) {
+    throw new Error('Please add this site to your Home Screen first (Share → Add to Home Screen), then open it from there to enable notifications.');
+  }
+
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') throw new Error('Notifications are blocked. Allow them in your browser settings.');
 

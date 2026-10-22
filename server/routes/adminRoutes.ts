@@ -27,7 +27,7 @@ import {
   formatApprovedOrderNumber,
   generateOrderNumber,
 } from '../utils/helpers';
-import { nextSequence } from '../models/Counter';
+import { nextSequence, getNextOrderNumber, formatOrderNumber } from '../models/Counter';
 import { PushSubscription } from '../models/PushSubscription';
 import { sendToTopic, pushEnabled } from '../utils/push';
 import { env } from '../config/env';
@@ -787,17 +787,47 @@ router.put('/orders/:id/status', async (req: Request, res: Response, next: NextF
     const prevFulfillment = order.fulfillmentStatus;
     const prevPayment = order.paymentStatus;
 
-    // Prevent invalid state transitions from terminal states
+    // If reopening a previously cancelled or refunded order, re-allocate the stock
     if (
       (prevFulfillment === 'cancelled' || prevFulfillment === 'refunded') &&
       data.fulfillmentStatus &&
-      data.fulfillmentStatus !== prevFulfillment &&
-      data.fulfillmentStatus !== 'refunded'
+      !['cancelled', 'refunded'].includes(data.fulfillmentStatus) &&
+      order.inventoryRestored
     ) {
-      throw new AppError(
-        `Order ${order.orderNumber} is already ${prevFulfillment} and cannot be reopened.`,
-        400
-      );
+      for (const item of order.items) {
+        const prod = await Product.findById(item.product);
+        if (prod) {
+          const prevStock = prod.stock;
+          prod.stock = Math.max(0, prod.stock - item.quantity);
+          prod.soldCount = (prod.soldCount || 0) + item.quantity;
+
+          if (item.variantSku && prod.variants && prod.variants.length > 0) {
+            const v = prod.variants.find((vr) => vr.sku === item.variantSku);
+            if (v) {
+              v.stock = Math.max(0, v.stock - item.quantity);
+            }
+          }
+          await prod.save();
+
+          await StockMovement.create({
+            product: prod._id,
+            sku: item.sku,
+            variantSku: item.variantSku,
+            type: 'order_placed',
+            quantityChange: -item.quantity,
+            previousStock: prevStock,
+            newStock: prod.stock,
+            reason: `Stock re-allocated: Order ${order.orderNumber} reopened from ${prevFulfillment} to ${data.fulfillmentStatus}`,
+            orderId: order._id,
+            orderNumber: order.orderNumber,
+            performedBy: req.user!._id,
+            performedByName: req.user!.name,
+          });
+        }
+      }
+      order.inventoryRestored = false;
+      order.cancelledAt = undefined;
+      order.refundedAt = undefined;
     }
 
     if (data.courierName !== undefined) order.courierName = data.courierName;
@@ -875,7 +905,7 @@ router.put('/orders/:id/status', async (req: Request, res: Response, next: NextF
     const approving = ['confirmed', 'processing', 'shipped', 'delivered'].includes(targetFulfillment);
     if (approving && !isApprovedOrderNumber(order.orderNumber)) {
       if (!order.requestNumber) order.requestNumber = order.orderNumber;
-      order.orderNumber = formatApprovedOrderNumber(await nextSequence('approvedOrder'));
+      order.orderNumber = await getNextOrderNumber();
       order.approvedAt = new Date();
       approvedNumberNote = ` Approved as ${order.orderNumber} (ref ${order.requestNumber}).`;
     }
@@ -917,6 +947,324 @@ router.put('/orders/:id/status', async (req: Request, res: Response, next: NextF
     next(err);
   }
 });
+
+// DELETE /api/admin/orders/:id — Permanently delete an order and restore inventory if needed
+router.delete('/orders/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      throw new AppError('Order not found.', 404);
+    }
+
+    const restoreStock = req.query.restoreStock !== 'false';
+    let stockRestoredCount = 0;
+
+    // Restore inventory if not already restored
+    if (restoreStock && !order.inventoryRestored) {
+      for (const item of order.items) {
+        const prod = await Product.findById(item.product);
+        if (prod) {
+          const prevStock = prod.stock;
+          prod.stock += item.quantity;
+          prod.soldCount = Math.max(0, (prod.soldCount || 0) - item.quantity);
+
+          if (item.variantSku && prod.variants && prod.variants.length > 0) {
+            const v = prod.variants.find((vr) => vr.sku === item.variantSku);
+            if (v) {
+              v.stock += item.quantity;
+            }
+          }
+          await prod.save();
+
+          await StockMovement.create({
+            product: prod._id,
+            sku: item.sku,
+            variantSku: item.variantSku,
+            type: 'order_cancelled',
+            quantityChange: item.quantity,
+            previousStock: prevStock,
+            newStock: prod.stock,
+            reason: `Stock returned to vault from deleted order ${order.orderNumber}`,
+            orderId: order._id,
+            orderNumber: order.orderNumber,
+            performedBy: req.user!._id,
+            performedByName: req.user!.name,
+          });
+          stockRestoredCount += item.quantity;
+        }
+      }
+    }
+
+    await Order.findByIdAndDelete(order._id);
+
+    await logAudit({
+      user: req.user,
+      action: 'DELETE_ORDER',
+      entityType: 'order',
+      entityId: String(order._id),
+      details: `Order ${order.orderNumber} permanently deleted by ${req.user!.name}. Total: Rs. ${order.totalAmount}. ${stockRestoredCount > 0 ? `Restored ${stockRestoredCount} item(s) to stock.` : 'No stock restoration needed.'}`,
+      ipAddress: req.ip,
+    });
+
+    res.json({
+      success: true,
+      message: `Order ${order.orderNumber} deleted successfully.`,
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      stockRestoredCount,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH / PUT /api/admin/orders/:id/force-update — Admin forceful override of any order field
+const forceUpdateHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const schema = z.object({
+      orderNumber: z.string().trim().min(2).max(40).optional(),
+      fulfillmentStatus: z
+        .enum(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'])
+        .optional(),
+      paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded']).optional(),
+      paymentMethod: z.enum(['cod', 'online_card', 'bank_transfer', 'jazzcash', 'easypaisa', 'online']).optional(),
+      shippingMethod: z.enum(SHIPPING_METHODS as [string, ...string[]]).optional(),
+      customer: z
+        .object({
+          fullName: z.string().trim().min(1).max(80).optional(),
+          phone: z.string().trim().min(3).max(30).optional(),
+          email: z.string().trim().max(100).optional(),
+          streetAddress: z.string().trim().max(250).optional(),
+          city: z.string().trim().max(80).optional(),
+          province: z.string().trim().max(80).optional(),
+          postalCode: z.string().trim().max(20).optional(),
+          notes: z.string().trim().max(500).optional(),
+        })
+        .optional(),
+      financials: z
+        .object({
+          subtotal: z.number().min(0).optional(),
+          discountAmount: z.number().min(0).optional(),
+          shippingCost: z.number().min(0).optional(),
+          totalAmount: z.number().min(0).optional(),
+        })
+        .optional(),
+      courierName: z.string().trim().max(80).optional(),
+      trackingNumber: z.string().trim().max(80).optional(),
+      deliveryPerson: z.string().trim().max(80).optional(),
+      deliveryPhone: z.string().trim().max(30).optional(),
+      adminReason: z.string().trim().max(500).optional(),
+      adjustStock: z.boolean().default(true),
+    });
+
+    const data = schema.parse(req.body);
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      throw new AppError('Order not found.', 404);
+    }
+
+    const changes: string[] = [];
+    const prevFulfillment = order.fulfillmentStatus;
+    const prevPayment = order.paymentStatus;
+
+    // 1. Order Number override
+    if (data.orderNumber && data.orderNumber.toUpperCase() !== order.orderNumber) {
+      const newNum = data.orderNumber.trim().toUpperCase();
+      const existing = await Order.findOne({ orderNumber: newNum, _id: { $ne: order._id } });
+      if (existing) {
+        throw new AppError(`Order number ${newNum} is already assigned to another order.`, 400);
+      }
+      changes.push(`Order ID [${order.orderNumber} -> ${newNum}]`);
+      order.orderNumber = newNum;
+    }
+
+    // 2. Fulfillment status & stock transition
+    if (data.fulfillmentStatus && data.fulfillmentStatus !== prevFulfillment) {
+      const targetFulfillment = data.fulfillmentStatus;
+      changes.push(`Fulfillment [${prevFulfillment} -> ${targetFulfillment}]`);
+
+      if (data.adjustStock) {
+        // From cancelled/refunded -> active
+        if (
+          (prevFulfillment === 'cancelled' || prevFulfillment === 'refunded') &&
+          !['cancelled', 'refunded'].includes(targetFulfillment) &&
+          order.inventoryRestored
+        ) {
+          for (const item of order.items) {
+            const prod = await Product.findById(item.product);
+            if (prod) {
+              const prevStock = prod.stock;
+              prod.stock = Math.max(0, prod.stock - item.quantity);
+              prod.soldCount = (prod.soldCount || 0) + item.quantity;
+              if (item.variantSku && prod.variants && prod.variants.length > 0) {
+                const v = prod.variants.find((vr) => vr.sku === item.variantSku);
+                if (v) v.stock = Math.max(0, v.stock - item.quantity);
+              }
+              await prod.save();
+              await StockMovement.create({
+                product: prod._id,
+                sku: item.sku,
+                variantSku: item.variantSku,
+                type: 'order_placed',
+                quantityChange: -item.quantity,
+                previousStock: prevStock,
+                newStock: prod.stock,
+                reason: `Stock re-allocated via forceful order update (${prevFulfillment} -> ${targetFulfillment})`,
+                orderId: order._id,
+                orderNumber: order.orderNumber,
+                performedBy: req.user!._id,
+                performedByName: req.user!.name,
+              });
+            }
+          }
+          order.inventoryRestored = false;
+        }
+
+        // From active -> cancelled/refunded
+        if (
+          ['cancelled', 'refunded'].includes(targetFulfillment) &&
+          !order.inventoryRestored
+        ) {
+          for (const item of order.items) {
+            const prod = await Product.findById(item.product);
+            if (prod) {
+              const prevStock = prod.stock;
+              prod.stock += item.quantity;
+              prod.soldCount = Math.max(0, (prod.soldCount || 0) - item.quantity);
+              if (item.variantSku && prod.variants && prod.variants.length > 0) {
+                const v = prod.variants.find((vr) => vr.sku === item.variantSku);
+                if (v) v.stock += item.quantity;
+              }
+              await prod.save();
+              await StockMovement.create({
+                product: prod._id,
+                sku: item.sku,
+                variantSku: item.variantSku,
+                type: 'order_cancelled',
+                quantityChange: item.quantity,
+                previousStock: prevStock,
+                newStock: prod.stock,
+                reason: `Stock restored via forceful order update (${prevFulfillment} -> ${targetFulfillment})`,
+                orderId: order._id,
+                orderNumber: order.orderNumber,
+                performedBy: req.user!._id,
+                performedByName: req.user!.name,
+              });
+            }
+          }
+          order.inventoryRestored = true;
+        }
+      }
+
+      order.fulfillmentStatus = targetFulfillment;
+      if (targetFulfillment === 'shipped' && !order.shippedAt) order.shippedAt = new Date();
+      if (targetFulfillment === 'delivered' && !order.deliveredAt) order.deliveredAt = new Date();
+      if (targetFulfillment === 'cancelled' && !order.cancelledAt) order.cancelledAt = new Date();
+      if (targetFulfillment === 'refunded' && !order.refundedAt) order.refundedAt = new Date();
+    }
+
+    // 3. Payment status
+    if (data.paymentStatus && data.paymentStatus !== prevPayment) {
+      changes.push(`Payment [${prevPayment} -> ${data.paymentStatus}]`);
+      order.paymentStatus = data.paymentStatus;
+      if (data.paymentStatus === 'paid' && !order.paidAt) order.paidAt = new Date();
+      if (data.paymentStatus === 'refunded' && !order.refundedAt) order.refundedAt = new Date();
+    }
+
+    // 4. Payment method
+    if (data.paymentMethod && data.paymentMethod !== order.paymentMethod) {
+      changes.push(`Payment Method [${order.paymentMethod} -> ${data.paymentMethod}]`);
+      order.paymentMethod = data.paymentMethod;
+    }
+
+    // 5. Shipping method
+    if (data.shippingMethod && data.shippingMethod !== order.shippingMethod) {
+      changes.push(`Shipping Method [${order.shippingMethod} -> ${data.shippingMethod}]`);
+      order.shippingMethod = data.shippingMethod;
+    }
+
+    // 6. Customer details
+    if (data.customer) {
+      const c = data.customer;
+      if (c.fullName !== undefined && c.fullName !== order.shippingAddress.fullName) {
+        changes.push(`Name [${order.shippingAddress.fullName} -> ${c.fullName}]`);
+        order.shippingAddress.fullName = c.fullName;
+      }
+      if (c.phone !== undefined && c.phone !== order.shippingAddress.phone) {
+        changes.push(`Phone [${order.shippingAddress.phone} -> ${c.phone}]`);
+        order.shippingAddress.phone = c.phone;
+      }
+      if (c.email !== undefined && c.email !== order.shippingAddress.email) {
+        changes.push(`Email [${order.shippingAddress.email || 'none'} -> ${c.email}]`);
+        order.shippingAddress.email = c.email;
+      }
+      if (c.streetAddress !== undefined && c.streetAddress !== order.shippingAddress.streetAddress) {
+        changes.push('Address updated');
+        order.shippingAddress.streetAddress = c.streetAddress;
+      }
+      if (c.city !== undefined && c.city !== order.shippingAddress.city) {
+        changes.push(`City [${order.shippingAddress.city} -> ${c.city}]`);
+        order.shippingAddress.city = c.city;
+      }
+      if (c.province !== undefined) order.shippingAddress.province = c.province;
+      if (c.postalCode !== undefined) order.shippingAddress.postalCode = c.postalCode;
+      if (c.notes !== undefined) order.shippingAddress.notes = c.notes;
+    }
+
+    // 7. Financials
+    if (data.financials) {
+      const f = data.financials;
+      if (f.subtotal !== undefined) order.subtotal = f.subtotal;
+      if (f.discountAmount !== undefined) order.discountAmount = f.discountAmount;
+      if (f.shippingCost !== undefined) order.shippingCost = f.shippingCost;
+      if (f.totalAmount !== undefined && f.totalAmount !== order.totalAmount) {
+        changes.push(`Total [Rs. ${order.totalAmount} -> Rs. ${f.totalAmount}]`);
+        order.totalAmount = f.totalAmount;
+      }
+    }
+
+    // 8. Courier & delivery details
+    if (data.courierName !== undefined) order.courierName = data.courierName;
+    if (data.trackingNumber !== undefined) order.trackingNumber = data.trackingNumber;
+    if (data.deliveryPerson !== undefined) order.deliveryPerson = data.deliveryPerson;
+    if (data.deliveryPhone !== undefined) order.deliveryPhone = data.deliveryPhone;
+
+    // 9. Status history & audit
+    const reasonText = data.adminReason ? ` (Reason: ${data.adminReason})` : '';
+    const summary = changes.length > 0 ? changes.join('; ') : 'Order details modified';
+    const noteText = `Force update by admin ${req.user!.name}: ${summary}${reasonText}`;
+
+    order.statusHistory.push({
+      status: order.fulfillmentStatus,
+      paymentStatus: order.paymentStatus,
+      note: noteText,
+      updatedBy: req.user!.name,
+      timestamp: new Date(),
+    });
+
+    await order.save();
+
+    await logAudit({
+      user: req.user,
+      action: 'FORCE_UPDATE_ORDER',
+      entityType: 'order',
+      entityId: String(order._id),
+      details: `Order ${order.orderNumber}: ${noteText}`,
+      ipAddress: req.ip,
+    });
+
+    res.json({
+      success: true,
+      message: `Order ${order.orderNumber} updated successfully.`,
+      order,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+router.patch('/orders/:id/force-update', forceUpdateHandler);
+router.put('/orders/:id/force-update', forceUpdateHandler);
 
 // ==========================================
 // D1b. MANUAL ORDERS & DELIVERY ADJUSTMENTS
@@ -1063,9 +1411,9 @@ router.post('/orders', async (req: Request, res: Response, next: NextFunction) =
     const totalAmount = discounted + shippingCost;
 
     const now = new Date();
-    const requestNumber = generateOrderNumber();
+    const orderNumber = await getNextOrderNumber();
+    const requestNumber = orderNumber;
     const approved = data.fulfillmentStatus !== 'pending';
-    const orderNumber = approved ? formatApprovedOrderNumber(await nextSequence('approvedOrder')) : requestNumber;
     const delivered = data.fulfillmentStatus === 'delivered';
     const paymentStatus = delivered ? 'paid' : data.paymentStatus;
     const channel = data.manualChannel ? ` via ${data.manualChannel}` : '';
@@ -1411,8 +1759,8 @@ router.post('/push/test', async (req: Request, res: Response, next: NextFunction
     }
 
     const result = await sendToTopic('admin-orders', {
-      title: '🚨 New Order: Fatima Noor (Test Alert)',
-      body: 'Customer: Fatima Noor • Rs. 45,000 • Lahore • Order #TEST-9876',
+      title: '🚨 New Order! Latest: Store Administrator',
+      body: 'Customer: Store Administrator\nTotal: Rs. 350 • Lahore\nOrder #MS-001',
       url: '/admin',
       tag: 'test-admin-push',
       urgent: true,

@@ -40,6 +40,7 @@ import { NewOrderNotifier } from '../components/admin/NewOrderNotifier';
 import { CreateOrderModal } from '../components/admin/CreateOrderModal';
 import { DeliveryAdjustPanel } from '../components/admin/DeliveryAdjustPanel';
 import { DELIVERY_LABEL } from '../components/admin/deliveryOptions';
+import { ForceEditOrderModal } from '../components/admin/ForceEditOrderModal';
 import { AdminLoginPage } from './AdminLoginPage';
 import { WhatsAppComposer } from '../components/admin/WhatsAppComposer';
 import { suggestedTemplate } from '../lib/whatsapp';
@@ -124,7 +125,12 @@ export const AdminDashboardPage: React.FC = () => {
       addToast('Order alerts activated on this device! Testing delivery...', 'success');
       await handleSendTestPush();
     } catch (err: any) {
-      addToast(err?.message || 'Could not turn on notifications.', 'error');
+      // Provide more helpful error messages for mobile
+      if (err?.message?.includes('Home Screen')) {
+        addToast('Mobile Setup Required: Add this site to Home Screen first, then open from there.', 'error');
+      } else {
+        addToast(err?.message || 'Could not turn on notifications.', 'error');
+      }
     } finally {
       setPushBusy(false);
     }
@@ -158,6 +164,10 @@ export const AdminDashboardPage: React.FC = () => {
   const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
   const [orderTracking, setOrderTracking] = useState('');
   const [orderNote, setOrderNote] = useState('');
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [forceEditOrder, setForceEditOrder] = useState<Order | null>(null);
+  const [isDeletingOrder, setIsDeletingOrder] = useState(false);
+  const [restoreStockOnDelete, setRestoreStockOnDelete] = useState(true);
 
   // Customers state
   const [customers, setCustomers] = useState<any[]>([]);

@@ -1,5 +1,5 @@
 /* MS Velora service worker: installable app, fast repeat loads, push notifications. */
-const VERSION = 'msv-v9';
+const VERSION = 'msv-v10';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -92,7 +92,7 @@ self.addEventListener('push', (event) => {
   } catch {
     data = { title: 'MS Velora', body: event.data ? event.data.text() : '' };
   }
-  const title = data.title || 'MS Velora';
+  const title = data.title || '🚨 New Order Received!';
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || '',
@@ -101,10 +101,13 @@ self.addEventListener('push', (event) => {
       image: data.image,
       tag: data.tag || 'msv-order',
       renotify: true,
-      requireInteraction: Boolean(data.urgent),
+      requireInteraction: true,
       silent: false,
-      vibrate: data.urgent ? [500, 200, 500, 200, 500, 200, 1000] : [300, 150, 300],
+      vibrate: data.urgent ? [500, 200, 500, 200, 500, 200, 1000] : [500, 200, 500],
       data: { url: data.url || '/admin' },
+      actions: [
+        { action: 'open_order', title: 'Open Admin' },
+      ],
     })
   );
 });

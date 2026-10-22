@@ -11,6 +11,7 @@ import { StoreSettings } from '../models/StoreSettings';
 import { optionalAuth, requireAuth } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import { evaluateCoupon, generateOrderNumber } from '../utils/helpers';
+import { getNextOrderNumber } from '../models/Counter';
 import { env } from '../config/env';
 
 const router = Router();
@@ -540,7 +541,7 @@ router.post(
           : 0;
       const totalAmount = discountedSubtotal + shippingCost + taxAmount;
 
-      const orderNumber = generateOrderNumber();
+      const orderNumber = await getNextOrderNumber();
 
       const order = await Order.create({
         orderNumber,
@@ -616,10 +617,10 @@ router.post(
         )
       );
 
-      // Alert the admin's devices (phone/desktop) — never blocks or fails the order
+      // Alert the admin's devices (phone/desktop) — delivers in background even when browser/admin is closed
       void sendToTopic('admin-orders', {
-        title: `🚨 New Order: ${data.shippingAddress.fullName}`,
-        body: `Customer: ${data.shippingAddress.fullName} • Rs. ${Math.round(totalAmount).toLocaleString('en-PK')} • ${data.shippingAddress.city} • Order #${order.orderNumber}`,
+        title: `🚨 New Order! Latest: ${data.shippingAddress.fullName}`,
+        body: `Customer: ${data.shippingAddress.fullName}\nTotal: Rs. ${Math.round(totalAmount).toLocaleString('en-PK')} • ${data.shippingAddress.city}\nOrder #${order.orderNumber}`,
         url: '/admin',
         tag: `order-${order._id}`,
         urgent: true,
