@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
-  Star,
-  CheckCircle2,
   Copy,
   Sparkles,
   ShieldCheck,
@@ -25,7 +23,6 @@ export const HomePage: React.FC = () => {
     categories,
     bestSellers,
     newArrivals,
-    verifiedReviews,
     storefrontLoading,
     addToast,
   } = useStore();
@@ -314,80 +311,6 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* I. Verified Customer Reviews */}
-      {visibility.customerReviews && verifiedReviews.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-            <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
-              Verified Collector Testimonials
-            </span>
-            <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#F2EFE9]">
-              Loved by Our Customers
-            </h2>
-            <p className="text-sm text-neutral-500">
-              Genuine reviews submitted by verified MS Velora customers across Pakistan.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {verifiedReviews.slice(0, 4).map((rev) => {
-              const prod =
-                typeof rev.product === 'object' && rev.product !== null
-                  ? (rev.product as Product)
-                  : null;
-              return (
-                <div
-                  key={rev._id}
-                  className="bg-white p-6 rounded-xl border border-black/8 shadow-xs flex flex-col justify-between space-y-4"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-0.5 text-[#C5A059]">
-                        {Array.from({ length: rev.rating }).map((_, idx) => (
-                          <Star key={idx} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      {rev.verifiedPurchase && (
-                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                          <CheckCircle2 className="w-3 h-3" /> Verified Buyer
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 className="font-serif-luxury text-lg font-semibold text-[#F2EFE9]">
-                      "{rev.title}"
-                    </h3>
-
-                    <p className="text-xs text-neutral-600 leading-relaxed line-clamp-4">
-                      {rev.comment}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-neutral-100 space-y-2">
-                    <p className="text-xs font-semibold text-[#F2EFE9]">{rev.userName}</p>
-                    {prod && (
-                      <Link
-                        to={`/product/${prod.slug}`}
-                        className="flex items-center gap-2.5 p-2 rounded bg-[#1C1C1F] hover:bg-[#26262B] transition-colors"
-                      >
-                        <img
-                          src={prod.mainImage}
-                          alt={prod.name}
-                          loading="lazy"
-                          className="w-9 h-9 rounded object-cover shrink-0"
-                        />
-                        <span className="text-[11px] font-medium text-[#F2EFE9] line-clamp-1">
-                          {prod.name}
-                        </span>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </div>
   );
 };
