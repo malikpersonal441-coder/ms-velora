@@ -11,7 +11,7 @@ import { Product } from '../models/Product';
 import { Category } from '../models/Category';
 import { Collection } from '../models/Collection';
 import mongoose from 'mongoose';
-import { Order, OrderFulfillmentStatus, OrderPaymentStatus, SHIPPING_METHODS } from '../models/Order';
+import { Order, OrderFulfillmentStatus, OrderPaymentStatus, ShippingMethod, SHIPPING_METHODS } from '../models/Order';
 import { User } from '../models/User';
 import { StockMovement } from '../models/StockMovement';
 import { Coupon } from '../models/Coupon';
@@ -1028,7 +1028,7 @@ const forceUpdateHandler = async (req: Request, res: Response, next: NextFunctio
         .optional(),
       paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded']).optional(),
       paymentMethod: z.enum(['cod', 'online_card', 'bank_transfer', 'jazzcash', 'easypaisa', 'online']).optional(),
-      shippingMethod: z.enum(SHIPPING_METHODS as [string, ...string[]]).optional(),
+      shippingMethod: z.enum(['standard', 'express', 'hand', 'pickup'] as const).optional(),
       customer: z
         .object({
           fullName: z.string().trim().min(1).max(80).optional(),
@@ -1180,7 +1180,7 @@ const forceUpdateHandler = async (req: Request, res: Response, next: NextFunctio
     // 5. Shipping method
     if (data.shippingMethod && data.shippingMethod !== order.shippingMethod) {
       changes.push(`Shipping Method [${order.shippingMethod} -> ${data.shippingMethod}]`);
-      order.shippingMethod = data.shippingMethod;
+      order.shippingMethod = data.shippingMethod as ShippingMethod;
     }
 
     // 6. Customer details
