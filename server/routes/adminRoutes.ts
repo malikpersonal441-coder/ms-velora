@@ -1401,6 +1401,34 @@ router.get('/whatsapp/overview', async (_req: Request, res: Response, next: Next
 // D3. PUSH NOTIFICATIONS
 // ==========================================
 // GET /api/admin/push/stats — how many devices will receive announcements
+// POST /api/admin/push/test — send a test push notification to all subscribed admin devices
+router.post('/push/test', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!pushEnabled) throw new AppError('Push notifications are not configured on this server.', 503);
+    const adminCount = await PushSubscription.countDocuments({ topics: 'admin-orders' });
+    if (adminCount === 0) {
+      throw new AppError('No admin devices are subscribed yet. Tap "Enable Notifications" on your phone or PC first.', 400);
+    }
+
+    const result = await sendToTopic('admin-orders', {
+      title: '🚨 New Order: Fatima Noor (Test Alert)',
+      body: 'Customer: Fatima Noor • Rs. 45,000 • Lahore • Order #TEST-9876',
+      url: '/admin',
+      tag: 'test-admin-push',
+      urgent: true,
+    });
+
+    res.json({
+      success: true,
+      message: `Test notification successfully delivered to ${result.sent} device(s)! Check your mobile lock screen or desktop notification banner.`,
+      sent: result.sent,
+      subscribedDevices: adminCount,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/push/stats', async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const [newArrivalSubscribers, adminDevices] = await Promise.all([

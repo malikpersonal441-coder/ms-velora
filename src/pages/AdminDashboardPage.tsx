@@ -32,6 +32,8 @@ import {
   Printer,
   LogOut,
 } from 'lucide-react';
+import { Smartphone, BellRing } from 'lucide-react';
+import { subscribePush, isSubscribedLocally, pushSupported } from '../lib/pwa';
 import { WhatsAppCenter } from '../components/admin/WhatsAppCenter';
 import { ChangePasswordPanel } from '../components/admin/ChangePasswordPanel';
 import { NewOrderNotifier } from '../components/admin/NewOrderNotifier';
@@ -97,6 +99,36 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Overview state
   const [overview, setOverview] = useState<any>(null);
+
+  // Device Push Notification State
+  const [isDeviceSubscribed, setIsDeviceSubscribed] = useState(() => isSubscribedLocally('admin-orders'));
+  const [pushBusy, setPushBusy] = useState(false);
+
+  const handleSendTestPush = async () => {
+    setPushBusy(true);
+    try {
+      const res = await apiRequest('/api/admin/push/test', { method: 'POST' });
+      addToast(res.message || 'Test notification delivered! Check your phone/desktop.', 'success');
+    } catch (err: any) {
+      addToast(err?.message || 'Failed to send test push notification.', 'error');
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
+  const handleEnablePush = async () => {
+    setPushBusy(true);
+    try {
+      await subscribePush('admin-orders');
+      setIsDeviceSubscribed(true);
+      addToast('Order alerts activated on this device! Testing delivery...', 'success');
+      await handleSendTestPush();
+    } catch (err: any) {
+      addToast(err?.message || 'Could not turn on notifications.', 'error');
+    } finally {
+      setPushBusy(false);
+    }
+  };
 
   // Products state
   const [adminProducts, setAdminProducts] = useState<Product[]>([]);
@@ -752,6 +784,50 @@ export const AdminDashboardPage: React.FC = () => {
           };
           return (
             <div className="space-y-6">
+              {/* Device Background Push Alert Banner */}
+              {!isDeviceSubscribed && pushSupported() ? (
+                <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-[#DFBD78]/20 via-[#FAF5EA] to-[#DFBD78]/20 border-2 border-[#C5A059] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <span className="w-10 h-10 rounded-full bg-[#C5A059] text-[#0D0D0D] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                      <Smartphone className="w-5 h-5 animate-pulse" />
+                    </span>
+                    <div>
+                      <h4 className="font-serif-luxury text-base sm:text-lg font-bold text-[#0D0D0D]">
+                        Turn On Mobile & Desktop Background Order Alerts
+                      </h4>
+                      <p className="text-xs text-neutral-600 mt-0.5">
+                        Receive sound and customer name notification on this phone or PC whenever an order arrives — even when your phone is locked or admin panel is closed!
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleEnablePush}
+                      disabled={pushBusy}
+                      className="px-4 py-2.5 rounded-xl bg-[#0D0D0D] text-white hover:bg-[#C5A059] hover:text-[#0D0D0D] text-xs font-bold uppercase tracking-wider transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                    >
+                      {pushBusy ? 'Activating...' : '📲 Turn On Alerts On This Device'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs">
+                  <div className="flex items-center gap-2 text-emerald-800 font-medium">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span>🟢 Phone & Desktop Background Alerts Active (Notifications will ring even when admin panel is closed)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSendTestPush}
+                    disabled={pushBusy}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-[11px] transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                  >
+                    {pushBusy ? 'Sending...' : '🚀 Test Phone Notification'}
+                  </button>
+                </div>
+              )}
+
               {/* Welcome banner */}
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF5EA] to-[#F3EBDA] text-[#0D0D0D] p-6 sm:p-8 border border-[#C5A059]/25">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_85%_0%,rgba(197,160,89,0.16),transparent_55%)]" />
