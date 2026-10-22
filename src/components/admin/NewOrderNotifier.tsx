@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, X, Volume2, VolumeX, MessageCircle, Inbox } from 'lucide-react';
+import { Bell, X, Volume2, VolumeX, MessageCircle, Inbox, Sparkles, Smartphone, CheckCircle, ExternalLink } from 'lucide-react';
 import { apiRequest, formatPrice } from '../../lib/api';
 import type { Order } from '../../types';
 import { PushToggleButton } from '../AppActions';
+import { subscribePush, isSubscribedLocally, pushSupported } from '../../lib/pwa';
 
-const POLL_MS = 15000;
+const POLL_MS = 10000; // Check every 10 seconds
 const SOUND_KEY = 'bfs_admin_sound';
 const SEEN_KEY = 'bfs_admin_seen_orders';
-const ALARM_EVERY_MS = 2500;
-const ALARM_MAX_MS = 2 * 60 * 1000; // stop ringing after 2 min even if nobody taps
-const VIBRATE = [400, 150, 400, 150, 800];
+const ALARM_EVERY_MS = 3200;
+const ALARM_MAX_MS = 2 * 60 * 1000; // Stop ringing after 2 min if unacknowledged
+const VIBRATE = [500, 200, 500, 200, 500, 200, 1000];
 
-// One shared AudioContext, unlocked on the admin's first click/tap so the
-// alarm can play later without a fresh user gesture (browser autoplay rules).
+// Shared AudioContext unlocked on user gesture
 let audioCtx: AudioContext | null = null;
 const getCtx = () => {
   try {
@@ -27,9 +27,14 @@ const getCtx = () => {
     return null;
   }
 };
+
 if (typeof window !== 'undefined') {
-  window.addEventListener('pointerdown', getCtx, { once: true });
-  window.addEventListener('keydown', getCtx, { once: true });
+  const unlock = () => {
+    getCtx();
+  };
+  window.addEventListener('pointerdown', unlock, { once: true });
+  window.addEventListener('keydown', unlock, { once: true });
+  window.addEventListener('touchstart', unlock, { once: true });
 }
 
 const tone = (notes: { f: number; t: number; d: number }[], vol: number, type: OscillatorType) => {
@@ -50,32 +55,60 @@ const tone = (notes: { f: number; t: number; d: number }[], vol: number, type: O
   });
 };
 
-/** Soft two-note chime (sound toggle preview). */
+/** Soft two-note chime for test / sound toggle */
 const playChime = () =>
   tone(
     [
-      { f: 1046.5, t: 0, d: 0.7 },
-      { f: 1568, t: 0.14, d: 0.7 },
+      { f: 1046.5, t: 0, d: 0.5 },
+      { f: 1568.0, t: 0.15, d: 0.6 },
     ],
-    0.18,
-    'sine'
-  );
-
-/** Loud, urgent bell ring used for the new-order alarm. */
-const playAlarm = () => {
-  tone(
-    [0, 0.18, 0.36, 0.54].map((t, i) => ({ f: i % 2 ? 1318.5 : 1760, t, d: 0.16 })),
-    0.4,
-    'square'
-  );
-  tone(
-    [
-      { f: 880, t: 0.8, d: 0.5 },
-      { f: 1174.7, t: 0.95, d: 0.6 },
-    ],
-    0.35,
+    0.3,
     'triangle'
   );
+
+/** Urgent luxury shop chime for new orders */
+const playAlarm = () => {
+  // Layer 1: Bright ringing chime
+  tone(
+    [
+      { f: 1046.5, t: 0, d: 0.35 },    // C6
+      { f: 1318.5, t: 0.12, d: 0.38 },  // E6
+      { f: 1568.0, t: 0.24, d: 0.45 },  // G6
+      { f: 2093.0, t: 0.38, d: 0.75 },  // C7
+    ],
+    0.55,
+    'triangle'
+  );
+  // Layer 2: Resonant crystal harmonic
+  tone(
+    [
+      { f: 1318.5, t: 0.45, d: 0.3 },
+      { f: 1760.0, t: 0.65, d: 0.4 },
+      { f: 2093.0, t: 0.85, d: 0.7 },
+    ],
+    0.45,
+    'sine'
+  );
+};
+
+/** Voice announcement: speaks the customer's name and amount out loud */
+const speakOrderAlert = (customerName: string, amount: number) => {
+  try {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const cleanName = customerName.replace(/[^a-zA-Z\s]/g, '').trim() || 'Valued Customer';
+    const text = `New order from ${cleanName}. Amount ${Math.round(amount)} rupees.`;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.98;
+    utterance.pitch = 1.05;
+    utterance.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice = voices.find((v) => v.lang.startsWith('en')) || voices[0];
+    if (enVoice) utterance.voice = enVoice;
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    // Ignore speech errors gracefully
+  }
 };
 
 const timeAgo = (iso: string) => {
@@ -94,6 +127,7 @@ const readSeen = (): Set<string> | null => {
     return null;
   }
 };
+
 const writeSeen = (ids: Set<string>) => {
   try {
     localStorage.setItem(SEEN_KEY, JSON.stringify([...ids].slice(-300)));
@@ -107,10 +141,6 @@ interface Props {
   onNewCount: (count: number) => void;
 }
 
-/**
- * Header bell: polls for new orders and raises a full-screen alert that rings,
- * vibrates and flashes the tab title until acknowledged. Dropdown inbox lists unread orders.
- */
 export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) => {
   const [unread, setUnread] = useState<Order[]>([]);
   const [alert, setAlert] = useState<{ order: Order; count: number } | null>(null);
@@ -122,6 +152,9 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
       return true;
     }
   });
+  const [devicePushActive, setDevicePushActive] = useState(() => isSubscribedLocally('admin-orders'));
+  const [subscribing, setSubscribing] = useState(false);
+
   const seen = useRef<Set<string> | null>(readSeen());
   const soundRef = useRef(soundOn);
   soundRef.current = soundOn;
@@ -139,22 +172,32 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
     if (titleTimer.current !== undefined) document.title = baseTitle.current;
     titleTimer.current = undefined;
     if ('vibrate' in navigator) navigator.vibrate(0);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }, []);
 
   const startAlarm = useCallback(
-    (count: number) => {
+    (order: Order, count: number) => {
       stopAlarm();
       baseTitle.current = document.title;
-      const flash = `🔔 ${count > 1 ? `${count} NEW ORDERS` : 'NEW ORDER'}`;
+      const customerName = order.shippingAddress.fullName || 'Customer';
+      const flash = `🚨 NEW ORDER: ${customerName.toUpperCase()}`;
       let on = false;
       titleTimer.current = window.setInterval(() => {
         on = !on;
         document.title = on ? flash : baseTitle.current;
-      }, 1000);
+      }, 900);
+
       if ('vibrate' in navigator) navigator.vibrate(VIBRATE);
+
       if (!soundRef.current) return;
+
       const started = Date.now();
       playAlarm();
+      // Announce customer's name after chime
+      setTimeout(() => {
+        speakOrderAlert(customerName, order.totalAmount);
+      }, 700);
+
       alarmTimer.current = window.setInterval(() => {
         if (Date.now() - started > ALARM_MAX_MS) {
           window.clearInterval(alarmTimer.current);
@@ -171,12 +214,27 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
     stopAlarm();
   }, [stopAlarm]);
 
+  // Request & Auto-enroll device in admin order notifications
+  const enableDeviceAlerts = async () => {
+    if (!pushSupported()) return;
+    setSubscribing(true);
+    try {
+      await subscribePush('admin-orders');
+      setDevicePushActive(true);
+      playChime();
+    } catch (err: any) {
+      console.warn('[push] enrollment error', err?.message);
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
+  // Check for orders via polling
   const check = useCallback(async () => {
     try {
       const res = await apiRequest('/api/admin/orders?limit=20');
       const orders: Order[] = res.orders || [];
       if (!seen.current) {
-        // First ever visit: treat existing orders as already seen
         seen.current = new Set(orders.map((o) => o._id));
         writeSeen(seen.current);
         return;
@@ -192,20 +250,25 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
         total = (a?.count || 0) + fresh.length;
         return { order: fresh[0], count: total };
       });
-      startAlarm(total);
+      startAlarm(fresh[0], total);
 
-      // System notification as well when the admin isn't looking at this tab; stays until tapped
-      if ('Notification' in window && Notification.permission === 'granted' && (document.hidden || !document.hasFocus())) {
-        const title = fresh.length > 1 ? `🔔 ${fresh.length} new orders` : `🔔 New order ${fresh[0].orderNumber}`;
-        const opts = {
-          body: `${fresh[0].shippingAddress.fullName} • ${formatPrice(fresh[0].totalAmount)}`,
+      // System notification for Desktop & Mobile Notification Center with Customer Name
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const title =
+          fresh.length > 1
+            ? `🚨 ${fresh.length} New Orders! Latest: ${fresh[0].shippingAddress.fullName}`
+            : `🚨 New Order: ${fresh[0].shippingAddress.fullName}`;
+        const opts: NotificationOptions = {
+          body: `Customer: ${fresh[0].shippingAddress.fullName}\nTotal: ${formatPrice(fresh[0].totalAmount)} • ${fresh[0].shippingAddress.city}\nOrder #${fresh[0].orderNumber}`,
           icon: '/brand/icon-192.png',
-          tag: 'bfs-new-order',
+          badge: '/brand/favicon-32.png',
+          tag: `order-${fresh[0]._id}`,
           renotify: true,
           requireInteraction: true,
+          silent: false,
           vibrate: VIBRATE,
           data: { url: '/admin' },
-        } as NotificationOptions;
+        };
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.ready
             .then((reg) => reg.showNotification(title, opts))
@@ -224,9 +287,16 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
     const id = window.setInterval(check, POLL_MS);
     const onVisible = () => !document.hidden && check();
     document.addEventListener('visibilitychange', onVisible);
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().catch(() => undefined);
+
+    // Auto-subscribe if permission was already granted previously
+    if (pushSupported() && 'Notification' in window) {
+      if (Notification.permission === 'granted' && !isSubscribedLocally('admin-orders')) {
+        subscribePush('admin-orders')
+          .then(() => setDevicePushActive(true))
+          .catch(() => undefined);
+      }
     }
+
     return () => {
       window.clearInterval(id);
       document.removeEventListener('visibilitychange', onVisible);
@@ -268,16 +338,76 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
     else window.clearInterval(alarmTimer.current);
   };
 
+  // Test Order Alert Simulation
+  const triggerTestAlert = () => {
+    getCtx();
+    const mockOrder: Order = {
+      _id: 'test-' + Date.now(),
+      orderNumber: 'TEST-' + Math.floor(1000 + Math.random() * 9000),
+      items: [
+        {
+          product: 'test-prod',
+          title: 'Royal Diamond Solitaire Ring',
+          price: 45000,
+          quantity: 1,
+        } as any,
+      ],
+      subtotal: 45000,
+      totalAmount: 45000,
+      discountAmount: 0,
+      shippingCost: 0,
+      taxAmount: 0,
+      paymentMethod: 'cod',
+      paymentStatus: 'pending',
+      fulfillmentStatus: 'unfulfilled',
+      shippingAddress: {
+        fullName: 'Fatima Noor (Test Customer)',
+        phone: '03001234567',
+        addressLine1: 'DHA Phase 5',
+        city: 'Lahore',
+        country: 'Pakistan',
+      },
+      orderSource: 'website',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    } as any;
+
+    setAlert({ order: mockOrder, count: 1 });
+    startAlarm(mockOrder, 1);
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const opts: NotificationOptions = {
+        body: `Customer: Fatima Noor • Rs. 45,000 • Lahore • Order #${mockOrder.orderNumber}`,
+        icon: '/brand/icon-192.png',
+        badge: '/brand/favicon-32.png',
+        tag: 'test-order-alert',
+        renotify: true,
+        requireInteraction: true,
+        silent: false,
+        vibrate: VIBRATE,
+        data: { url: '/admin' },
+      };
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready
+          .then((reg) => reg.showNotification('🚨 Test Order Alert: Fatima Noor', opts))
+          .catch(() => new Notification('🚨 Test Order Alert: Fatima Noor', opts));
+      } else {
+        new Notification('🚨 Test Order Alert: Fatima Noor', opts);
+      }
+    }
+  };
+
   const count = unread.length;
 
   return (
     <div className="relative flex items-center gap-2" ref={panelRef}>
-      {/* Bell with unread count */}
+      {/* Bell icon with live badge */}
       <button
         type="button"
         onClick={() => {
           setOpen((v) => !v);
           dismissAlert();
+          getCtx();
         }}
         className={`relative inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white border transition-colors shadow-sm ${
           open ? 'border-[#C5A059] text-[#9E7B36]' : 'border-black/10 text-neutral-600 hover:border-[#C5A059] hover:text-[#9E7B36]'
@@ -285,22 +415,22 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
         aria-label={count ? `${count} new orders` : 'Notifications'}
         aria-expanded={open}
       >
-        <Bell className={`w-[18px] h-[18px] ${count ? 'animate-[wiggle_1s_ease-in-out_1]' : ''}`} key={count} />
+        <Bell className={`w-[18px] h-[18px] ${count ? 'animate-[wiggle_1s_ease-in-out_infinite] text-[#9E7B36]' : ''}`} />
         {count > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#F3EFE6] badge-pop">
+          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[10px] font-bold flex items-center justify-center ring-2 ring-white badge-pop">
             {count > 9 ? '9+' : count}
           </span>
         )}
       </button>
 
-      {/* Full-screen new-order alert: rings until acknowledged */}
+      {/* Prominent Full-Screen Modal with Customer Name and Immediate Actions */}
       <AnimatePresence>
         {alert && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#0D0D0D]/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#0D0D0D]/75 backdrop-blur-md"
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="new-order-alert-title"
@@ -310,34 +440,71 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-              className="relative w-full max-w-sm rounded-3xl bg-white text-center shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] overflow-hidden"
+              className="relative w-full max-w-md rounded-3xl bg-white text-center shadow-[0_40px_100px_-20px_rgba(0,0,0,0.65)] overflow-hidden border border-[#C5A059]/40"
             >
-              <div className="relative flex items-center justify-center bg-gradient-to-br from-[#C5A059] via-[#DFBD78] to-[#9E7B36] px-6 py-8">
-                <span className="absolute w-24 h-24 rounded-full bg-white/40 animate-ping" aria-hidden />
-                <span className="relative w-20 h-20 rounded-full bg-white text-[#9E7B36] flex items-center justify-center shadow-lg">
-                  <Bell className="w-10 h-10 animate-[wiggle_0.6s_ease-in-out_infinite]" />
+              {/* Header Badge */}
+              <div className="relative flex flex-col items-center justify-center bg-gradient-to-br from-[#C5A059] via-[#DFBD78] to-[#9E7B36] px-6 py-7">
+                <span className="absolute w-28 h-28 rounded-full bg-white/35 animate-ping pointer-events-none" aria-hidden />
+                <span className="relative w-20 h-20 rounded-full bg-white text-[#9E7B36] flex items-center justify-center shadow-xl">
+                  <Bell className="w-10 h-10 animate-[wiggle_0.5s_ease-in-out_infinite]" />
                 </span>
+                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/20 text-white text-[11px] uppercase tracking-[0.22em] font-bold">
+                  <Sparkles className="w-3 h-3 text-[#FFF1CA]" />
+                  <span>{alert.count > 1 ? `${alert.count} NEW ORDERS WAITING` : 'NEW ORDER RECEIVED'}</span>
+                </div>
               </div>
-              <div className="px-6 pt-5 pb-6 space-y-1">
-                <p className="text-[11px] uppercase tracking-[0.24em] font-bold text-[#9E7B36]">
-                  {alert.count > 1 ? `${alert.count} new orders` : 'New order received'}
-                </p>
-                <h2 id="new-order-alert-title" className="font-serif-luxury text-2xl font-semibold text-[#0D0D0D]">
-                  {alert.order.shippingAddress.fullName}
-                </h2>
-                <p className="text-sm text-neutral-500">
-                  {alert.order.orderNumber} • {alert.order.shippingAddress.city}
-                  {alert.order.orderSource === 'whatsapp' && ' • WhatsApp'}
-                </p>
-                <p className="pt-2 text-3xl font-bold text-[#0D0D0D] tabular-nums">{formatPrice(alert.order.totalAmount)}</p>
+
+              {/* Order Info & Customer Name */}
+              <div className="px-6 pt-5 pb-5 space-y-3">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.24em] font-bold text-[#9E7B36] block">
+                    Customer Name
+                  </span>
+                  <h2 id="new-order-alert-title" className="font-serif-luxury text-3xl font-bold text-[#0D0D0D] leading-tight">
+                    {alert.order.shippingAddress.fullName}
+                  </h2>
+                  <p className="text-xs text-neutral-500 font-medium">
+                    Order #{alert.order.orderNumber} • {alert.order.shippingAddress.city}
+                    {alert.order.orderSource === 'whatsapp' && ' • WhatsApp'}
+                  </p>
+                </div>
+
+                {/* Amount Box */}
+                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#C5A059]/30 space-y-1">
+                  <span className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold block">Total Payable</span>
+                  <p className="text-3xl font-bold text-[#0D0D0D] tabular-nums tracking-tight">
+                    {formatPrice(alert.order.totalAmount)}
+                  </p>
+                  <p className="text-[11px] text-neutral-600">
+                    {alert.order.paymentMethod === 'cod' ? '💵 Cash on Delivery' : '💳 Online Payment'} • {alert.order.items?.length || 1} item(s)
+                  </p>
+                </div>
+
+                {/* WhatsApp Quick Link */}
+                {alert.order.shippingAddress.phone && (
+                  <a
+                    href={`https://wa.me/${alert.order.shippingAddress.phone.replace(/[^0-9]/g, '').replace(/^0/, '92')}?text=${encodeURIComponent(
+                      `Hello ${alert.order.shippingAddress.fullName}, thank you for placing order #${alert.order.orderNumber} with MS Velora Fine Jewellery! We are preparing your order.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-semibold hover:bg-emerald-100 transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4 text-emerald-600" />
+                    <span>WhatsApp {alert.order.shippingAddress.fullName}</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                  </a>
+                )}
               </div>
-              <div className="grid grid-cols-2 gap-2 px-6 pb-6">
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-2.5 px-6 pb-6">
                 <button
                   type="button"
                   onClick={dismissAlert}
-                  className="py-3 rounded-xl border border-black/10 text-sm font-semibold text-neutral-600 hover:bg-neutral-100"
+                  className="py-3 rounded-xl border border-black/15 text-xs font-bold uppercase tracking-wider text-neutral-600 hover:bg-neutral-100 transition-colors"
                 >
-                  Dismiss
+                  Silence / Dismiss
                 </button>
                 <button
                   type="button"
@@ -350,9 +517,9 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                       openOrder(alert.order);
                     }
                   }}
-                  className="py-3 rounded-xl bg-[#0D0D0D] text-white text-sm font-semibold hover:bg-[#9E7B36] transition-colors"
+                  className="py-3 rounded-xl bg-[#0D0D0D] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#C5A059] hover:text-[#0D0D0D] transition-colors shadow-md"
                 >
-                  {alert.count > 1 ? 'View all' : 'View order'}
+                  {alert.count > 1 ? 'View All' : 'Open Order'}
                 </button>
               </div>
             </motion.div>
@@ -360,7 +527,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
         )}
       </AnimatePresence>
 
-      {/* Inbox dropdown (scrollable) */}
+      {/* Dropdown Inbox */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -368,22 +535,25 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="absolute right-0 top-12 z-[80] w-[min(380px,calc(100vw-24px))] rounded-2xl bg-white border border-black/10 shadow-[0_24px_60px_-16px_rgba(13,13,13,0.35)] overflow-hidden"
+            className="absolute right-0 top-12 z-[80] w-[min(390px,calc(100vw-24px))] rounded-2xl bg-white border border-black/10 shadow-[0_24px_60px_-16px_rgba(13,13,13,0.35)] overflow-hidden"
             role="dialog"
             aria-label="New orders"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-black/5">
+            {/* Dropdown Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-black/5 bg-[#FAF8F5]">
               <div>
-                <p className="text-sm font-semibold text-[#0D0D0D]">New orders</p>
-                <p className="text-[11px] text-neutral-500">{count ? `${count} waiting` : 'You are all caught up'}</p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">Orders Inbox</p>
+                <p className="text-[11px] text-neutral-500">{count ? `${count} waiting for confirmation` : 'All caught up'}</p>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={toggleSound}
-                  className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-[#0D0D0D]"
+                  className={`p-2 rounded-lg transition-colors ${
+                    soundOn ? 'text-[#9E7B36] hover:bg-[#C5A059]/15' : 'text-neutral-400 hover:bg-neutral-100'
+                  }`}
                   aria-label={soundOn ? 'Mute sound' : 'Turn sound on'}
-                  title={soundOn ? 'Sound on' : 'Sound off'}
+                  title={soundOn ? 'Sound On' : 'Sound Muted'}
                 >
                   {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 </button>
@@ -398,10 +568,45 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               </div>
             </div>
 
+            {/* Quick Test & Status Bar */}
+            <div className="p-3 border-b border-black/5 bg-white flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-800">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Audio & Voice Alerts On</span>
+              </div>
+              <button
+                type="button"
+                onClick={triggerTestAlert}
+                className="px-2.5 py-1 rounded bg-[#0D0D0D] text-white hover:bg-[#C5A059] hover:text-[#0D0D0D] text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                title="Test sound, customer name speech and mobile notification"
+              >
+                🔊 Test Alert
+              </button>
+            </div>
+
+            {/* Device Push Notification Banner if not yet active */}
+            {!devicePushActive && pushSupported() && (
+              <div className="p-3 bg-amber-50 border-b border-amber-200/80 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-[11px] text-amber-900 leading-tight">
+                  <Smartphone className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Receive push sound on this device even when screen is locked?</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={enableDeviceAlerts}
+                  disabled={subscribing}
+                  className="px-3 py-1.5 rounded-lg bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-wider shrink-0 transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {subscribing ? 'Enabling...' : 'Enable'}
+                </button>
+              </div>
+            )}
+
             {count === 0 ? (
               <div className="px-6 py-10 text-center text-neutral-400">
-                <Inbox className="w-8 h-8 mx-auto mb-2" />
-                <p className="text-xs">New orders will appear here with an alarm.</p>
+                <Inbox className="w-8 h-8 mx-auto mb-2 text-neutral-300" />
+                <p className="text-xs font-medium text-neutral-500">No new orders right now.</p>
+                <p className="text-[11px] text-neutral-400 mt-1">When an order arrives, an alarm will ring with customer name.</p>
               </div>
             ) : (
               <ul className="max-h-[min(420px,60vh)] overflow-y-auto overscroll-contain divide-y divide-black/5">
@@ -426,7 +631,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                           {o.orderSource === 'whatsapp' && <MessageCircle className="w-3 h-3 text-[#128C7E] shrink-0" />}
                         </span>
                         <span className="block text-[11px] text-neutral-500 truncate">
-                          {o.orderNumber} • {o.shippingAddress.city} • {timeAgo(o.createdAt)}
+                          #{o.orderNumber} • {o.shippingAddress.city} • {timeAgo(o.createdAt)}
                         </span>
                       </span>
                       <span className="text-[13px] font-semibold text-[#0D0D0D] tabular-nums whitespace-nowrap">
@@ -438,11 +643,12 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               </ul>
             )}
 
+            {/* Bottom Controls */}
             <div className="px-4 py-2.5 border-t border-black/5 flex items-center justify-between gap-3 bg-[#FAF8F5]">
               <PushToggleButton
                 topic="admin-orders"
-                onLabel="Alerts on this device"
-                offLabel="Device alerts on"
+                onLabel="Device Push: Off"
+                offLabel="Device Push: On"
                 className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#9E7B36] hover:text-[#0D0D0D] disabled:opacity-60"
               />
               {count > 0 && (
@@ -451,7 +657,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                   onClick={() => setUnread([])}
                   className="text-[11px] font-semibold text-neutral-500 hover:text-[#0D0D0D]"
                 >
-                  Mark all as seen
+                  Mark all as read
                 </button>
               )}
             </div>

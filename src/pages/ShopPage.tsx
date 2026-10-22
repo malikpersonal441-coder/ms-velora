@@ -13,6 +13,7 @@ import {
 import { apiRequest, formatPrice } from '../lib/api';
 import { Product } from '../types';
 import { ProductCard } from '../components/ProductCard';
+import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
 import { useStore } from '../context/StoreContext';
 
 interface Facets {
@@ -564,17 +565,7 @@ export const ShopPage: React.FC = () => {
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <div
-                    key={n}
-                    className="bg-white rounded-lg border border-black/5 overflow-hidden animate-pulse"
-                  >
-                    <div className="aspect-[4/5] bg-neutral-200" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-3 bg-neutral-200 rounded w-1/3" />
-                      <div className="h-5 bg-neutral-200 rounded w-3/4" />
-                      <div className="h-4 bg-neutral-200 rounded w-1/2" />
-                    </div>
-                  </div>
+                  <ProductCardSkeleton key={n} />
                 ))}
               </div>
             ) : error ? (

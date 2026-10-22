@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
@@ -11,10 +11,13 @@ import {
 import { useStore } from '../context/StoreContext';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { ProductCard } from '../components/ProductCard';
+import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
 import { SectionHeading } from '../components/SectionHeading';
 import { Showcase3D } from '../components/Showcase3D';
 import { Reveal } from '../components/Reveal';
 import { Product } from '../types';
+
+const BestSellersModal = lazy(() => import('../components/BestSellersModal').then(m => ({ default: m.BestSellersModal })));
 
 export const HomePage: React.FC = () => {
   const {
@@ -27,6 +30,7 @@ export const HomePage: React.FC = () => {
     addToast,
   } = useStore();
   const prefersReducedMotion = useReducedMotion();
+  const [isBestSellersModalOpen, setIsBestSellersModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = 'MS Velora — Fine Jewellery for Women';
@@ -107,29 +111,15 @@ export const HomePage: React.FC = () => {
             link={{ to: '/shop?bestSeller=true', label: 'Shop All Best Sellers' }}
           />
 
-          {storefrontLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <div
-                  key={n}
-                  className="bg-white rounded-lg border border-black/5 overflow-hidden animate-pulse"
-                >
-                  <div className="aspect-[4/5] bg-neutral-200" />
-                  <div className="p-4 space-y-3">
-                    <div className="h-3 bg-neutral-200 rounded w-1/3" />
-                    <div className="h-5 bg-neutral-200 rounded w-3/4" />
-                    <div className="h-4 bg-neutral-200 rounded w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
-              {bestSellers.slice(0, 10).map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-          )}
+          <div className="flex justify-center mt-8">
+            <button
+              type="button"
+              onClick={() => setIsBestSellersModalOpen(true)}
+              className="px-8 py-4 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded transition-colors shadow-md"
+            >
+              View Best Sellers
+            </button>
+          </div>
         </section>
       )}
 
@@ -221,11 +211,19 @@ export const HomePage: React.FC = () => {
             link={{ to: '/shop?newArrival=true', label: 'View All New Arrivals' }}
           />
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
-            {newArrivals.slice(0, 10).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          {storefrontLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <ProductCardSkeleton key={n} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+              {newArrivals.slice(0, 10).map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -310,6 +308,15 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* Best Sellers Modal */}
+      <Suspense fallback={null}>
+        <BestSellersModal
+          isOpen={isBestSellersModalOpen}
+          onClose={() => setIsBestSellersModalOpen(false)}
+          products={bestSellers}
+        />
+      </Suspense>
 
     </div>
   );

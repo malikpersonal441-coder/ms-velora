@@ -11,9 +11,13 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           motion: ['framer-motion'],
+          icons: ['lucide-react'],
         },
       },
     },
+    // Enable build optimizations
+    chunkSizeWarningLimit: 1000,
+    cssCodeSplit: true,
   },
   server: {
     port: 5174,

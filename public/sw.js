@@ -1,5 +1,5 @@
 /* MS Velora service worker: installable app, fast repeat loads, push notifications. */
-const VERSION = 'msv-v8';
+const VERSION = 'msv-v9';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -99,11 +99,12 @@ self.addEventListener('push', (event) => {
       icon: data.icon || '/brand/icon-192.png',
       badge: data.badge || '/brand/favicon-32.png',
       image: data.image,
-      tag: data.tag,
-      renotify: Boolean(data.tag),
+      tag: data.tag || 'msv-order',
+      renotify: true,
       requireInteraction: Boolean(data.urgent),
-      vibrate: data.urgent ? [400, 150, 400, 150, 400, 150, 800] : undefined,
-      data: { url: data.url || '/' },
+      silent: false,
+      vibrate: data.urgent ? [500, 200, 500, 200, 500, 200, 1000] : [300, 150, 300],
+      data: { url: data.url || '/admin' },
     })
   );
 });

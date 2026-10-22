@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, memo } from 'react';
 import { sized, srcSet } from '../lib/img';
 import { Link } from 'react-router-dom';
-import { Heart, Eye, ShoppingBag, Star, Check } from 'lucide-react';
+import { ShoppingBag, Star, Check } from 'lucide-react';
 import { Product } from '../types';
 import { formatProductPrice } from '../lib/api';
 import { useStore } from '../context/StoreContext';
@@ -12,17 +12,13 @@ interface ProductCardProps {
   product: Product;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
   const {
     addToCart,
-    toggleWishlist,
-    isInWishlist,
-    setQuickViewProduct,
     settings,
   } = useStore();
 
   const symbol = settings?.currencySymbol || 'Rs.';
-  const wished = isInWishlist(product._id);
   const hasSale =
     product.salePrice !== null &&
     product.salePrice !== undefined &&
@@ -56,8 +52,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const r = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
-    cardRef.current.style.setProperty('--rx', `${(0.5 - y) * 6}deg`);
-    cardRef.current.style.setProperty('--ry', `${(x - 0.5) * 8}deg`);
+    cardRef.current.style.setProperty('--rx', `${(0.5 - y) * 4}deg`);
+    cardRef.current.style.setProperty('--ry', `${(x - 0.5) * 6}deg`);
     cardRef.current.style.setProperty('--mx', `${x * 100}%`);
     cardRef.current.style.setProperty('--my', `${y * 100}%`);
   };
@@ -73,6 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className="lux-card group h-full bg-white border border-[#0D0D0D]/8 rounded-lg overflow-hidden flex flex-col hover:border-[#C5A059]/60"
+      style={{ willChange: 'transform' }}
     >
       {/* Image Container */}
       <div className="relative aspect-square bg-[#F3EFE6] overflow-hidden">
@@ -109,12 +106,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </span>
           ) : (
             <>
-              {product.bestSeller && (
-                <span className="px-2.5 py-1 bg-[#0D0D0D] text-[#C5A059] border border-[#C5A059]/40 text-[10px] font-semibold uppercase tracking-[0.15em] rounded">
-                  Best Seller
-                </span>
-              )}
-              {product.newArrival && !product.bestSeller && (
+              {product.newArrival && (
                 <span className="px-2.5 py-1 bg-[#1A1A1E] text-[#FAF8F5] text-[10px] font-semibold uppercase tracking-[0.15em] rounded">
                   New Arrival
                 </span>
@@ -128,30 +120,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
 
-        {/* Top Right Quick Actions */}
-        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col gap-1.5 z-10">
-          <button
-            type="button"
-            onClick={() => toggleWishlist(product)}
-            aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
-            className={`w-9 h-9 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all shadow-sm ${
-              wished
-                ? 'bg-[#0D0D0D] text-[#C5A059]'
-                : 'bg-white/95 text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#C5A059]'
-            }`}
-          >
-            <Heart key={String(wished)} className={`w-4 h-4 ${wished ? 'fill-current heart-beat' : ''}`} />
-          </button>
 
-          <button
-            type="button"
-            onClick={() => setQuickViewProduct(product)}
-            aria-label={`Quick view ${product.name}`}
-            className="w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white/95 text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#C5A059] flex items-center justify-center transition-all shadow-sm"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-        </div>
 
         {/* Quick Add Overlay Bar */}
         <div
@@ -197,9 +166,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div>
           <div className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.18em] text-[#9E7B36] font-semibold">
             <span className="truncate">{product.brand}</span>
-            <span className="text-neutral-500 font-mono-code text-[10px]">
-              {product.specifications?.movement || 'Jewellery'}
-            </span>
           </div>
 
           <Link
@@ -208,11 +174,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           >
             {product.name}
           </Link>
-
-          <p className="mt-1 text-xs text-neutral-500 line-clamp-1">
-            {product.specifications?.caseMaterial || 'Gold Plated'} •{' '}
-            {product.specifications?.crystal || 'Cubic Zirconia'}
-          </p>
         </div>
 
         <div className="pt-2 border-t border-neutral-100 flex items-end justify-between gap-2">
@@ -266,3 +227,5 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     </Reveal>
   );
 };
+
+export const ProductCard = memo(ProductCardComponent);

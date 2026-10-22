@@ -618,10 +618,10 @@ router.post(
 
       // Alert the admin's devices (phone/desktop) — never blocks or fails the order
       void sendToTopic('admin-orders', {
-        title: `🔔 New order ${order.orderNumber}`,
-        body: `${data.shippingAddress.fullName} • ${data.shippingAddress.city} • Rs. ${Math.round(totalAmount).toLocaleString('en-PK')}`,
+        title: `🚨 New Order: ${data.shippingAddress.fullName}`,
+        body: `Customer: ${data.shippingAddress.fullName} • Rs. ${Math.round(totalAmount).toLocaleString('en-PK')} • ${data.shippingAddress.city} • Order #${order.orderNumber}`,
         url: '/admin',
-        tag: 'bfs-new-order',
+        tag: `order-${order._id}`,
         urgent: true,
       });
 
