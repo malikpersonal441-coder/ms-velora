@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
       <div className="border-b border-black/5 bg-[radial-gradient(ellipse_at_20%_0%,rgba(197,160,89,0.08),transparent_60%)] bg-[#FAF8F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <img src="/brand/icon-192.png" alt="" width={52} height={52} className="w-13 h-13 rounded-xl shrink-0 shadow-xs" />
+            <img src="/brand/icon-192.png" alt="" width={52} height={52} className="w-13 h-13 rounded-full shrink-0 shadow-xs" />
             <div>
               <p className="font-serif-luxury text-2xl text-[#0D0D0D]">Never miss a new arrival</p>
               <p className="text-sm text-neutral-600">Get a notification when new jewellery arrives, and install our app for faster shopping.</p>

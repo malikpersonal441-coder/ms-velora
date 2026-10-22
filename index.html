@@ -46,59 +46,259 @@
     <link rel="preload" as="image" href="/brand/logo.jpg" type="image/jpeg" />
   </head>
   <body class="bg-[#FBFAF7] text-[#1A1A1E] antialiased selection:bg-[#C5A059]/25 selection:text-[#0D0D0D]">
-    <!-- Opening loader: Round luxury gold medallion with rotating shimmer halo and breathing glow -->
+    <!-- Opening loader: Circular luxury gold medallion with rotating shimmer orbital rings and breathing glow -->
     <div id="msv-loader" role="status" aria-live="polite" aria-label="Loading MS Velora">
       <div class="msv-loader-container">
+        <!-- Circular expanding pulse ripple waves -->
+        <div class="msv-pulse-ring msv-pulse-1"></div>
+        <div class="msv-pulse-ring msv-pulse-2"></div>
+
+        <!-- Outer dashed orbital ring with rotating golden jewel accent -->
+        <div class="msv-orbit-ring">
+          <div class="msv-orbit-dot"></div>
+        </div>
+
+        <!-- Inner counter-rotating luxury shimmer halo ring -->
         <div class="msv-halo-ring"></div>
+
+        <!-- Central circular medallion disc -->
         <div class="msv-logo-disc">
           <img class="msv-logo" src="/brand/logo.jpg" alt="MS Velora Fine Jewellery" width="160" height="160" />
+          <div class="msv-shimmer-sweep"></div>
         </div>
       </div>
       <div class="msv-caption">
         <span class="msv-brand-title">MS VELORA</span>
-        <span class="msv-brand-sub">FINE JEWELLERY</span>
-        <span class="msv-line" aria-hidden="true"></span>
+        <div class="msv-divider">
+          <span class="msv-div-line"></span>
+          <span class="msv-div-gem">&#9670;</span>
+          <span class="msv-div-line"></span>
+        </div>
+        <span class="msv-brand-sub">TIMELESS ELEGANCE</span>
       </div>
     </div>
     <style>
-      #msv-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#FFFFFF;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility .7s}
-      .msv-loader-container{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
-      .msv-halo-ring{position:absolute;inset:-6px;border-radius:50%;padding:2px;background:conic-gradient(from 0deg,transparent 0%,#C5A059 25%,#DFBD78 50%,#C5A059 75%,transparent 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:msv-spin 3.2s linear infinite}
-      .msv-logo-disc{width:140px;height:140px;border-radius:50%;overflow:hidden;padding:2px;background:linear-gradient(135deg,#DFBD78,#C5A059 50%,#9E7B36);box-shadow:0 12px 35px rgba(197,160,89,.22),0 4px 15px rgba(0,0,0,.06);position:relative;z-index:2;animation:msv-float 3s ease-in-out infinite alternate}
-      .msv-logo{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
-      .msv-caption{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-      .msv-brand-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.28em;color:#9E7B36;text-transform:uppercase;animation:msv-fade 1.2s ease forwards}
-      .msv-brand-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.32em;color:rgba(13,13,13,.55);text-transform:uppercase}
-      .msv-line{display:block;height:1px;width:140px;margin-top:4px;background:linear-gradient(90deg,transparent,#C5A059 30%,#DFBD78 50%,#C5A059 70%,transparent);transform:scaleX(0);animation:msv-line 1.2s cubic-bezier(.65,0,.35,1) .4s forwards}
-      #msv-loader.msv-done{opacity:0;visibility:hidden;pointer-events:none}
-      @keyframes msv-spin{to{transform:rotate(360deg)}}
-      @keyframes msv-float{0%{transform:scale(.98);box-shadow:0 8px 25px rgba(197,160,89,.2)}100%{transform:scale(1.03);box-shadow:0 16px 40px rgba(197,160,89,.35)}}
-      @keyframes msv-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-      @keyframes msv-line{to{transform:scaleX(1)}}
-      @media (prefers-reduced-motion:reduce){.msv-halo-ring{animation:none}.msv-logo-disc{animation:none}.msv-line{transform:scaleX(1)}}
+      #msv-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        background: #FFFFFF;
+        background-image: radial-gradient(circle at 50% 45%, rgba(223, 189, 120, 0.16) 0%, rgba(255, 255, 255, 0.98) 60%, #FFFFFF 100%);
+        transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.65s;
+      }
+      .msv-loader-container {
+        position: relative;
+        width: 170px;
+        height: 170px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Circular pulse ripple waves */
+      .msv-pulse-ring {
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(197, 160, 89, 0.35);
+        pointer-events: none;
+        animation: msv-pulse-wave 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+      .msv-pulse-2 {
+        animation-delay: 1.4s;
+      }
+      /* Outer dashed orbit with jewel dot */
+      .msv-orbit-ring {
+        position: absolute;
+        inset: -14px;
+        border-radius: 50%;
+        border: 1px dashed rgba(197, 160, 89, 0.4);
+        animation: msv-spin 8s linear infinite;
+        pointer-events: none;
+      }
+      .msv-orbit-dot {
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #FFF1CA, #DFBD78 50%, #9E7B36);
+        box-shadow: 0 0 10px rgba(223, 189, 120, 0.9), 0 0 4px #C5A059;
+      }
+      /* Inner rotating dual-gradient shimmer ring */
+      .msv-halo-ring {
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: #DFBD78;
+        border-right-color: #C5A059;
+        border-bottom-color: rgba(197, 160, 89, 0.2);
+        animation: msv-spin-reverse 3s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+        filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.45));
+        pointer-events: none;
+      }
+      /* Central Circular Medallion Disc */
+      .msv-logo-disc {
+        position: relative;
+        width: 148px;
+        height: 148px;
+        border-radius: 50%;
+        overflow: hidden;
+        clip-path: circle(50% at 50% 50%);
+        padding: 3px;
+        background: linear-gradient(135deg, #DFBD78 0%, #C5A059 45%, #9E7B36 100%);
+        box-shadow: 0 12px 35px rgba(197, 160, 89, 0.28), 0 0 0 2px rgba(197, 160, 89, 0.35);
+        z-index: 2;
+        animation: msv-breathe 3s ease-in-out infinite alternate;
+      }
+      .msv-logo {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        background: #FAF8F5;
+      }
+      .msv-shimmer-sweep {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border-radius: 50%;
+        background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
+        transform: translateX(-150%) rotate(25deg);
+        animation: msv-sheen 3.2s ease-in-out infinite;
+      }
+      .msv-caption {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-align: center;
+      }
+      .msv-brand-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        color: #0D0D0D;
+        text-transform: uppercase;
+        animation: msv-fade 1s ease forwards;
+      }
+      .msv-divider {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 160px;
+        justify-content: center;
+      }
+      .msv-div-line {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #C5A059 60%, #DFBD78);
+      }
+      .msv-divider .msv-div-line:last-child {
+        background: linear-gradient(90deg, #DFBD78, #C5A059 40%, transparent);
+      }
+      .msv-div-gem {
+        font-size: 8px;
+        color: #C5A059;
+        line-height: 1;
+      }
+      .msv-brand-sub {
+        font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 0.32em;
+        color: #9E7B36;
+        text-transform: uppercase;
+      }
+      #msv-loader.msv-done {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      @keyframes msv-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes msv-spin-reverse {
+        to { transform: rotate(-360deg); }
+      }
+      @keyframes msv-breathe {
+        0% {
+          transform: scale(0.97);
+          box-shadow: 0 10px 30px rgba(197, 160, 89, 0.25), 0 0 0 2px rgba(197, 160, 89, 0.3);
+        }
+        100% {
+          transform: scale(1.03);
+          box-shadow: 0 18px 45px rgba(197, 160, 89, 0.4), 0 0 0 4px rgba(223, 189, 120, 0.45);
+        }
+      }
+      @keyframes msv-pulse-wave {
+        0% {
+          transform: scale(0.92);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1.42);
+          opacity: 0;
+        }
+      }
+      @keyframes msv-sheen {
+        0%, 20% {
+          transform: translateX(-160%) rotate(25deg);
+        }
+        60%, 100% {
+          transform: translateX(160%) rotate(25deg);
+        }
+      }
+      @keyframes msv-fade {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .msv-orbit-ring,
+        .msv-halo-ring,
+        .msv-logo-disc,
+        .msv-pulse-ring,
+        .msv-shimmer-sweep {
+          animation: none;
+        }
+      }
     </style>
     <script>
       (function () {
         var loader = document.getElementById('msv-loader');
         if (!loader) return;
-        // Customers only: the admin console and print pages open instantly
-        if (location.pathname.indexOf('/admin') === 0) { loader.remove(); return; }
-        // Intro plays only on a visitor's first ever visit; later loads skip it
-        var seen = false;
-        try { seen = localStorage.getItem('msv_intro_seen') === '1'; localStorage.setItem('msv_intro_seen', '1'); } catch (e) {}
-        if (seen) { loader.remove(); return; }
-        var MIN = 1600, start = Date.now(), done = false;
+        // Customers only: admin console and print slips open instantly
+        if (location.pathname.indexOf('/admin') === 0) {
+          loader.remove();
+          return;
+        }
+        var MIN = 1350; // brief luxury circular animation display
+        var start = Date.now(), done = false;
         var finish = function () {
           if (done) return;
           done = true;
           loader.classList.add('msv-done');
-          setTimeout(function () { loader.remove(); }, 900);
+          setTimeout(function () {
+            try { loader.remove(); } catch (e) {}
+          }, 700);
         };
-        var whenReady = function () { setTimeout(finish, Math.max(0, MIN - (Date.now() - start))); };
+        var whenReady = function () {
+          var elapsed = Date.now() - start;
+          setTimeout(finish, Math.max(0, MIN - elapsed));
+        };
         if (document.readyState === 'complete') whenReady();
         else window.addEventListener('load', whenReady);
-        // Never block the page for long
-        setTimeout(finish, 6000);
+        // Fallback: never hold user for more than 4 seconds
+        setTimeout(finish, 4000);
       })();
     </script>
     <div id="root"></div>

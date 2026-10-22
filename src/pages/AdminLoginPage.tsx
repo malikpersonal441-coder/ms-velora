@@ -62,7 +62,7 @@ export const AdminLoginPage: React.FC = () => {
               alt="MS Velora"
               width={96}
               height={96}
-              className="h-full w-full rounded-full object-cover bg-black"
+              className="h-full w-full rounded-full object-cover bg-[#FAF8F5]"
             />
           </div>
           <h1 className="font-serif-luxury text-3xl text-[#FAF8F5] font-semibold">Staff Console</h1>

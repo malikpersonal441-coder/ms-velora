@@ -575,7 +575,7 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="h-[72px] px-5 flex items-center justify-between border-b border-white/5">
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative shrink-0 p-0.5 rounded-full bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-sm">
-              <img src="/brand/logo.jpg" alt="MS Velora" width={40} height={40} className="h-9 w-9 rounded-full object-cover bg-black" />
+              <img src="/brand/logo.jpg" alt="MS Velora" width={40} height={40} className="h-9 w-9 rounded-full object-cover bg-[#FAF8F5]" />
             </div>
             <div className="min-w-0 leading-tight">
               <p className="font-serif-luxury text-lg font-semibold truncate">MS Velora</p>
