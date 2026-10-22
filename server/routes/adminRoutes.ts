@@ -10,7 +10,8 @@ import { AppError } from '../middleware/errorHandler';
 import { Product } from '../models/Product';
 import { Category } from '../models/Category';
 import { Collection } from '../models/Collection';
-import { Order, OrderFulfillmentStatus, OrderPaymentStatus } from '../models/Order';
+import mongoose from 'mongoose';
+import { Order, OrderFulfillmentStatus, OrderPaymentStatus, SHIPPING_METHODS } from '../models/Order';
 import { User } from '../models/User';
 import { StockMovement } from '../models/StockMovement';
 import { Coupon } from '../models/Coupon';
@@ -18,7 +19,14 @@ import { HomepageContent } from '../models/HomepageContent';
 import { StoreSettings } from '../models/StoreSettings';
 import { AuditLog } from '../models/AuditLog';
 import { Review } from '../models/Review';
-import { slugify, generateSku, logAudit, isApprovedOrderNumber, formatApprovedOrderNumber } from '../utils/helpers';
+import {
+  slugify,
+  generateSku,
+  logAudit,
+  isApprovedOrderNumber,
+  formatApprovedOrderNumber,
+  generateOrderNumber,
+} from '../utils/helpers';
 import { nextSequence } from '../models/Counter';
 import { PushSubscription } from '../models/PushSubscription';
 import { sendToTopic, pushEnabled } from '../utils/push';
@@ -704,7 +712,7 @@ router.get('/orders', async (req: Request, res: Response, next: NextFunction) =>
     if (paymentStatus && paymentStatus !== 'all') {
       filter.paymentStatus = paymentStatus;
     }
-    if (orderSource === 'website' || orderSource === 'whatsapp') {
+    if (orderSource === 'website' || orderSource === 'whatsapp' || orderSource === 'manual') {
       filter.orderSource = orderSource;
     }
     if (q && q.trim()) {
@@ -905,6 +913,340 @@ router.put('/orders/:id/status', async (req: Request, res: Response, next: NextF
       message: `Order ${order.orderNumber} updated.`,
       order,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ==========================================
+// D1b. MANUAL ORDERS & DELIVERY ADJUSTMENTS
+// ==========================================
+const SHIPPING_LABEL: Record<string, string> = {
+  standard: 'Courier (standard)',
+  express: 'Courier (express)',
+  hand: 'Hand delivery',
+  pickup: 'Store pickup',
+};
+
+/** Default delivery charge for a method, using the store's delivery settings. */
+const defaultShippingFor = (
+  method: string,
+  discountedSubtotal: number,
+  settings: { standardShippingFee: number; expressShippingFee: number; freeShippingThreshold: number; handDeliveryFee?: number }
+) => {
+  if (method === 'pickup') return 0;
+  if (method === 'hand') return settings.handDeliveryFee || 0;
+  if (method === 'express') return settings.expressShippingFee;
+  return discountedSubtotal >= settings.freeShippingThreshold ? 0 : settings.standardShippingFee;
+};
+
+// POST /api/admin/orders — create an order by hand (phone, Instagram, walk-in, …)
+router.post('/orders', async (req: Request, res: Response, next: NextFunction) => {
+  type Deducted = { productId: mongoose.Types.ObjectId; variantSku?: string; quantity: number };
+  const deducted: Deducted[] = [];
+  try {
+    const schema = z.object({
+      customer: z.object({
+        fullName: z.string().trim().min(2).max(80),
+        phone: z.string().trim().min(5).max(30),
+        email: z.union([z.string().trim().email(), z.literal('')]).default(''),
+        streetAddress: z.string().trim().max(200).default(''),
+        city: z.string().trim().max(60).default(''),
+        province: z.string().trim().max(60).default(''),
+        postalCode: z.string().trim().max(20).default(''),
+        notes: z.string().trim().max(500).default(''),
+      }),
+      items: z
+        .array(
+          z.object({
+            productId: z.string().regex(/^[a-f\d]{24}$/i),
+            variantSku: z.string().optional(),
+            quantity: z.number().int().min(1).max(999),
+            unitPrice: z.number().min(0).optional(),
+          })
+        )
+        .min(1, 'Add at least one product.'),
+      shippingMethod: z.enum(SHIPPING_METHODS as [string, ...string[]]).default('standard'),
+      shippingCost: z.number().min(0).optional(),
+      discountAmount: z.number().min(0).default(0),
+      paymentMethod: z.enum(['cod', 'bank_transfer', 'jazzcash', 'easypaisa', 'online']).default('cod'),
+      paymentStatus: z.enum(['pending', 'paid']).default('pending'),
+      fulfillmentStatus: z.enum(['pending', 'confirmed', 'processing', 'shipped', 'delivered']).default('confirmed'),
+      courierName: z.string().trim().max(60).default(''),
+      trackingNumber: z.string().trim().max(60).default(''),
+      deliveryPerson: z.string().trim().max(80).default(''),
+      deliveryPhone: z.string().trim().max(30).default(''),
+      manualChannel: z.string().trim().max(40).default(''),
+      note: z.string().trim().max(500).default(''),
+      deductStock: z.boolean().default(true),
+    });
+    const data = schema.parse(req.body);
+
+    const settings =
+      (await StoreSettings.findOne({ key: 'default' })) || new StoreSettings({ key: 'default' });
+
+    const lines: {
+      product: mongoose.Types.ObjectId;
+      name: string;
+      slug: string;
+      brand: string;
+      sku: string;
+      variantSku?: string;
+      variantName?: string;
+      image: string;
+      unitPrice: number;
+      quantity: number;
+      subtotal: number;
+      previousStock: number;
+      newStock: number;
+    }[] = [];
+
+    for (const item of data.items) {
+      const prod = await Product.findById(item.productId);
+      if (!prod || prod.status === 'archived') throw new AppError('One of the selected products no longer exists.', 400);
+
+      const variant = item.variantSku ? prod.variants.find((v) => v.sku === item.variantSku) : undefined;
+      if (item.variantSku && !variant) throw new AppError(`Option ${item.variantSku} of ${prod.name} not found.`, 400);
+
+      let previousStock = variant ? variant.stock : prod.stock;
+      let newStock = previousStock;
+      if (data.deductStock) {
+        const filter: Record<string, unknown> = { _id: prod._id, stock: { $gte: item.quantity } };
+        const inc: Record<string, number> = { stock: -item.quantity, soldCount: item.quantity };
+        if (variant) {
+          filter.variants = { $elemMatch: { sku: variant.sku, stock: { $gte: item.quantity } } };
+          inc['variants.$.stock'] = -item.quantity;
+        }
+        const updated = await Product.findOneAndUpdate(filter, { $inc: inc }, { new: true });
+        if (!updated) {
+          throw new AppError(
+            `Not enough stock for ${prod.name}${variant ? ` (${variant.name})` : ''}. Available: ${previousStock}. Untick "Deduct stock" to create it anyway.`,
+            409
+          );
+        }
+        deducted.push({ productId: prod._id as mongoose.Types.ObjectId, variantSku: variant?.sku, quantity: item.quantity });
+        const afterVar = variant ? updated.variants.find((v) => v.sku === variant.sku) : undefined;
+        newStock = afterVar ? afterVar.stock : updated.stock;
+      }
+
+      let regular = prod.price;
+      let sale = prod.salePrice;
+      if (variant) {
+        if (variant.price !== undefined && variant.price > 0) regular = variant.price;
+        if (variant.salePrice !== undefined) sale = variant.salePrice;
+      }
+      const listPrice = sale && sale > 0 && sale < regular ? sale : regular;
+      const unitPrice = item.unitPrice !== undefined ? item.unitPrice : listPrice;
+
+      lines.push({
+        product: prod._id as mongoose.Types.ObjectId,
+        name: prod.name,
+        slug: prod.slug,
+        brand: prod.brand,
+        sku: variant ? variant.sku : prod.sku,
+        variantSku: variant?.sku,
+        variantName: variant?.name,
+        image: (variant as any)?.image || prod.mainImage,
+        unitPrice,
+        quantity: item.quantity,
+        subtotal: unitPrice * item.quantity,
+        previousStock,
+        newStock,
+      });
+    }
+
+    const subtotal = lines.reduce((s, l) => s + l.subtotal, 0);
+    const discountAmount = Math.min(subtotal, data.discountAmount);
+    const discounted = subtotal - discountAmount;
+    const shippingCost =
+      data.shippingCost !== undefined ? data.shippingCost : defaultShippingFor(data.shippingMethod, discounted, settings);
+    const totalAmount = discounted + shippingCost;
+
+    const now = new Date();
+    const requestNumber = generateOrderNumber();
+    const approved = data.fulfillmentStatus !== 'pending';
+    const orderNumber = approved ? formatApprovedOrderNumber(await nextSequence('approvedOrder')) : requestNumber;
+    const delivered = data.fulfillmentStatus === 'delivered';
+    const paymentStatus = delivered ? 'paid' : data.paymentStatus;
+    const channel = data.manualChannel ? ` via ${data.manualChannel}` : '';
+
+    const order = await Order.create({
+      orderNumber,
+      requestNumber,
+      approvedAt: approved ? now : undefined,
+      user: null,
+      isGuest: true,
+      items: lines.map(({ previousStock: _p, newStock: _n, ...l }) => l),
+      shippingAddress: { ...data.customer, country: 'Pakistan' },
+      shippingMethod: data.shippingMethod,
+      subtotal,
+      discountAmount,
+      shippingCost,
+      taxAmount: 0,
+      totalAmount,
+      currency: settings.currency,
+      paymentMethod: data.paymentMethod,
+      paymentStatus,
+      paidAt: paymentStatus === 'paid' ? now : undefined,
+      fulfillmentStatus: data.fulfillmentStatus,
+      shippedAt: ['shipped', 'delivered'].includes(data.fulfillmentStatus) ? now : undefined,
+      deliveredAt: delivered ? now : undefined,
+      courierName: data.courierName,
+      trackingNumber: data.trackingNumber,
+      deliveryPerson: data.deliveryPerson,
+      deliveryPhone: data.deliveryPhone,
+      manualChannel: data.manualChannel,
+      inventoryRestored: false,
+      orderSource: 'manual',
+      statusHistory: [
+        {
+          status: data.fulfillmentStatus,
+          paymentStatus,
+          note:
+            `Manual order created by ${req.user!.name}${channel} — ${SHIPPING_LABEL[data.shippingMethod]}.` +
+            (data.deductStock ? '' : ' Stock not deducted.') +
+            (data.note ? ` ${data.note}` : ''),
+          updatedBy: req.user!.name,
+          timestamp: now,
+        },
+      ],
+    });
+
+    if (data.deductStock) {
+      await Promise.all(
+        lines.map((l) =>
+          StockMovement.create({
+            product: l.product,
+            sku: l.sku,
+            variantSku: l.variantSku,
+            type: 'order_placed',
+            quantityChange: -l.quantity,
+            previousStock: l.previousStock,
+            newStock: l.newStock,
+            reason: `Manual order ${order.orderNumber} for ${data.customer.fullName}`,
+            orderId: order._id,
+            orderNumber: order.orderNumber,
+            performedBy: req.user!._id,
+            performedByName: req.user!.name,
+          })
+        )
+      );
+    }
+
+    await logAudit({
+      user: req.user,
+      action: 'CREATE_MANUAL_ORDER',
+      entityType: 'order',
+      entityId: String(order._id),
+      details: `Manual order ${order.orderNumber} for ${data.customer.fullName} (Rs. ${totalAmount})`,
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({ success: true, message: `Order ${order.orderNumber} created.`, order });
+  } catch (err) {
+    // Give back any stock taken before the failure
+    for (const d of deducted) {
+      try {
+        if (d.variantSku) {
+          await Product.updateOne(
+            { _id: d.productId, 'variants.sku': d.variantSku },
+            { $inc: { stock: d.quantity, soldCount: -d.quantity, 'variants.$.stock': d.quantity } }
+          );
+        } else {
+          await Product.updateOne({ _id: d.productId }, { $inc: { stock: d.quantity, soldCount: -d.quantity } });
+        }
+      } catch {
+        // best effort
+      }
+    }
+    next(err);
+  }
+});
+
+// PUT /api/admin/orders/:id/delivery — change delivery method, charges, rider, address; totals recalculated
+router.put('/orders/:id/delivery', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const schema = z.object({
+      shippingMethod: z.enum(SHIPPING_METHODS as [string, ...string[]]).optional(),
+      shippingCost: z.number().min(0).optional(),
+      discountAmount: z.number().min(0).optional(),
+      courierName: z.string().trim().max(60).optional(),
+      trackingNumber: z.string().trim().max(60).optional(),
+      deliveryPerson: z.string().trim().max(80).optional(),
+      deliveryPhone: z.string().trim().max(30).optional(),
+      address: z
+        .object({
+          fullName: z.string().trim().min(2).max(80).optional(),
+          phone: z.string().trim().min(5).max(30).optional(),
+          streetAddress: z.string().trim().max(200).optional(),
+          city: z.string().trim().max(60).optional(),
+          notes: z.string().trim().max(500).optional(),
+        })
+        .optional(),
+    });
+    const data = schema.parse(req.body);
+    const order = await Order.findById(req.params.id);
+    if (!order) throw new AppError('Order not found.', 404);
+
+    const changes: string[] = [];
+    if (data.shippingMethod && data.shippingMethod !== order.shippingMethod) {
+      changes.push(`delivery ${SHIPPING_LABEL[order.shippingMethod] || order.shippingMethod} → ${SHIPPING_LABEL[data.shippingMethod]}`);
+      order.shippingMethod = data.shippingMethod as typeof order.shippingMethod;
+    }
+    if (data.shippingCost !== undefined && data.shippingCost !== order.shippingCost) {
+      changes.push(`delivery charge Rs. ${order.shippingCost} → Rs. ${data.shippingCost}`);
+      order.shippingCost = data.shippingCost;
+    }
+    if (data.discountAmount !== undefined && data.discountAmount !== order.discountAmount) {
+      const d = Math.min(order.subtotal, data.discountAmount);
+      changes.push(`discount Rs. ${order.discountAmount} → Rs. ${d}`);
+      order.discountAmount = d;
+    }
+    (['courierName', 'trackingNumber', 'deliveryPerson', 'deliveryPhone'] as const).forEach((k) => {
+      const v = data[k];
+      if (v !== undefined && v !== (order[k] || '')) {
+        changes.push(`${k === 'deliveryPerson' ? 'rider' : k === 'deliveryPhone' ? 'rider phone' : k === 'courierName' ? 'courier' : 'tracking'}: ${v || '—'}`);
+        order[k] = v;
+      }
+    });
+    if (data.address) {
+      (Object.keys(data.address) as (keyof typeof data.address)[]).forEach((k) => {
+        const v = data.address![k];
+        if (v !== undefined && v !== order.shippingAddress[k]) {
+          (order.shippingAddress as any)[k] = v;
+          changes.push(`${k} updated`);
+        }
+      });
+    }
+    if (changes.length === 0) {
+      res.json({ success: true, message: 'Nothing changed.', order });
+      return;
+    }
+
+    const prevTotal = order.totalAmount;
+    order.totalAmount = Math.max(0, order.subtotal - order.discountAmount) + order.shippingCost + (order.taxAmount || 0);
+    if (order.totalAmount !== prevTotal) changes.push(`total Rs. ${prevTotal} → Rs. ${order.totalAmount}`);
+
+    const note = `Delivery adjusted: ${changes.join('; ')}.`;
+    order.statusHistory.push({
+      status: order.fulfillmentStatus,
+      paymentStatus: order.paymentStatus,
+      note,
+      updatedBy: req.user!.name,
+      timestamp: new Date(),
+    });
+    await order.save();
+
+    await logAudit({
+      user: req.user,
+      action: 'ADJUST_ORDER_DELIVERY',
+      entityType: 'order',
+      entityId: String(order._id),
+      details: `Order ${order.orderNumber}: ${note}`,
+      ipAddress: req.ip,
+    });
+
+    res.json({ success: true, message: `Order ${order.orderNumber} updated.`, order });
   } catch (err) {
     next(err);
   }

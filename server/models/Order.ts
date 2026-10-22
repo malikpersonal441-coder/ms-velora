@@ -45,7 +45,11 @@ export type OrderFulfillmentStatus =
 
 export type OrderPaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
-export type OrderSource = 'website' | 'whatsapp';
+export type OrderSource = 'website' | 'whatsapp' | 'manual';
+
+/** standard/express = courier; hand = own rider / by-hand delivery; pickup = customer collects. */
+export type ShippingMethod = 'standard' | 'express' | 'hand' | 'pickup';
+export const SHIPPING_METHODS: ShippingMethod[] = ['standard', 'express', 'hand', 'pickup'];
 
 export interface IWhatsAppLogEntry {
   template: string;
@@ -65,7 +69,7 @@ export interface IOrder extends Document {
   isGuest: boolean;
   items: IOrderItem[];
   shippingAddress: IShippingAddress;
-  shippingMethod: 'standard' | 'express';
+  shippingMethod: ShippingMethod;
   subtotal: number;
   discountAmount: number;
   couponCode?: string;
@@ -79,6 +83,11 @@ export interface IOrder extends Document {
   paidAt?: Date;
   fulfillmentStatus: OrderFulfillmentStatus;
   courierName?: string;
+  /** Rider / person handing over the parcel (hand delivery). */
+  deliveryPerson?: string;
+  deliveryPhone?: string;
+  /** Where a manual order came from: Instagram, phone call, walk-in… */
+  manualChannel?: string;
   trackingNumber?: string;
   shippedAt?: Date;
   deliveredAt?: Date;
@@ -112,12 +121,12 @@ const OrderItemSchema = new Schema<IOrderItem>(
 const ShippingAddressSchema = new Schema<IShippingAddress>(
   {
     fullName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, lowercase: true, trim: true },
+    email: { type: String, default: '', lowercase: true, trim: true },
     phone: { type: String, required: true, trim: true },
     streetAddress: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true },
-    province: { type: String, required: true, trim: true },
-    postalCode: { type: String, required: true, trim: true },
+    province: { type: String, default: '', trim: true },
+    postalCode: { type: String, default: '', trim: true },
     country: { type: String, default: 'Pakistan' },
     notes: { type: String, default: '' },
   },
@@ -156,7 +165,7 @@ const OrderSchema = new Schema<IOrder>(
     isGuest: { type: Boolean, default: false },
     items: { type: [OrderItemSchema], required: true },
     shippingAddress: { type: ShippingAddressSchema, required: true },
-    shippingMethod: { type: String, enum: ['standard', 'express'], default: 'standard' },
+    shippingMethod: { type: String, enum: SHIPPING_METHODS, default: 'standard' },
     subtotal: { type: Number, required: true, min: 0 },
     discountAmount: { type: Number, default: 0, min: 0 },
     couponCode: { type: String, uppercase: true, trim: true },
@@ -185,6 +194,9 @@ const OrderSchema = new Schema<IOrder>(
       index: true,
     },
     courierName: { type: String, default: '' },
+    deliveryPerson: { type: String, default: '', trim: true, maxlength: 80 },
+    deliveryPhone: { type: String, default: '', trim: true, maxlength: 30 },
+    manualChannel: { type: String, default: '', trim: true, maxlength: 40 },
     trackingNumber: { type: String, default: '' },
     shippedAt: { type: Date },
     deliveredAt: { type: Date },
@@ -192,7 +204,7 @@ const OrderSchema = new Schema<IOrder>(
     refundedAt: { type: Date },
     inventoryRestored: { type: Boolean, default: false },
     statusHistory: { type: [OrderStatusHistorySchema], default: [] },
-    orderSource: { type: String, enum: ['website', 'whatsapp'], default: 'website', index: true },
+    orderSource: { type: String, enum: ['website', 'whatsapp', 'manual'], default: 'website', index: true },
     whatsappLog: { type: [WhatsAppLogSchema], default: [] },
   },
   { timestamps: true }

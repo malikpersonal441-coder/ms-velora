@@ -1,9 +1,9 @@
 /* MS Velora service worker: installable app, fast repeat loads, push notifications. */
-const VERSION = 'msv-v7';
+const VERSION = 'msv-v8';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const IMAGE_CACHE = `${VERSION}-images`;
-const PRECACHE = ['/', '/site.webmanifest', '/brand/logo.jpg', '/brand/icon-192.png'];
+const PRECACHE = ['/', '/site.webmanifest', '/admin.webmanifest', '/brand/logo.jpg', '/brand/icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(STATIC_CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
@@ -101,6 +101,8 @@ self.addEventListener('push', (event) => {
       image: data.image,
       tag: data.tag,
       renotify: Boolean(data.tag),
+      requireInteraction: Boolean(data.urgent),
+      vibrate: data.urgent ? [400, 150, 400, 150, 400, 150, 800] : undefined,
       data: { url: data.url || '/' },
     })
   );

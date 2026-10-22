@@ -35,6 +35,9 @@ import {
 import { WhatsAppCenter } from '../components/admin/WhatsAppCenter';
 import { ChangePasswordPanel } from '../components/admin/ChangePasswordPanel';
 import { NewOrderNotifier } from '../components/admin/NewOrderNotifier';
+import { CreateOrderModal } from '../components/admin/CreateOrderModal';
+import { DeliveryAdjustPanel } from '../components/admin/DeliveryAdjustPanel';
+import { DELIVERY_LABEL } from '../components/admin/deliveryOptions';
 import { AdminLoginPage } from './AdminLoginPage';
 import { WhatsAppComposer } from '../components/admin/WhatsAppComposer';
 import { suggestedTemplate } from '../lib/whatsapp';
@@ -120,6 +123,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [orderNextFulfillment, setOrderNextFulfillment] = useState('');
   const [orderNextPayment, setOrderNextPayment] = useState('');
   const [orderCourier, setOrderCourier] = useState('');
+  const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
   const [orderTracking, setOrderTracking] = useState('');
   const [orderNote, setOrderNote] = useState('');
 
@@ -236,7 +240,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#F2EFE9] text-[#1C1C1F] flex items-center justify-center text-xs uppercase tracking-widest">
+      <div className="min-h-screen bg-[#0D0D0D] text-[#FAF8F5] flex items-center justify-center text-xs uppercase tracking-widest">
         Verifying Administrator Credentials...
       </div>
     );
@@ -419,8 +423,6 @@ export const AdminDashboardPage: React.FC = () => {
         body: JSON.stringify({
           fulfillmentStatus: orderNextFulfillment,
           paymentStatus: orderNextPayment,
-          courierName: orderCourier || 'Leopards',
-          trackingNumber: orderTracking,
           note: orderNote || undefined,
         }),
       });
@@ -553,7 +555,7 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="admin-ui min-h-screen bg-[#26262B] text-[#F2EFE9] lg:flex">
+    <div className="admin-ui min-h-screen bg-[#F3EFE6] text-[#0D0D0D] lg:flex">
       {/* Mobile drawer backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
@@ -565,7 +567,7 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* Sidebar: off-canvas drawer on mobile, sticky rail on desktop */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-[272px] shrink-0 bg-[#E8E4DC] text-[#1C1C1F] flex flex-col border-r border-white/5 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-[272px] shrink-0 bg-[#1A1A1E] text-[#FAF8F5] flex flex-col border-r border-white/5 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
         aria-label="Admin navigation"
@@ -621,7 +623,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <Icon className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-[#C5A059]' : 'text-white/45 group-hover:text-white/80'}`} />
                       <span className="truncate">{item.label}</span>
                       {id === 'orders' && newOrderCount > 0 && (
-                        <span className="ml-auto min-w-5 h-5 px-1.5 rounded-full bg-[#C5A059] text-[#F2EFE9] text-[10px] font-bold flex items-center justify-center badge-pop">
+                        <span className="ml-auto min-w-5 h-5 px-1.5 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[10px] font-bold flex items-center justify-center badge-pop">
                           {newOrderCount}
                         </span>
                       )}
@@ -672,7 +674,7 @@ export const AdminDashboardPage: React.FC = () => {
 
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Sticky glass top bar */}
-        <header className="sticky top-0 z-30 h-[72px] bg-[#26262B]/85 backdrop-blur-xl border-b border-black/[0.06]">
+        <header className="sticky top-0 z-30 h-[72px] bg-[#F3EFE6]/85 backdrop-blur-xl border-b border-black/[0.06]">
           <div className="h-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
             <button
               type="button"
@@ -707,14 +709,14 @@ export const AdminDashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={loadTabContent}
-              className="inline-flex items-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-white border border-black/10 hover:border-[#C5A059] hover:text-[#D4B06A] text-xs font-semibold transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-white border border-black/10 hover:border-[#C5A059] hover:text-[#9E7B36] text-xs font-semibold transition-colors shadow-sm"
               aria-label="Refresh data"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
             <span
-              className="hidden sm:flex w-10 h-10 rounded-full bg-[#F2EFE9] text-[#DFBD78] text-xs font-bold items-center justify-center"
+              className="hidden sm:flex w-10 h-10 rounded-full bg-[#0D0D0D] text-[#DFBD78] text-xs font-bold items-center justify-center"
               title={user.email}
             >
               {initials}
@@ -751,16 +753,16 @@ export const AdminDashboardPage: React.FC = () => {
           return (
             <div className="space-y-6">
               {/* Welcome banner */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF5EA] to-[#F3EBDA] text-[#F2EFE9] p-6 sm:p-8 border border-[#C5A059]/25">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF5EA] to-[#F3EBDA] text-[#0D0D0D] p-6 sm:p-8 border border-[#C5A059]/25">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_85%_0%,rgba(197,160,89,0.16),transparent_55%)]" />
                 <div className="absolute inset-3 border border-[#C5A059]/25 rounded-xl pointer-events-none" />
                 <div className="relative flex flex-col lg:flex-row lg:items-end justify-between gap-6">
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.35em] text-[#D4B06A] font-semibold">
+                    <p className="text-[11px] uppercase tracking-[0.35em] text-[#9E7B36] font-semibold">
                       {new Date().toLocaleDateString('en-PK', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                     <h2 className="mt-2 font-serif-luxury text-3xl sm:text-4xl">
-                      {greeting}, <span className="italic text-[#D4B06A]">{ownerName}</span>
+                      {greeting}, <span className="italic text-[#9E7B36]">{ownerName}</span>
                     </h2>
                     <p className="mt-1 text-sm text-neutral-600">
                       {(sc.pending || 0) > 0
@@ -771,12 +773,12 @@ export const AdminDashboardPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-px bg-[#C5A059]/20 rounded-xl overflow-hidden min-w-[280px] shadow-[0_8px_24px_-14px_rgba(158,123,54,0.45)]">
                     <div className="bg-white p-4">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-semibold">Today</p>
-                      <p className="mt-1 font-serif-luxury text-2xl font-semibold text-[#F2EFE9] tabular-nums">{rs(m.todaySales)}</p>
+                      <p className="mt-1 font-serif-luxury text-2xl font-semibold text-[#0D0D0D] tabular-nums">{rs(m.todaySales)}</p>
                       <p className="text-[11px] text-neutral-500">{m.todayOrders || 0} order{m.todayOrders === 1 ? '' : 's'}</p>
                     </div>
                     <div className="bg-white p-4">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-semibold">This month</p>
-                      <p className="mt-1 font-serif-luxury text-2xl font-semibold text-[#F2EFE9] tabular-nums">{rs(m.monthSales)}</p>
+                      <p className="mt-1 font-serif-luxury text-2xl font-semibold text-[#0D0D0D] tabular-nums">{rs(m.monthSales)}</p>
                       <p className="text-[11px] text-neutral-500">{m.monthOrders || 0} order{m.monthOrders === 1 ? '' : 's'}</p>
                     </div>
                   </div>
@@ -807,11 +809,11 @@ export const AdminDashboardPage: React.FC = () => {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-neutral-500">{k.label}</p>
-                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${k.warn ? 'bg-red-50 text-red-600' : k.accent ? 'bg-amber-50 text-amber-700' : 'bg-[#F5F0E4] text-[#D4B06A]'}`}>
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${k.warn ? 'bg-red-50 text-red-600' : k.accent ? 'bg-amber-50 text-amber-700' : 'bg-[#F5F0E4] text-[#9E7B36]'}`}>
                           <Icon className="w-4 h-4" />
                         </span>
                       </div>
-                      <p className="mt-2 font-serif-luxury text-[28px] leading-none font-semibold text-[#F2EFE9] tabular-nums">{k.value}</p>
+                      <p className="mt-2 font-serif-luxury text-[28px] leading-none font-semibold text-[#0D0D0D] tabular-nums">{k.value}</p>
                       <p className="mt-2 text-[11px] text-neutral-500">{k.sub}</p>
                     </button>
                   );
@@ -822,7 +824,7 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="bg-white rounded-2xl border border-black/[0.06] p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-serif-luxury text-2xl font-semibold">Orders at a glance</h3>
-                  <button type="button" onClick={() => go('orders')} className="link-underline text-[11px] uppercase tracking-[0.2em] font-semibold text-[#D4B06A]">
+                  <button type="button" onClick={() => go('orders')} className="link-underline text-[11px] uppercase tracking-[0.2em] font-semibold text-[#9E7B36]">
                     All orders →
                   </button>
                 </div>
@@ -835,7 +837,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
                 <div className="mt-5 grid grid-cols-3 sm:grid-cols-6 gap-3">
                   {pipeline.map((p) => (
-                    <div key={p.key} className="rounded-xl bg-[#1C1C1F] border border-black/[0.04] p-3">
+                    <div key={p.key} className="rounded-xl bg-[#FAF8F5] border border-black/[0.04] p-3">
                       <p className="flex items-center gap-1.5 text-[11px] text-neutral-500">
                         <span className={`w-2 h-2 rounded-full ${p.color}`} /> {p.label}
                       </p>
@@ -850,7 +852,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="xl:col-span-3 bg-white rounded-2xl border border-black/[0.06] overflow-hidden">
                   <div className="flex items-center justify-between px-6 pt-6 pb-3">
                     <h3 className="font-serif-luxury text-2xl font-semibold">Latest Orders</h3>
-                    <button type="button" onClick={() => go('orders')} className="link-underline text-[11px] uppercase tracking-[0.2em] font-semibold text-[#D4B06A]">
+                    <button type="button" onClick={() => go('orders')} className="link-underline text-[11px] uppercase tracking-[0.2em] font-semibold text-[#9E7B36]">
                       View all →
                     </button>
                   </div>
@@ -873,9 +875,9 @@ export const AdminDashboardPage: React.FC = () => {
                                 setOrderTracking(o.trackingNumber || '');
                                 setOrderNote('');
                               }}
-                              className="w-full text-left flex items-center gap-3 px-6 py-3 hover:bg-[#1C1C1F] transition-colors"
+                              className="w-full text-left flex items-center gap-3 px-6 py-3 hover:bg-[#FAF8F5] transition-colors"
                             >
-                              <span className="w-9 h-9 shrink-0 rounded-full bg-[#26262B] text-[#D4B06A] text-[11px] font-bold flex items-center justify-center">
+                              <span className="w-9 h-9 shrink-0 rounded-full bg-[#F3EFE6] text-[#9E7B36] text-[11px] font-bold flex items-center justify-center">
                                 {o.shippingAddress.fullName.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()}
                               </span>
                               <span className="min-w-0 flex-1">
@@ -914,9 +916,9 @@ export const AdminDashboardPage: React.FC = () => {
                             key={a.label}
                             type="button"
                             onClick={a.onClick}
-                            className="flex items-center gap-2.5 p-3 rounded-xl border border-black/[0.06] bg-[#1C1C1F] hover:border-[#C5A059] hover:bg-[#C5A059]/5 text-[13px] font-semibold transition-colors"
+                            className="flex items-center gap-2.5 p-3 rounded-xl border border-black/[0.06] bg-[#FAF8F5] hover:border-[#C5A059] hover:bg-[#C5A059]/5 text-[13px] font-semibold transition-colors"
                           >
-                            <Icon className="w-4 h-4 text-[#D4B06A]" /> {a.label}
+                            <Icon className="w-4 h-4 text-[#9E7B36]" /> {a.label}
                           </button>
                         );
                       })}
@@ -929,7 +931,7 @@ export const AdminDashboardPage: React.FC = () => {
                       {(overview.bestSellingProducts || []).slice(0, 5).map((p: Product, i: number) => (
                         <li key={p._id} className="flex items-center gap-3">
                           <span className="w-5 text-center font-serif-luxury text-lg text-[#C5A059]">{i + 1}</span>
-                          <img src={p.mainImage} alt="" className="w-10 h-10 rounded-lg object-cover bg-[#26262B]" />
+                          <img src={p.mainImage} alt="" className="w-10 h-10 rounded-lg object-cover bg-[#F3EFE6]" />
                           <span className="min-w-0 flex-1">
                             <span className="block text-[13px] font-semibold truncate">{p.name}</span>
                             <span className="block text-[11px] text-neutral-500">{p.soldCount || 0} sold • {p.stock} in stock</span>
@@ -949,7 +951,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <ul className="space-y-2.5">
                         {[...(overview.inventoryAlerts?.outOfStock || []), ...(overview.inventoryAlerts?.lowStock || [])].slice(0, 6).map((p: Product) => (
                           <li key={p._id} className="flex items-center gap-3">
-                            <img src={p.mainImage} alt="" className="w-9 h-9 rounded-lg object-cover bg-[#26262B]" />
+                            <img src={p.mainImage} alt="" className="w-9 h-9 rounded-lg object-cover bg-[#F3EFE6]" />
                             <span className="min-w-0 flex-1 text-[13px] font-medium truncate">{p.name}</span>
                             <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap ${p.stock === 0 ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800'}`}>
                               {p.stock === 0 ? 'Sold out' : `${p.stock} left`}
@@ -957,7 +959,7 @@ export const AdminDashboardPage: React.FC = () => {
                           </li>
                         ))}
                       </ul>
-                      <button type="button" onClick={() => go('inventory')} className="mt-4 w-full py-2.5 rounded-xl border border-black/10 hover:border-[#F2EFE9] text-[12px] font-semibold transition-colors">
+                      <button type="button" onClick={() => go('inventory')} className="mt-4 w-full py-2.5 rounded-xl border border-black/10 hover:border-[#0D0D0D] text-[12px] font-semibold transition-colors">
                         Update Stock
                       </button>
                     </div>
@@ -1027,7 +1029,7 @@ export const AdminDashboardPage: React.FC = () => {
               <button
                 type="button"
                 onClick={openCreateProductModal}
-                className="px-5 py-2.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-wider font-bold rounded-lg inline-flex items-center gap-2 transition-colors"
+                className="px-5 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-wider font-bold rounded-lg inline-flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Jewellery</span>
@@ -1037,7 +1039,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="bg-white rounded-xl border border-black/8 overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-[#F2EFE9] text-[#1C1C1F] uppercase tracking-wider text-[11px]">
+                  <tr className="bg-[#0D0D0D] text-[#FAF8F5] uppercase tracking-wider text-[11px]">
                     <th className="p-3.5">
                       <input
                         type="checkbox"
@@ -1062,7 +1064,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-neutral-200">
                   {adminProducts.map((prod) => (
-                    <tr key={prod._id} className="hover:bg-[#1C1C1F]">
+                    <tr key={prod._id} className="hover:bg-[#FAF8F5]">
                       <td className="p-3.5">
                         <input
                           type="checkbox"
@@ -1081,10 +1083,10 @@ export const AdminDashboardPage: React.FC = () => {
                           <img
                             src={prod.mainImage}
                             alt={prod.name}
-                            className="w-12 h-12 rounded object-cover bg-[#26262B]"
+                            className="w-12 h-12 rounded object-cover bg-[#F3EFE6]"
                           />
                           <div>
-                            <p className="font-serif-luxury text-base font-bold text-[#F2EFE9]">
+                            <p className="font-serif-luxury text-base font-bold text-[#0D0D0D]">
                               {prod.name}
                             </p>
                             <p className="text-neutral-400">
@@ -1094,7 +1096,7 @@ export const AdminDashboardPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="p-3.5 font-mono-code">
-                        <span className="font-bold block text-[#F2EFE9]">{prod.sku}</span>
+                        <span className="font-bold block text-[#0D0D0D]">{prod.sku}</span>
                         <span className="text-neutral-500">{prod.brand}</span>
                       </td>
                       <td className="p-3.5 font-mono-code">
@@ -1131,7 +1133,7 @@ export const AdminDashboardPage: React.FC = () => {
                           {prod.status}
                         </span>
                         {prod.bestSeller && (
-                          <span className="px-2 py-0.5 rounded bg-[#F2EFE9] text-[#C5A059] text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-[#0D0D0D] text-[#C5A059] text-[10px]">
                             Best Seller
                           </span>
                         )}
@@ -1140,7 +1142,7 @@ export const AdminDashboardPage: React.FC = () => {
                         <Link
                           to={`/product/${prod.slug}`}
                           target="_blank"
-                          className="inline-flex p-1.5 text-neutral-500 hover:text-[#F2EFE9]"
+                          className="inline-flex p-1.5 text-neutral-500 hover:text-[#0D0D0D]"
                           title="Preview on Storefront"
                         >
                           <ArrowUpRight className="w-4 h-4" />
@@ -1151,7 +1153,7 @@ export const AdminDashboardPage: React.FC = () => {
                             setEditingProduct(prod);
                             setIsProductModalOpen(true);
                           }}
-                          className="inline-flex p-1.5 text-neutral-600 hover:text-[#D4B06A]"
+                          className="inline-flex p-1.5 text-neutral-600 hover:text-[#9E7B36]"
                           title="Edit item"
                         >
                           <Edit3 className="w-4 h-4" />
@@ -1168,7 +1170,7 @@ export const AdminDashboardPage: React.FC = () => {
                                 addToast(err.message || 'Could not send the announcement.', 'error');
                               }
                             }}
-                            className="inline-flex p-1.5 text-neutral-600 hover:text-[#D4B06A]"
+                            className="inline-flex p-1.5 text-neutral-600 hover:text-[#9E7B36]"
                             title="Announce to customers (push notification)"
                           >
                             <Megaphone className="w-4 h-4" />
@@ -1211,8 +1213,8 @@ export const AdminDashboardPage: React.FC = () => {
                     onClick={() => setInventoryFilter(st)}
                     className={`px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider ${
                       inventoryFilter === st
-                        ? 'bg-[#F2EFE9] text-[#C5A059]'
-                        : 'bg-[#1C1C1F] text-neutral-600'
+                        ? 'bg-[#0D0D0D] text-[#C5A059]'
+                        : 'bg-[#FAF8F5] text-neutral-600'
                     }`}
                   >
                     {st.replace(/_/g, ' ')}
@@ -1221,7 +1223,7 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
               <a
                 href="/api/admin/reports/export/inventory"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded-lg"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg"
               >
                 <Download className="w-3.5 h-3.5 text-[#C5A059]" />
                 <span>Export Inventory CSV</span>
@@ -1231,7 +1233,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="bg-white rounded-xl border border-black/8 overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-[#F2EFE9] text-[#1C1C1F] uppercase tracking-wider text-[11px]">
+                  <tr className="bg-[#0D0D0D] text-[#FAF8F5] uppercase tracking-wider text-[11px]">
                     <th className="p-3.5">SKU</th>
                     <th className="p-3.5">Item</th>
                     <th className="p-3.5">Available Stock</th>
@@ -1242,9 +1244,9 @@ export const AdminDashboardPage: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-neutral-200">
                   {inventoryList.map((item) => (
-                    <tr key={item._id} className="hover:bg-[#1C1C1F]">
+                    <tr key={item._id} className="hover:bg-[#FAF8F5]">
                       <td className="p-3.5 font-mono-code font-bold">{item.sku}</td>
-                      <td className="p-3.5 font-medium text-[#F2EFE9]">{item.name}</td>
+                      <td className="p-3.5 font-medium text-[#0D0D0D]">{item.name}</td>
                       <td className="p-3.5 font-mono-code font-bold text-sm">{item.stock}</td>
                       <td className="p-3.5 font-mono-code text-neutral-500">
                         {item.lowStockThreshold}
@@ -1275,7 +1277,7 @@ export const AdminDashboardPage: React.FC = () => {
                             setAdjustQty(5);
                             setAdjustReason('');
                           }}
-                          className="px-3.5 py-1.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs font-semibold rounded transition-colors"
+                          className="px-3.5 py-1.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs font-semibold rounded transition-colors"
                         >
                           Adjust Stock
                         </button>
@@ -1368,9 +1370,17 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
+                onClick={() => setIsCreateOrderOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#C5A059] hover:bg-[#9E7B36] text-[#0D0D0D] hover:text-white text-xs font-bold transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Create Order</span>
+              </button>
+              <button
+                type="button"
                 disabled={slipIds.length === 0}
                 onClick={() => openSlips(slipIds)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-black/15 hover:border-[#F2EFE9] text-xs font-semibold disabled:opacity-40 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-black/15 hover:border-[#0D0D0D] text-xs font-semibold disabled:opacity-40 transition-colors"
                 title={slipIds.length ? '' : 'Tick orders in the list first'}
               >
                 <Printer className="w-3.5 h-3.5" />
@@ -1378,7 +1388,7 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
               <a
                 href="/api/admin/reports/export/orders"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded-lg"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg"
               >
                 <Download className="w-3.5 h-3.5 text-[#C5A059]" />
                 <span>Download Orders (Excel)</span>
@@ -1440,10 +1450,18 @@ export const AdminDashboardPage: React.FC = () => {
                         </td>
                         <td className="p-3.5 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-[#F2EFE9] text-[13px]">{o.orderNumber}</span>
+                            <span className="font-semibold text-[#0D0D0D] text-[13px]">{o.orderNumber}</span>
                             {o.orderSource === 'whatsapp' && (
                               <span title="Ordered via WhatsApp" className="inline-flex w-5 h-5 rounded-full bg-[#25D366]/15 text-[#128C7E] items-center justify-center">
                                 <MessageCircle className="w-3 h-3" />
+                              </span>
+                            )}
+                            {o.orderSource === 'manual' && (
+                              <span
+                                title={`Created by admin${o.manualChannel ? ` (${o.manualChannel})` : ''}`}
+                                className="px-1.5 py-0.5 rounded bg-[#C5A059]/15 text-[#9E7B36] text-[10px] font-bold uppercase tracking-wider"
+                              >
+                                Manual
                               </span>
                             )}
                           </div>
@@ -1455,7 +1473,7 @@ export const AdminDashboardPage: React.FC = () => {
                         </td>
                         <td className="p-3.5">
                           <div className="flex items-center gap-3">
-                            <span className="w-8 h-8 shrink-0 rounded-full bg-[#26262B] text-[#D4B06A] text-[11px] font-bold flex items-center justify-center">
+                            <span className="w-8 h-8 shrink-0 rounded-full bg-[#F3EFE6] text-[#9E7B36] text-[11px] font-bold flex items-center justify-center">
                               {o.shippingAddress.fullName
                                 .split(/\s+/)
                                 .slice(0, 2)
@@ -1464,7 +1482,7 @@ export const AdminDashboardPage: React.FC = () => {
                                 .toUpperCase()}
                             </span>
                             <div className="min-w-0">
-                              <p className="font-semibold text-[#F2EFE9] text-[13px] truncate">{o.shippingAddress.fullName}</p>
+                              <p className="font-semibold text-[#0D0D0D] text-[13px] truncate">{o.shippingAddress.fullName}</p>
                               <p className="text-[11px] text-neutral-500 whitespace-nowrap">
                                 {o.shippingAddress.city} <span className="mx-1 text-neutral-300">•</span> {o.shippingAddress.phone}
                               </p>
@@ -1472,9 +1490,11 @@ export const AdminDashboardPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="p-3.5 text-right whitespace-nowrap">
-                          <span className="font-semibold text-[13px] text-[#F2EFE9] tabular-nums">{formatPrice(o.totalAmount)}</span>
+                          <span className="font-semibold text-[13px] text-[#0D0D0D] tabular-nums">{formatPrice(o.totalAmount)}</span>
                           <p className="text-[11px] text-neutral-500">
                             {o.items.length} item{o.items.length > 1 ? 's' : ''}
+                            <span className="mx-1 text-neutral-300">•</span>
+                            {DELIVERY_LABEL[o.shippingMethod] || 'Courier'}
                           </p>
                         </td>
                         <td className="p-3.5 whitespace-nowrap">
@@ -1509,7 +1529,7 @@ export const AdminDashboardPage: React.FC = () => {
                               onClick={() => setWaOrder(o)}
                               aria-label={`WhatsApp ${o.shippingAddress.fullName}`}
                               title={`Message ${o.shippingAddress.fullName} on WhatsApp`}
-                              className="relative inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[#25D366]/40 text-[#128C7E] hover:bg-[#25D366] hover:text-[#F2EFE9] hover:border-[#25D366] transition-colors"
+                              className="relative inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[#25D366]/40 text-[#128C7E] hover:bg-[#25D366] hover:text-[#0D0D0D] hover:border-[#25D366] transition-colors"
                             >
                               <MessageCircle className="w-4 h-4" />
                               {(o.whatsappLog?.length || 0) > 0 && (
@@ -1523,14 +1543,14 @@ export const AdminDashboardPage: React.FC = () => {
                               onClick={() => openSlips([o._id])}
                               aria-label={`Print shipping slip for ${o.orderNumber}`}
                               title="Print shipping slip"
-                              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-black/15 text-neutral-600 hover:border-[#F2EFE9] hover:text-[#F2EFE9] transition-colors"
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-black/15 text-neutral-600 hover:border-[#0D0D0D] hover:text-[#0D0D0D] transition-colors"
                             >
                               <Printer className="w-4 h-4" />
                             </button>
                             <button
                               type="button"
                               onClick={openOrder}
-                              className="h-9 px-4 rounded-lg border border-black/15 hover:border-[#F2EFE9] hover:bg-[#F2EFE9] hover:text-[#1C1C1F] text-[12px] font-semibold transition-colors"
+                              className="h-9 px-4 rounded-lg border border-black/15 hover:border-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#FAF8F5] text-[12px] font-semibold transition-colors"
                             >
                               Open
                             </button>
@@ -1566,7 +1586,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="bg-white rounded-xl border border-black/8 overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-[#F2EFE9] text-[#1C1C1F] uppercase tracking-wider text-[11px]">
+                  <tr className="bg-[#0D0D0D] text-[#FAF8F5] uppercase tracking-wider text-[11px]">
                     <th className="p-3.5">Name & Role</th>
                     <th className="p-3.5">Contact</th>
                     <th className="p-3.5">Orders</th>
@@ -1577,10 +1597,10 @@ export const AdminDashboardPage: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-neutral-200">
                   {customers.map((c) => (
-                    <tr key={c._id} className="hover:bg-[#1C1C1F]">
+                    <tr key={c._id} className="hover:bg-[#FAF8F5]">
                       <td className="p-3.5">
-                        <span className="font-bold text-[#F2EFE9] block">{c.name}</span>
-                        <span className="text-[10px] uppercase tracking-wider text-[#D4B06A] font-semibold">
+                        <span className="font-bold text-[#0D0D0D] block">{c.name}</span>
+                        <span className="text-[10px] uppercase tracking-wider text-[#9E7B36] font-semibold">
                           {c.role}
                         </span>
                       </td>
@@ -1608,7 +1628,7 @@ export const AdminDashboardPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleToggleCustomerStatus(c._id, c.status)}
-                            className="px-3 py-1 border border-neutral-300 hover:border-[#F2EFE9] rounded text-xs font-semibold"
+                            className="px-3 py-1 border border-neutral-300 hover:border-[#0D0D0D] rounded text-xs font-semibold"
                           >
                             {c.status === 'active' ? 'Suspend' : 'Activate'}
                           </button>
@@ -1643,7 +1663,7 @@ export const AdminDashboardPage: React.FC = () => {
                   loadTabContent();
                   refreshStorefront();
                 }}
-                className="space-y-3 bg-[#1C1C1F] p-4 rounded-lg border border-black/5"
+                className="space-y-3 bg-[#FAF8F5] p-4 rounded-lg border border-black/5"
               >
                 <input
                   type="text"
@@ -1662,7 +1682,7 @@ export const AdminDashboardPage: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded"
+                  className="px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded"
                 >
                   Create Category
                 </button>
@@ -1672,7 +1692,7 @@ export const AdminDashboardPage: React.FC = () => {
                 {adminCategories.map((cat) => (
                   <div key={cat._id} className="py-3 flex items-center justify-between">
                     <div>
-                      <p className="font-bold text-[#F2EFE9]">{cat.name}</p>
+                      <p className="font-bold text-[#0D0D0D]">{cat.name}</p>
                       <p className="text-neutral-500">/{cat.slug}</p>
                     </div>
                     <button
@@ -1716,7 +1736,7 @@ export const AdminDashboardPage: React.FC = () => {
                   loadTabContent();
                   refreshStorefront();
                 }}
-                className="space-y-3 bg-[#1C1C1F] p-4 rounded-lg border border-black/5"
+                className="space-y-3 bg-[#FAF8F5] p-4 rounded-lg border border-black/5"
               >
                 <input
                   type="text"
@@ -1742,7 +1762,7 @@ export const AdminDashboardPage: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded"
+                  className="px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded"
                 >
                   Create Collection
                 </button>
@@ -1758,7 +1778,7 @@ export const AdminDashboardPage: React.FC = () => {
                         className="w-10 h-10 rounded object-cover"
                       />
                       <div>
-                        <p className="font-bold text-[#F2EFE9]">{col.name}</p>
+                        <p className="font-bold text-[#0D0D0D]">{col.name}</p>
                         <p className="text-neutral-500">{col.subtitle}</p>
                       </div>
                     </div>
@@ -1929,7 +1949,7 @@ export const AdminDashboardPage: React.FC = () => {
                       ],
                     })
                   }
-                  className="px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded"
+                  className="px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded"
                 >
                   + Add Slide
                 </button>
@@ -1939,10 +1959,10 @@ export const AdminDashboardPage: React.FC = () => {
                 {cmsHomepage.heroSlides?.map((slide: any, idx: number) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-xl bg-[#1C1C1F] border border-black/10 space-y-3"
+                    className="p-4 rounded-xl bg-[#FAF8F5] border border-black/10 space-y-3"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#D4B06A]">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#9E7B36]">
                         Slide #{idx + 1}
                       </span>
                       <button
@@ -2057,7 +2077,7 @@ export const AdminDashboardPage: React.FC = () => {
 
             <button
               type="submit"
-              className="px-8 py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-bold rounded-lg shadow-md"
+              className="px-8 py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-bold rounded-lg shadow-md"
             >
               Publish Homepage Changes Live
             </button>
@@ -2110,7 +2130,7 @@ export const AdminDashboardPage: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-wider font-bold rounded transition-colors"
+                  className="px-5 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-wider font-bold rounded transition-colors"
                 >
                   Create Coupon
                 </button>
@@ -2120,7 +2140,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="bg-white rounded-xl border border-black/8 overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-[#F2EFE9] text-[#1C1C1F] uppercase tracking-wider text-[11px]">
+                  <tr className="bg-[#0D0D0D] text-[#FAF8F5] uppercase tracking-wider text-[11px]">
                     <th className="p-3.5">Code</th>
                     <th className="p-3.5">Discount</th>
                     <th className="p-3.5">Min Subtotal</th>
@@ -2163,7 +2183,7 @@ export const AdminDashboardPage: React.FC = () => {
                             });
                             loadTabContent();
                           }}
-                          className="text-[#D4B06A] font-semibold hover:underline"
+                          className="text-[#9E7B36] font-semibold hover:underline"
                         >
                           {c.isActive ? 'Disable' : 'Enable'}
                         </button>
@@ -2203,14 +2223,14 @@ export const AdminDashboardPage: React.FC = () => {
                   <div className="flex flex-wrap gap-3">
                     <a
                       href="/api/admin/reports/export/orders"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded-lg"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg"
                     >
                       <Download className="w-3.5 h-3.5 text-[#C5A059]" />
                       <span>Download Orders CSV</span>
                     </a>
                     <a
                       href="/api/admin/reports/export/inventory"
-                      className="inline-flex items-center gap-2 px-4 py-2 border border-[#F2EFE9] text-[#F2EFE9] text-xs uppercase tracking-wider font-semibold rounded-lg"
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-[#0D0D0D] text-[#0D0D0D] text-xs uppercase tracking-wider font-semibold rounded-lg"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>Download Inventory Valuation CSV</span>
@@ -2219,23 +2239,23 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-[#1C1C1F] border border-black/8">
+                  <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/8">
                     <span className="text-xs text-neutral-500 block">
                       Total Vault Cost Valuation
                     </span>
-                    <span className="font-mono-code text-xl font-bold text-[#F2EFE9]">
+                    <span className="font-mono-code text-xl font-bold text-[#0D0D0D]">
                       {formatPrice(reportsData.inventoryValuation.totalInventoryCostValuation)}
                     </span>
                   </div>
-                  <div className="p-4 rounded-xl bg-[#1C1C1F] border border-black/8">
+                  <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/8">
                     <span className="text-xs text-neutral-500 block">
                       Total Vault Retail Valuation
                     </span>
-                    <span className="font-mono-code text-xl font-bold text-[#F2EFE9]">
+                    <span className="font-mono-code text-xl font-bold text-[#0D0D0D]">
                       {formatPrice(reportsData.inventoryValuation.totalInventoryRetailValuation)}
                     </span>
                   </div>
-                  <div className="p-4 rounded-xl bg-[#1C1C1F] border border-black/8">
+                  <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/8">
                     <span className="text-xs text-neutral-500 block">
                       Projected Gross Margin
                     </span>
@@ -2285,6 +2305,31 @@ export const AdminDashboardPage: React.FC = () => {
                       }
                       className="w-full px-3 py-2 border border-neutral-300 rounded"
                     />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Express Courier Fee (PKR)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={storeSettings.expressShippingFee ?? 0}
+                      onChange={(e) =>
+                        setStoreSettings({ ...storeSettings, expressShippingFee: Number(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 border border-neutral-300 rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Hand Delivery Fee (PKR)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={storeSettings.handDeliveryFee ?? 0}
+                      onChange={(e) =>
+                        setStoreSettings({ ...storeSettings, handDeliveryFee: Number(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 border border-neutral-300 rounded"
+                    />
+                    <p className="mt-1 text-[11px] text-neutral-500">Default for own-rider deliveries. Store pickup is always free.</p>
                   </div>
                   <div>
                     <label className="font-semibold block mb-1">
@@ -2421,7 +2466,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-widest font-bold rounded transition-colors"
+                  className="px-6 py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-widest font-bold rounded transition-colors"
                 >
                   Save Store Settings
                 </button>
@@ -2451,7 +2496,7 @@ export const AdminDashboardPage: React.FC = () => {
                           {formatDateTime(log.createdAt)}
                         </td>
                         <td className="py-2.5 px-3 font-medium">{log.actorEmail}</td>
-                        <td className="py-2.5 px-3 font-mono-code font-bold text-[#D4B06A]">
+                        <td className="py-2.5 px-3 font-mono-code font-bold text-[#9E7B36]">
                           {log.action}
                         </td>
                         <td className="py-2.5 px-3 text-neutral-700">{log.details}</td>
@@ -2605,7 +2650,7 @@ export const AdminDashboardPage: React.FC = () => {
                     className="flex-1 px-3 py-2 border border-neutral-300 rounded"
                   />
                   <label
-                    className={`px-4 py-2 bg-[#E8E4DC] text-[#1C1C1F] rounded cursor-pointer inline-flex items-center gap-1.5 font-semibold ${
+                    className={`px-4 py-2 bg-[#1A1A1E] text-[#FAF8F5] rounded cursor-pointer inline-flex items-center gap-1.5 font-semibold ${
                       uploadStatus?.phase === 'compressing' || uploadStatus?.phase === 'uploading' ? 'opacity-60 pointer-events-none' : ''
                     }`}
                   >
@@ -2654,7 +2699,7 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
 
               {/* Specifications */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#1C1C1F] border border-black/5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#FAF8F5] border border-black/5">
                 <div>
                   <label className="font-semibold block mb-1">Type</label>
                   <input
@@ -2764,7 +2809,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] rounded-lg font-bold uppercase tracking-wider"
+                  className="px-6 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] rounded-lg font-bold uppercase tracking-wider"
                 >
                   Save Jewellery
                 </button>
@@ -2848,7 +2893,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#F2EFE9] text-[#1C1C1F] rounded font-bold uppercase tracking-wider"
+                  className="px-5 py-2 bg-[#0D0D0D] text-[#FAF8F5] rounded font-bold uppercase tracking-wider"
                 >
                   Record Stock Adjustment
                 </button>
@@ -2877,15 +2922,33 @@ export const AdminDashboardPage: React.FC = () => {
         />
       )}
 
+      {isCreateOrderOpen && (
+        <CreateOrderModal
+          onClose={() => setIsCreateOrderOpen(false)}
+          onError={(msg) => addToast(msg, 'error')}
+          onCreated={async (order) => {
+            addToast(`Order ${order.orderNumber} created.`, 'success');
+            setIsCreateOrderOpen(false);
+            await loadTabContent();
+            setSelectedOrder(order);
+            setOrderNextFulfillment(order.fulfillmentStatus);
+            setOrderNextPayment(order.paymentStatus);
+            setOrderCourier(order.courierName || 'Leopards');
+            setOrderTracking(order.trackingNumber || '');
+            setOrderNote('');
+          }}
+        />
+      )}
+
       {selectedOrder && (
         <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#D4B06A] font-bold">
+                <span className="text-[10px] uppercase tracking-widest text-[#9E7B36] font-bold">
                   Order Fulfillment Management
                 </span>
-                <h3 className="font-mono-code text-2xl font-bold text-[#F2EFE9]">
+                <h3 className="font-mono-code text-2xl font-bold text-[#0D0D0D]">
                   {selectedOrder.orderNumber}
                 </h3>
               </div>
@@ -2900,14 +2963,14 @@ export const AdminDashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setWaOrder(selectedOrder)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#25D366] hover:bg-[#1EBE5A] text-[#F2EFE9] text-xs font-bold"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs font-bold"
                 >
                   <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                 </button>
                 <button
                   type="button"
                   onClick={() => openSlips([selectedOrder._id])}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-neutral-300 hover:border-[#F2EFE9] text-xs font-semibold"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-neutral-300 hover:border-[#0D0D0D] text-xs font-semibold"
                 >
                   <Printer className="w-3.5 h-3.5" /> Print Slip
                 </button>
@@ -2954,29 +3017,6 @@ export const AdminDashboardPage: React.FC = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="font-bold block mb-1">Courier Partner</label>
-                  <select
-                    value={orderCourier || 'Leopards'}
-                    onChange={(e) => setOrderCourier(e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white"
-                  >
-                    <option value="Leopards">Leopards Courier</option>
-                    <option value="TCS">TCS</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="font-bold block mb-1">Tracking Number</label>
-                  <input
-                    type="text"
-                    value={orderTracking}
-                    onChange={(e) => setOrderTracking(e.target.value)}
-                    placeholder="TCS-88990011"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded font-mono-code"
-                  />
-                </div>
-
                 <div className="sm:col-span-2">
                   <label className="font-bold block mb-1">Status Update Note</label>
                   <input
@@ -3000,18 +3040,28 @@ export const AdminDashboardPage: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] font-bold uppercase tracking-widest rounded-lg transition-colors"
+                className="w-full py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] font-bold uppercase tracking-widest rounded-lg transition-colors"
               >
                 Update Order & Record History
               </button>
             </form>
+
+            <DeliveryAdjustPanel
+              order={selectedOrder}
+              onSaved={(updated) => {
+                addToast(`Delivery updated for ${updated.orderNumber}.`, 'success');
+                setSelectedOrder(updated);
+                setAdminOrders((list) => list.map((x) => (x._id === updated._id ? updated : x)));
+              }}
+              onError={(msg) => addToast(msg, 'error')}
+            />
 
             {/* Chronological History */}
             <div className="space-y-2 pt-3 border-t border-neutral-200 text-xs">
               <h4 className="font-bold uppercase tracking-wider">Order Status History</h4>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {selectedOrder.statusHistory.map((h, i) => (
-                  <div key={i} className="p-2.5 rounded bg-[#1C1C1F] border border-black/5">
+                  <div key={i} className="p-2.5 rounded bg-[#FAF8F5] border border-black/5">
                     <span className="font-bold uppercase">{h.status}</span> •{' '}
                     <span className="text-neutral-500">{formatDateTime(h.timestamp)}</span>
                     <p className="text-neutral-700 mt-0.5">{h.note}</p>

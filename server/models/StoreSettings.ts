@@ -11,6 +11,7 @@ export interface IStoreSettings extends Document {
   timezone: string;
   standardShippingFee: number;
   expressShippingFee: number;
+  handDeliveryFee: number;
   freeShippingThreshold: number;
   taxPercentage: number;
   allowGuestCheckout: boolean;
@@ -68,6 +69,7 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     timezone: { type: String, default: 'Asia/Karachi' },
     standardShippingFee: { type: Number, default: 350, min: 0 },
     expressShippingFee: { type: Number, default: 750, min: 0 },
+    handDeliveryFee: { type: Number, default: 0, min: 0 },
     freeShippingThreshold: { type: Number, default: 25000, min: 0 },
     taxPercentage: { type: Number, default: 0, min: 0, max: 50 },
     allowGuestCheckout: { type: Boolean, default: true },

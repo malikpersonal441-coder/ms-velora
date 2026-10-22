@@ -199,6 +199,7 @@ export interface StoreSettings {
   timezone: string;
   standardShippingFee: number;
   expressShippingFee: number;
+  handDeliveryFee?: number;
   freeShippingThreshold: number;
   taxPercentage: number;
   allowGuestCheckout: boolean;
@@ -324,7 +325,10 @@ export interface Order {
     country: string;
     notes?: string;
   };
-  shippingMethod: 'standard' | 'express';
+  shippingMethod: 'standard' | 'express' | 'hand' | 'pickup';
+  deliveryPerson?: string;
+  deliveryPhone?: string;
+  manualChannel?: string;
   subtotal: number;
   discountAmount: number;
   couponCode?: string;
@@ -350,7 +354,7 @@ export interface Order {
   deliveredAt?: string;
   cancelledAt?: string;
   inventoryRestored: boolean;
-  orderSource?: 'website' | 'whatsapp';
+  orderSource?: 'website' | 'whatsapp' | 'manual';
   whatsappLog?: WhatsAppLogEntry[];
   statusHistory: {
     status: string;

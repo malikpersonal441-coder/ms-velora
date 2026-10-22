@@ -618,10 +618,11 @@ router.post(
 
       // Alert the admin's devices (phone/desktop) — never blocks or fails the order
       void sendToTopic('admin-orders', {
-        title: `New order ${order.orderNumber}`,
+        title: `🔔 New order ${order.orderNumber}`,
         body: `${data.shippingAddress.fullName} • ${data.shippingAddress.city} • Rs. ${Math.round(totalAmount).toLocaleString('en-PK')}`,
         url: '/admin',
         tag: 'bfs-new-order',
+        urgent: true,
       });
 
       // Clear server cart if user is authenticated

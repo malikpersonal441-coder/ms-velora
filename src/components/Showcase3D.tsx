@@ -73,7 +73,7 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
                 style={{ transform: `rotateY(${i * step}deg) translateZ(${radius}px)` }}
               >
                 <div
-                  className={`w-full h-full rounded-sm overflow-hidden bg-[#26262B] transition-all duration-700 ${
+                  className={`w-full h-full rounded-sm overflow-hidden bg-[#F3EFE6] transition-all duration-700 ${
                     isFront
                       ? 'shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8),0_0_0_1px_rgba(197,160,89,0.6)] brightness-100'
                       : 'shadow-[0_20px_40px_-20px_rgba(0,0,0,0.6)] brightness-[0.55]'
@@ -89,10 +89,10 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
 
       {/* Caption for the spotlit piece */}
       <div className="mt-1 text-center min-h-[88px]" aria-live="polite">
-        <p className="text-[10px] uppercase tracking-[0.4em] text-[#D4B06A] font-semibold">{active.brand}</p>
+        <p className="text-[10px] uppercase tracking-[0.4em] text-[#9E7B36] font-semibold">{active.brand}</p>
         <Link
           to={`/product/${active.slug}`}
-          className="mt-2 inline-block font-serif-luxury text-2xl sm:text-3xl text-[#F2EFE9] hover:text-[#D4B06A] transition-colors"
+          className="mt-2 inline-block font-serif-luxury text-2xl sm:text-3xl text-[#0D0D0D] hover:text-[#9E7B36] transition-colors"
         >
           {active.name}
         </Link>
@@ -111,7 +111,7 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
             type="button"
             onClick={() => setAngle((a) => a + d)}
             aria-label={label}
-            className="w-12 h-12 rounded-full border border-[#C5A059]/50 bg-white/80 text-[#F2EFE9] hover:bg-[#C5A059] hover:text-white flex items-center justify-center transition-colors duration-500 shadow-xs"
+            className="w-12 h-12 rounded-full border border-[#C5A059]/50 bg-white/80 text-[#0D0D0D] hover:bg-[#C5A059] hover:text-white flex items-center justify-center transition-colors duration-500 shadow-xs"
           >
             <Icon className="w-5 h-5" />
           </button>

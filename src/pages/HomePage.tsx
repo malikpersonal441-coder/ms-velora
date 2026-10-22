@@ -65,10 +65,10 @@ export const HomePage: React.FC = () => {
           <div className="bg-white rounded-2xl border border-[#C5A059]/25 p-4 sm:p-7 shadow-xl">
             <div className="flex items-center justify-between mb-4 sm:mb-5 pb-3 border-b border-[#C5A059]/15">
               <div>
-                <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] text-[#D4B06A] font-semibold block">Explore By Maison</span>
-                <h3 className="font-serif-luxury text-lg sm:text-2xl font-semibold text-[#F2EFE9]">Shop By Category</h3>
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.24em] text-[#9E7B36] font-semibold block">Explore By Maison</span>
+                <h3 className="font-serif-luxury text-lg sm:text-2xl font-semibold text-[#0D0D0D]">Shop By Category</h3>
               </div>
-              <Link to="/shop" className="text-[11px] sm:text-xs uppercase tracking-widest text-[#D4B06A] hover:text-[#F2EFE9] font-semibold flex items-center gap-1">
+              <Link to="/shop" className="text-[11px] sm:text-xs uppercase tracking-widest text-[#9E7B36] hover:text-[#0D0D0D] font-semibold flex items-center gap-1">
                 View All <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -135,7 +135,7 @@ export const HomePage: React.FC = () => {
 
       {/* The Rotunda — 3D rotating showcase */}
       {[...bestSellers, ...newArrivals].length >= 3 && (
-        <section className="relative bg-[#1C1C1F] py-16 sm:py-20 overflow-hidden border-y border-[#C5A059]/20">
+        <section className="relative bg-[#FAF8F5] py-16 sm:py-20 overflow-hidden border-y border-[#C5A059]/20">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(197,160,89,0.1),transparent_60%)]" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeading
@@ -155,19 +155,19 @@ export const HomePage: React.FC = () => {
       {/* F. Promotional Banner */}
       {visibility.promoBanner && homepage?.promoBanner?.isActive && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl overflow-hidden bg-white text-[#F2EFE9] border border-[#C5A059]/25 shadow-xl">
+          <div className="relative rounded-2xl overflow-hidden bg-white text-[#0D0D0D] border border-[#C5A059]/25 shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
               <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 space-y-6 relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#C5A059]/40 bg-[#C5A059]/10 text-[#D4B06A] text-[11px] uppercase tracking-[0.2em] font-semibold">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#C5A059]/40 bg-[#C5A059]/10 text-[#9E7B36] text-[11px] uppercase tracking-[0.2em] font-semibold">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{homepage.promoBanner.badgeText}</span>
                 </div>
 
-                <h2 className="font-serif-luxury text-3xl sm:text-5xl font-semibold leading-tight text-[#F2EFE9]">
+                <h2 className="font-serif-luxury text-3xl sm:text-5xl font-semibold leading-tight text-[#0D0D0D]">
                   {homepage.promoBanner.title}
                 </h2>
 
-                <p className="text-base sm:text-lg text-[#D4B06A] font-serif-luxury italic">
+                <p className="text-base sm:text-lg text-[#9E7B36] font-serif-luxury italic">
                   {homepage.promoBanner.subtitle}
                 </p>
 
@@ -178,7 +178,7 @@ export const HomePage: React.FC = () => {
                 <div className="pt-2 flex flex-wrap items-center gap-4">
                   <Link
                     to={homepage.promoBanner.ctaLink || '/shop'}
-                    className="px-7 py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] font-semibold text-xs uppercase tracking-[0.2em] rounded transition-colors shadow-xs"
+                    className="px-7 py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded transition-colors shadow-xs"
                   >
                     {homepage.promoBanner.ctaText || 'Explore Limited Edition'}
                   </Link>
@@ -187,10 +187,10 @@ export const HomePage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleCopyCoupon(homepage.promoBanner.couponHighlight!)}
-                      className="px-5 py-3.5 rounded border border-dashed border-[#C5A059]/60 bg-[#1C1C1F] hover:border-[#C5A059] text-xs font-mono-code text-[#F2EFE9] flex items-center gap-2.5 transition-colors"
+                      className="px-5 py-3.5 rounded border border-dashed border-[#C5A059]/60 bg-[#FAF8F5] hover:border-[#C5A059] text-xs font-mono-code text-[#0D0D0D] flex items-center gap-2.5 transition-colors"
                     >
                       <span>USE CODE: {homepage.promoBanner.couponHighlight}</span>
-                      <Copy className="w-3.5 h-3.5 text-[#D4B06A]" />
+                      <Copy className="w-3.5 h-3.5 text-[#9E7B36]" />
                     </button>
                   )}
                 </div>
@@ -231,7 +231,7 @@ export const HomePage: React.FC = () => {
 
       {/* H. Brand Story */}
       {visibility.brandStory && homepage?.brandStory && (
-        <section className="bg-[#26262B] border-y border-[#F2EFE9]/8 py-20">
+        <section className="bg-[#F3EFE6] border-y border-[#0D0D0D]/8 py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-5">
@@ -244,10 +244,10 @@ export const HomePage: React.FC = () => {
                     height={750}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-white/95 backdrop-blur-md text-[#F2EFE9] border border-[#C5A059]/30 shadow-lg flex items-center gap-3">
+                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-white/95 backdrop-blur-md text-[#0D0D0D] border border-[#C5A059]/30 shadow-lg flex items-center gap-3">
                     <Sparkles className="w-8 h-8 text-[#C5A059] shrink-0" />
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-[#D4B06A] font-semibold">
+                      <p className="text-xs uppercase tracking-widest text-[#9E7B36] font-semibold">
                         Hand-Checked Quality
                       </p>
                       <p className="text-xs text-neutral-600">
@@ -259,15 +259,15 @@ export const HomePage: React.FC = () => {
               </div>
 
               <div className="lg:col-span-7 space-y-6">
-                <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
+                <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
                   {homepage.brandStory.eyebrow}
                 </span>
 
-                <h2 className="font-serif-luxury text-3xl sm:text-5xl font-semibold text-[#F2EFE9] leading-tight">
+                <h2 className="font-serif-luxury text-3xl sm:text-5xl font-semibold text-[#0D0D0D] leading-tight">
                   {homepage.brandStory.heading}
                 </h2>
 
-                <p className="text-base sm:text-lg text-[#F2EFE9]/85 font-medium leading-relaxed">
+                <p className="text-base sm:text-lg text-[#0D0D0D]/85 font-medium leading-relaxed">
                   {homepage.brandStory.leadParagraph}
                 </p>
 
@@ -282,10 +282,10 @@ export const HomePage: React.FC = () => {
                         key={i}
                         className="p-4 bg-white rounded-lg border border-black/8 space-y-1"
                       >
-                        <span className="text-[11px] uppercase tracking-wider text-[#D4B06A] font-semibold block">
+                        <span className="text-[11px] uppercase tracking-wider text-[#9E7B36] font-semibold block">
                           {h.label}
                         </span>
-                        <h3 className="font-serif-luxury text-xl font-bold text-[#F2EFE9]">
+                        <h3 className="font-serif-luxury text-xl font-bold text-[#0D0D0D]">
                           {h.value}
                         </h3>
                         <p className="text-xs text-neutral-500 leading-relaxed">
@@ -299,7 +299,7 @@ export const HomePage: React.FC = () => {
                 <div className="pt-2">
                   <Link
                     to={homepage.brandStory.ctaLink || '/shop'}
-                    className="inline-flex items-center gap-2 px-7 py-4 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-semibold rounded transition-colors"
+                    className="inline-flex items-center gap-2 px-7 py-4 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-semibold rounded transition-colors"
                   >
                     <span>{homepage.brandStory.ctaText || 'Explore Our Catalog'}</span>
                     <ArrowRight className="w-4 h-4" />

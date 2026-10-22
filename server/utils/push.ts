@@ -19,6 +19,8 @@ export interface PushPayload {
   url?: string;
   image?: string;
   tag?: string;
+  /** Keeps the notification on screen until tapped and vibrates hard (new-order alarm). */
+  urgent?: boolean;
 }
 
 /**
