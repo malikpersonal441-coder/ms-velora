@@ -23,8 +23,8 @@ export const ToastContainer: React.FC = () => {
               toast.type === 'error'
                 ? 'bg-red-950/95 text-red-100 border-red-500/40'
                 : toast.type === 'info'
-                ? 'bg-[#1A1A1E]/95 text-[#FAF8F5] border-white/15'
-                : 'bg-[#0D0D0D]/95 text-[#FAF8F5] border-[#C5A059]/50'
+                ? 'bg-[#E8E4DC]/95 text-[#1C1C1F] border-white/15'
+                : 'bg-[#F2EFE9]/95 text-[#1C1C1F] border-[#C5A059]/50'
             }`}
           >
             {toast.type === 'error' ? (

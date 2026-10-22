@@ -81,7 +81,7 @@ export const WhatsAppComposer: React.FC<ComposerProps> = ({
         <div className="flex items-center justify-between p-5 border-b border-neutral-200 bg-[#075E54] text-white rounded-t-2xl">
           <div className="flex items-center gap-3">
             <span className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center">
-              <MessageCircle className="w-5 h-5 text-[#0D0D0D]" />
+              <MessageCircle className="w-5 h-5 text-[#F2EFE9]" />
             </span>
             <div>
               <p className="font-semibold">{order.shippingAddress.fullName}</p>
@@ -110,7 +110,7 @@ export const WhatsAppComposer: React.FC<ComposerProps> = ({
                     : 'hover:bg-neutral-100 border border-transparent'
                 }`}
               >
-                <span className="flex items-center justify-between gap-2 font-semibold text-[#0D0D0D]">
+                <span className="flex items-center justify-between gap-2 font-semibold text-[#F2EFE9]">
                   {TEMPLATE_META[key].label}
                   {sentKeys.has(key) && (
                     <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-medium">
@@ -145,7 +145,7 @@ export const WhatsAppComposer: React.FC<ComposerProps> = ({
                   setEdited(true);
                 }}
                 rows={10}
-                className="mt-1 w-full p-3 rounded-lg rounded-tr-none border border-[#25D366]/30 bg-[#DCF8C6] text-sm text-[#0D0D0D] leading-relaxed shadow-sm"
+                className="mt-1 w-full p-3 rounded-lg rounded-tr-none border border-[#25D366]/30 bg-[#DCF8C6] text-sm text-[#F2EFE9] leading-relaxed shadow-sm"
               />
             </label>
 
@@ -159,7 +159,7 @@ export const WhatsAppComposer: React.FC<ComposerProps> = ({
               type="button"
               onClick={handleSend}
               disabled={sending || !message.trim() || !phone.trim()}
-              className="w-full py-3.5 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              className="w-full py-3.5 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
               {sending ? 'Logging…' : 'Open WhatsApp & Send'}
@@ -179,7 +179,7 @@ export const WhatsAppComposer: React.FC<ComposerProps> = ({
               {[...(order.whatsappLog || [])].reverse().map((l, i) => (
                 <li key={i} className="text-xs p-3 rounded-lg bg-neutral-50 border border-neutral-200">
                   <div className="flex justify-between gap-2 text-neutral-500 mb-1">
-                    <span className="font-semibold text-[#0D0D0D]">
+                    <span className="font-semibold text-[#F2EFE9]">
                       {l.template === 'custom' ? 'Custom message' : TEMPLATE_META[l.template]?.label}
                     </span>
                     <span>

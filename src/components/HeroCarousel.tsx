@@ -79,7 +79,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   return (
     <section
       ref={sectionRef}
-      className="relative bg-[#08090B] text-[#FAF8F5] overflow-hidden select-none grain"
+      className="relative bg-[#E8E4DC] text-[#1C1C1F] overflow-hidden select-none grain"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       aria-roledescription="carousel"
@@ -116,8 +116,8 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
                     style={{ animationDuration: `${Math.max(intervalMs, 6000) + 4000}ms` }}
                   />
                 </picture>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#08090B]/95 via-[#08090B]/60 to-[#08090B]/10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#08090B] via-transparent to-[#08090B]/50" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#E8E4DC]/95 via-[#E8E4DC]/60 to-[#E8E4DC]/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#E8E4DC] via-transparent to-[#E8E4DC]/50" />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_40%,rgba(197,160,89,0.12),transparent_55%)]" />
               </div>
             );
@@ -125,7 +125,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
         </motion.div>
 
         {/* Vertical edge label */}
-        <div className="hidden lg:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 items-center gap-4 [writing-mode:vertical-rl] rotate-180 text-[10px] uppercase tracking-[0.5em] text-[#FAF8F5]/35">
+        <div className="hidden lg:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 items-center gap-4 [writing-mode:vertical-rl] rotate-180 text-[10px] uppercase tracking-[0.5em] text-[#1C1C1F]/35">
           <span className="w-px h-16 bg-gradient-to-b from-transparent to-[#C5A059]/60" />
           Est. Lahore · Fine Jewellery
         </div>
@@ -174,7 +174,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
 
               <motion.p
                 variants={fadeUp}
-                className="mt-5 text-[15px] sm:text-base lg:text-[17px] text-[#FAF8F5]/70 leading-relaxed max-w-lg font-light"
+                className="mt-5 text-[15px] sm:text-base lg:text-[17px] text-[#1C1C1F]/70 leading-relaxed max-w-lg font-light"
               >
                 {slide.subtitle}
               </motion.p>
@@ -199,7 +199,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 pb-8 flex items-end justify-between gap-6">
             {slideCount > 1 ? (
               <div className="flex items-center gap-5">
-                <span className="font-serif-luxury text-3xl text-[#FAF8F5] tabular-nums">{pad(safeIndex + 1)}</span>
+                <span className="font-serif-luxury text-3xl text-[#1C1C1F] tabular-nums">{pad(safeIndex + 1)}</span>
                 <div className="flex items-center gap-2">
                   {activeSlides.map((_, idx) => (
                     <button
@@ -224,7 +224,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
                     </button>
                   ))}
                 </div>
-                <span className="font-serif-luxury text-lg text-[#FAF8F5]/40 tabular-nums">{pad(slideCount)}</span>
+                <span className="font-serif-luxury text-lg text-[#1C1C1F]/40 tabular-nums">{pad(slideCount)}</span>
               </div>
             ) : (
               <span />
@@ -233,7 +233,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
             <div className="flex items-center gap-6">
               <a
                 href="#after-hero"
-                className="hidden md:flex flex-col items-center gap-2 text-[10px] uppercase tracking-[0.35em] text-[#FAF8F5]/50 hover:text-[#DFBD78] transition-colors"
+                className="hidden md:flex flex-col items-center gap-2 text-[10px] uppercase tracking-[0.35em] text-[#1C1C1F]/50 hover:text-[#DFBD78] transition-colors"
               >
                 Scroll
                 <span className="relative w-px h-10 bg-white/15 overflow-hidden">
@@ -251,7 +251,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
                       type="button"
                       onClick={fn}
                       aria-label={label}
-                      className="w-12 h-12 rounded-full border border-white/20 bg-white/5 backdrop-blur-md hover:border-[#C5A059] hover:bg-[#C5A059] hover:text-[#0D0D0D] flex items-center justify-center transition-all duration-500"
+                      className="w-12 h-12 rounded-full border border-white/20 bg-white/5 backdrop-blur-md hover:border-[#C5A059] hover:bg-[#C5A059] hover:text-[#F2EFE9] flex items-center justify-center transition-all duration-500"
                     >
                       <Icon className="w-5 h-5" />
                     </button>
@@ -265,7 +265,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
 
       {/* Trust strip */}
       <div id="after-hero" className="relative z-20 bg-[#0D0E11] border-y border-[#C5A059]/15 py-5 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:divide-x divide-white/10 text-[11px] text-[#FAF8F5]/70">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:divide-x divide-white/10 text-[11px] text-[#1C1C1F]/70">
           {[
             { Icon: Award, text: 'Hand-Checked Quality' },
             { Icon: Shield, text: 'Plating Warranty' },

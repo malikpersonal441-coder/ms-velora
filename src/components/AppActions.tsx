@@ -48,7 +48,7 @@ export const InstallAppButton: React.FC<{ className?: string; label?: string }> 
       {iosHelp && (
         <div className="fixed inset-0 z-[90] bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={() => setIosHelp(false)}>
           <div
-            className="w-full max-w-sm bg-white rounded-2xl p-6 text-[#0D0D0D] space-y-4"
+            className="w-full max-w-sm bg-white rounded-2xl p-6 text-[#F2EFE9] space-y-4"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-label="Install on iPhone"

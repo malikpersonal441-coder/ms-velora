@@ -51,10 +51,10 @@ export const CartPage: React.FC = () => {
   if (cartItems.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-24 text-center space-y-5">
-        <div className="w-20 h-20 rounded-full bg-[#F3EFE6] flex items-center justify-center mx-auto text-[#9E7B36]">
+        <div className="w-20 h-20 rounded-full bg-[#26262B] flex items-center justify-center mx-auto text-[#D4B06A]">
           <ShoppingBag className="w-9 h-9" />
         </div>
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+        <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
           Your Shopping Bag is Empty
         </h1>
         <p className="text-sm text-neutral-500 max-w-md mx-auto">
@@ -62,7 +62,7 @@ export const CartPage: React.FC = () => {
         </p>
         <Link
           to="/shop"
-          className="inline-block px-8 py-4 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-semibold rounded transition-colors"
+          className="inline-block px-8 py-4 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-semibold rounded transition-colors"
         >
           Explore Jewellery
         </Link>
@@ -72,7 +72,7 @@ export const CartPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
-      <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D] mb-8">
+      <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9] mb-8">
         Your Shopping Bag ({cartItems.reduce((a, b) => a + b.quantity, 0)})
       </h1>
 
@@ -86,7 +86,7 @@ export const CartPage: React.FC = () => {
             >
               <Link
                 to={`/product/${item.slug}`}
-                className="w-24 h-28 rounded-lg bg-[#F3EFE6] overflow-hidden shrink-0"
+                className="w-24 h-28 rounded-lg bg-[#26262B] overflow-hidden shrink-0"
               >
                 <img
                   src={item.image}
@@ -96,12 +96,12 @@ export const CartPage: React.FC = () => {
               </Link>
 
               <div className="flex-1 min-w-0 space-y-1">
-                <span className="text-[11px] uppercase tracking-widest text-[#9E7B36] font-semibold">
+                <span className="text-[11px] uppercase tracking-widest text-[#D4B06A] font-semibold">
                   {item.brand}
                 </span>
                 <Link
                   to={`/product/${item.slug}`}
-                  className="block font-serif-luxury text-xl font-semibold text-[#0D0D0D] hover:text-[#9E7B36]"
+                  className="block font-serif-luxury text-xl font-semibold text-[#F2EFE9] hover:text-[#D4B06A]"
                 >
                   {item.name}
                 </Link>
@@ -146,7 +146,7 @@ export const CartPage: React.FC = () => {
                 </div>
 
                 <div className="text-right min-w-[100px]">
-                  <span className="font-mono-code text-base font-bold text-[#0D0D0D]">
+                  <span className="font-mono-code text-base font-bold text-[#F2EFE9]">
                     {formatPrice(item.subtotal, symbol)}
                   </span>
                 </div>
@@ -182,7 +182,7 @@ export const CartPage: React.FC = () => {
                     type="radio"
                     checked={shippingMethod === 'standard'}
                     onChange={() => setShippingMethod('standard')}
-                    className="accent-[#0D0D0D]"
+                    className="accent-[#F2EFE9]"
                   />
                   <span>Standard Insured (2–4 Days)</span>
                 </div>
@@ -199,7 +199,7 @@ export const CartPage: React.FC = () => {
                     type="radio"
                     checked={shippingMethod === 'express'}
                     onChange={() => setShippingMethod('express')}
-                    className="accent-[#0D0D0D]"
+                    className="accent-[#F2EFE9]"
                   />
                   <span>Express Air Courier (24–48h)</span>
                 </div>
@@ -240,7 +240,7 @@ export const CartPage: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded"
+                  className="px-4 py-2.5 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded"
                 >
                   Apply
                 </button>
@@ -268,7 +268,7 @@ export const CartPage: React.FC = () => {
                     : formatPrice(cartSummary.shippingCost, symbol)}
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-bold text-[#0D0D0D] pt-3 border-t border-neutral-200">
+              <div className="flex justify-between text-lg font-bold text-[#F2EFE9] pt-3 border-t border-neutral-200">
                 <span>Total (PKR)</span>
                 <span className="font-mono-code">
                   {formatPrice(cartSummary.totalAmount, symbol)}
@@ -279,7 +279,7 @@ export const CartPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/checkout')}
-              className="w-full py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-bold text-xs uppercase tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] font-bold text-xs uppercase tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 transition-colors"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4" />
@@ -368,7 +368,7 @@ export const CheckoutPage: React.FC = () => {
         <h1 className="font-serif-luxury text-3xl font-semibold">Your Bag is Empty</h1>
         <Link
           to="/shop"
-          className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
+          className="inline-block px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest rounded"
         >
           Return to Shop
         </Link>
@@ -444,10 +444,10 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
       <div className="mb-8">
-        <span className="text-xs uppercase tracking-[0.22em] text-[#9E7B36] font-semibold">
+        <span className="text-xs uppercase tracking-[0.22em] text-[#D4B06A] font-semibold">
           Checkout
         </span>
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+        <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
           Checkout
         </h1>
       </div>
@@ -458,7 +458,7 @@ export const CheckoutPage: React.FC = () => {
           {/* Saved Addresses Selector for Authenticated Users */}
           {user && user.addresses && user.addresses.length > 0 && (
             <div className="bg-white p-6 rounded-xl border border-black/8 space-y-3">
-              <h2 className="text-xs uppercase tracking-[0.18em] font-bold text-[#9E7B36]">
+              <h2 className="text-xs uppercase tracking-[0.18em] font-bold text-[#D4B06A]">
                 Select From Saved Addresses
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -474,9 +474,9 @@ export const CheckoutPage: React.FC = () => {
                       setProvince(addr.province);
                       setPostalCode(addr.postalCode);
                     }}
-                    className="p-3.5 text-left rounded-lg border border-neutral-200 hover:border-[#C5A059] bg-[#FAF8F5] text-xs space-y-1 transition-colors"
+                    className="p-3.5 text-left rounded-lg border border-neutral-200 hover:border-[#C5A059] bg-[#1C1C1F] text-xs space-y-1 transition-colors"
                   >
-                    <span className="font-bold text-[#0D0D0D] block">
+                    <span className="font-bold text-[#F2EFE9] block">
                       {addr.label} — {addr.fullName}
                     </span>
                     <span className="text-neutral-600 block truncate">{addr.streetAddress}</span>
@@ -491,7 +491,7 @@ export const CheckoutPage: React.FC = () => {
 
           {/* Recipient & Delivery Address */}
           <div className="bg-white p-6 sm:p-8 rounded-xl border border-black/8 space-y-5">
-            <h2 className="font-serif-luxury text-2xl font-semibold text-[#0D0D0D] border-b border-neutral-200 pb-3">
+            <h2 className="font-serif-luxury text-2xl font-semibold text-[#F2EFE9] border-b border-neutral-200 pb-3">
               1. Recipient & Delivery Information
             </h2>
 
@@ -506,7 +506,7 @@ export const CheckoutPage: React.FC = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Tariq Mehmood"
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
 
@@ -520,7 +520,7 @@ export const CheckoutPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="collector@example.com"
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
 
@@ -534,7 +534,7 @@ export const CheckoutPage: React.FC = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="0300 1234567 or +92 300 1234567"
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
 
@@ -548,7 +548,7 @@ export const CheckoutPage: React.FC = () => {
                   value={streetAddress}
                   onChange={(e) => setStreetAddress(e.target.value)}
                   placeholder="House 14-C, Street 8, Phase 5 DHA"
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
 
@@ -559,7 +559,7 @@ export const CheckoutPage: React.FC = () => {
                 <select
                   value={province}
                   onChange={(e) => setProvince(e.target.value)}
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg bg-white focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg bg-white focus:outline-none focus:border-[#F2EFE9]"
                 >
                   {PAKISTAN_PROVINCES.map((prov) => (
                     <option key={prov} value={prov}>
@@ -579,7 +579,7 @@ export const CheckoutPage: React.FC = () => {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Lahore / Karachi / Islamabad"
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
 
@@ -593,7 +593,7 @@ export const CheckoutPage: React.FC = () => {
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
                   placeholder="54000"
-                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
 
@@ -618,7 +618,7 @@ export const CheckoutPage: React.FC = () => {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Optional gift note or preferred delivery hours..."
-                  className="w-full px-4 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+                  className="w-full px-4 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
                 />
               </div>
             </div>
@@ -626,7 +626,7 @@ export const CheckoutPage: React.FC = () => {
 
           {/* Payment Method (No raw card storage!) */}
           <div className="bg-white p-6 sm:p-8 rounded-xl border border-black/8 space-y-4">
-            <h2 className="font-serif-luxury text-2xl font-semibold text-[#0D0D0D] border-b border-neutral-200 pb-3">
+            <h2 className="font-serif-luxury text-2xl font-semibold text-[#F2EFE9] border-b border-neutral-200 pb-3">
               2. Payment Method
             </h2>
 
@@ -635,7 +635,7 @@ export const CheckoutPage: React.FC = () => {
                 <label
                   className={`p-4 rounded-xl border cursor-pointer flex items-start gap-3 transition-all ${
                     paymentMethod === 'cod'
-                      ? 'border-[#0D0D0D] bg-[#FAF8F5]'
+                      ? 'border-[#F2EFE9] bg-[#1C1C1F]'
                       : 'border-neutral-200'
                   }`}
                 >
@@ -644,11 +644,11 @@ export const CheckoutPage: React.FC = () => {
                     name="paymentMethod"
                     checked={paymentMethod === 'cod'}
                     onChange={() => setPaymentMethod('cod')}
-                    className="mt-1 accent-[#0D0D0D]"
+                    className="mt-1 accent-[#F2EFE9]"
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 font-semibold text-sm">
-                      <Banknote className="w-4 h-4 text-[#9E7B36]" />
+                      <Banknote className="w-4 h-4 text-[#D4B06A]" />
                       <span>Cash on Delivery (COD)</span>
                     </div>
                     <p className="text-xs text-neutral-500 mt-1">
@@ -661,7 +661,7 @@ export const CheckoutPage: React.FC = () => {
               {(settings?.mobileWallets?.jazzcash?.enabled !== false || settings?.mobileWallets?.easypaisa?.enabled !== false) && (
                 <label
                   className={`p-4 rounded-xl border cursor-pointer flex items-start gap-3 transition-all ${
-                    paymentMethod === 'online' ? 'border-[#0D0D0D] bg-[#FAF8F5]' : 'border-neutral-200'
+                    paymentMethod === 'online' ? 'border-[#F2EFE9] bg-[#1C1C1F]' : 'border-neutral-200'
                   }`}
                 >
                   <input
@@ -669,7 +669,7 @@ export const CheckoutPage: React.FC = () => {
                     name="paymentMethod"
                     checked={paymentMethod === 'online'}
                     onChange={() => setPaymentMethod('online')}
-                    className="mt-1 accent-[#0D0D0D]"
+                    className="mt-1 accent-[#F2EFE9]"
                   />
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 font-semibold text-sm">
@@ -688,7 +688,7 @@ export const CheckoutPage: React.FC = () => {
                 <label
                   className={`p-4 rounded-xl border cursor-pointer flex items-start gap-3 transition-all ${
                     paymentMethod === 'bank_transfer'
-                      ? 'border-[#0D0D0D] bg-[#FAF8F5]'
+                      ? 'border-[#F2EFE9] bg-[#1C1C1F]'
                       : 'border-neutral-200'
                   }`}
                 >
@@ -697,11 +697,11 @@ export const CheckoutPage: React.FC = () => {
                     name="paymentMethod"
                     checked={paymentMethod === 'bank_transfer'}
                     onChange={() => setPaymentMethod('bank_transfer')}
-                    className="mt-1 accent-[#0D0D0D]"
+                    className="mt-1 accent-[#F2EFE9]"
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 font-semibold text-sm">
-                      <Building2 className="w-4 h-4 text-[#9E7B36]" />
+                      <Building2 className="w-4 h-4 text-[#D4B06A]" />
                       <span>Direct Bank / IBFT Transfer</span>
                     </div>
                     <p className="text-xs text-neutral-500 mt-1">
@@ -731,7 +731,7 @@ export const CheckoutPage: React.FC = () => {
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-14 h-16 rounded object-cover bg-[#F3EFE6] shrink-0"
+                    className="w-14 h-16 rounded object-cover bg-[#26262B] shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-serif-luxury text-base font-semibold truncate">
@@ -774,7 +774,7 @@ export const CheckoutPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => applyCoupon(couponInput)}
-                  className="px-4 py-2.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded"
+                  className="px-4 py-2.5 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded"
                 >
                   Apply
                 </button>
@@ -802,7 +802,7 @@ export const CheckoutPage: React.FC = () => {
                     : formatPrice(cartSummary.shippingCost, symbol)}
                 </span>
               </div>
-              <div className="flex justify-between text-xl font-bold text-[#0D0D0D] pt-3 border-t border-neutral-200">
+              <div className="flex justify-between text-xl font-bold text-[#F2EFE9] pt-3 border-t border-neutral-200">
                 <span>Total</span>
                 <span className="font-mono-code">
                   {formatPrice(cartSummary.totalAmount, symbol)}
@@ -813,7 +813,7 @@ export const CheckoutPage: React.FC = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-bold text-xs uppercase tracking-[0.2em] rounded-lg transition-colors shadow-lg disabled:opacity-50"
+              className="w-full py-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] font-bold text-xs uppercase tracking-[0.2em] rounded-lg transition-colors shadow-lg disabled:opacity-50"
             >
               {submitting ? 'Placing your order…' : 'Place Order'}
             </button>
@@ -829,7 +829,7 @@ export const CheckoutPage: React.FC = () => {
                   type="submit"
                   value="whatsapp"
                   disabled={submitting}
-                  className="group w-full py-4 bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] font-bold text-xs uppercase tracking-[0.2em] rounded-lg transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2.5"
+                  className="group w-full py-4 bg-[#25D366] hover:bg-[#1EBE5A] text-[#F2EFE9] font-bold text-xs uppercase tracking-[0.2em] rounded-lg transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2.5"
                 >
                   <MessageCircle className="w-4 h-4 transition-transform group-hover:scale-110" />
                   <span>Order via WhatsApp</span>
@@ -841,7 +841,7 @@ export const CheckoutPage: React.FC = () => {
             )}
 
             <div className="flex items-center justify-center gap-2 text-[11px] text-neutral-500">
-              <ShieldCheck className="w-4 h-4 text-[#9E7B36]" />
+              <ShieldCheck className="w-4 h-4 text-[#D4B06A]" />
               <span>Secure checkout • 2-year warranty included</span>
             </div>
           </div>
@@ -892,7 +892,7 @@ export const OrderConfirmationPage: React.FC = () => {
         <h1 className="font-serif-luxury text-3xl font-semibold">Order Not Found</h1>
         <Link
           to="/track-order"
-          className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
+          className="inline-block px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest rounded"
         >
           Look Up Another Order
         </Link>
@@ -903,13 +903,13 @@ export const OrderConfirmationPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
       <div className="bg-white rounded-2xl border border-[#C5A059]/40 shadow-xl overflow-hidden">
-        <div className="bg-[#FAF8F5] text-[#0D0D0D] p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C5A059]/20">
+        <div className="bg-[#1C1C1F] text-[#F2EFE9] p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C5A059]/20">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
+            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#D4B06A] font-semibold">
               <CheckCircle2 className="w-4 h-4" />
               <span>Order Receipt</span>
             </div>
-            <h1 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#0D0D0D]">
+            <h1 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#F2EFE9]">
               Thank You, {order.shippingAddress.fullName}
             </h1>
             <p className="text-xs text-neutral-500">
@@ -921,14 +921,14 @@ export const OrderConfirmationPage: React.FC = () => {
             <span className="text-[10px] uppercase tracking-widest text-neutral-500 block">
               Order Number
             </span>
-            <span className="font-mono-code text-xl font-bold text-[#9E7B36]">
+            <span className="font-mono-code text-xl font-bold text-[#D4B06A]">
               {order.orderNumber}
             </span>
             <div className="mt-2 no-print">
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/10 hover:bg-[#C5A059] hover:text-[#0D0D0D] text-xs font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/10 hover:bg-[#C5A059] hover:text-[#F2EFE9] text-xs font-medium transition-colors"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Invoice</span>
@@ -942,7 +942,7 @@ export const OrderConfirmationPage: React.FC = () => {
           {isWalletMethod(order.paymentMethod) && order.paymentStatus !== 'paid' && (
             <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/50">
               <div className="text-sm">
-                <p className="font-semibold text-[#0D0D0D]">
+                <p className="font-semibold text-[#F2EFE9]">
                   Payment pending — {order.paymentMethod === 'jazzcash' ? 'JazzCash' : order.paymentMethod === 'easypaisa' ? 'EasyPaisa' : 'Online Payment'}
                 </p>
                 <p className="text-xs text-neutral-600 mt-0.5">
@@ -952,7 +952,7 @@ export const OrderConfirmationPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setPayOpen(true)}
-                className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-bold transition-colors"
+                className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-bold transition-colors"
               >
                 Pay Now
               </button>
@@ -964,7 +964,7 @@ export const OrderConfirmationPage: React.FC = () => {
           {order.orderSource === 'whatsapp' && settings?.whatsappNumber && (
             <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/40">
               <div className="text-sm">
-                <p className="font-semibold text-[#0D0D0D]">Confirm your order on WhatsApp</p>
+                <p className="font-semibold text-[#F2EFE9]">Confirm your order on WhatsApp</p>
                 <p className="text-xs text-neutral-600 mt-0.5">
                   If WhatsApp didn't open, tap the button — your order details are already written for you.
                 </p>
@@ -973,7 +973,7 @@ export const OrderConfirmationPage: React.FC = () => {
                 href={waLink(settings.whatsappNumber, customerOrderMessage(order, settings))}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-bold transition-colors"
+                className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-bold transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
                 Open WhatsApp
@@ -982,12 +982,12 @@ export const OrderConfirmationPage: React.FC = () => {
           )}
 
           {/* Status Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-[#FAF8F5] border border-black/8 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-[#1C1C1F] border border-black/8 text-xs">
             <div>
               <span className="text-neutral-500 uppercase tracking-wider block">
                 Fulfillment Status
               </span>
-              <span className="font-bold text-sm uppercase text-[#0D0D0D] mt-0.5 block">
+              <span className="font-bold text-sm uppercase text-[#F2EFE9] mt-0.5 block">
                 {order.fulfillmentStatus}
               </span>
             </div>
@@ -995,7 +995,7 @@ export const OrderConfirmationPage: React.FC = () => {
               <span className="text-neutral-500 uppercase tracking-wider block">
                 Payment Status
               </span>
-              <span className="font-bold text-sm uppercase text-[#0D0D0D] mt-0.5 block">
+              <span className="font-bold text-sm uppercase text-[#F2EFE9] mt-0.5 block">
                 {order.paymentStatus} ({order.paymentMethod.toUpperCase()})
               </span>
             </div>
@@ -1003,7 +1003,7 @@ export const OrderConfirmationPage: React.FC = () => {
               <span className="text-neutral-500 uppercase tracking-wider block">
                 Delivery Destination
               </span>
-              <span className="font-semibold text-[#0D0D0D] mt-0.5 block">
+              <span className="font-semibold text-[#F2EFE9] mt-0.5 block">
                 {order.shippingAddress.city}, {order.shippingAddress.province}
               </span>
             </div>
@@ -1019,13 +1019,13 @@ export const OrderConfirmationPage: React.FC = () => {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-14 h-16 rounded object-cover bg-[#F3EFE6]"
+                      className="w-14 h-16 rounded object-cover bg-[#26262B]"
                     />
                     <div>
-                      <p className="text-[11px] uppercase tracking-wider text-[#9E7B36] font-semibold">
+                      <p className="text-[11px] uppercase tracking-wider text-[#D4B06A] font-semibold">
                         {item.brand}
                       </p>
-                      <h4 className="font-serif-luxury text-lg font-semibold text-[#0D0D0D]">
+                      <h4 className="font-serif-luxury text-lg font-semibold text-[#F2EFE9]">
                         {item.name}
                       </h4>
                       <p className="text-xs text-neutral-500">
@@ -1044,10 +1044,10 @@ export const OrderConfirmationPage: React.FC = () => {
           {/* Totals & Address */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-neutral-200">
             <div className="space-y-2 text-xs">
-              <h3 className="uppercase tracking-wider font-bold text-[#0D0D0D] text-sm">
+              <h3 className="uppercase tracking-wider font-bold text-[#F2EFE9] text-sm">
                 Delivery Address
               </h3>
-              <p className="font-semibold text-[#0D0D0D]">{order.shippingAddress.fullName}</p>
+              <p className="font-semibold text-[#F2EFE9]">{order.shippingAddress.fullName}</p>
               <p className="text-neutral-600">{order.shippingAddress.streetAddress}</p>
               <p className="text-neutral-600">
                 {order.shippingAddress.city}, {order.shippingAddress.province}{' '}
@@ -1074,7 +1074,7 @@ export const OrderConfirmationPage: React.FC = () => {
                   {order.shippingCost === 0 ? 'Complimentary' : formatPrice(order.shippingCost)}
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-bold text-[#0D0D0D] pt-2 border-t border-neutral-200">
+              <div className="flex justify-between text-lg font-bold text-[#F2EFE9] pt-2 border-t border-neutral-200">
                 <span>Total Amount</span>
                 <span className="font-mono-code">{formatPrice(order.totalAmount)}</span>
               </div>
@@ -1084,13 +1084,13 @@ export const OrderConfirmationPage: React.FC = () => {
           <div className="pt-4 flex flex-wrap items-center justify-between gap-4 no-print">
             <Link
               to={`/track-order?orderNumber=${order.orderNumber}`}
-              className="px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded"
+              className="px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest font-semibold rounded"
             >
               Track Order Status
             </Link>
             <Link
               to="/shop"
-              className="px-6 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs uppercase tracking-widest font-semibold rounded"
+              className="px-6 py-3 border border-[#F2EFE9] text-[#F2EFE9] text-xs uppercase tracking-widest font-semibold rounded"
             >
               Continue Shopping
             </Link>
@@ -1139,10 +1139,10 @@ export const TrackOrderPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 pb-24 space-y-8">
       <div className="text-center space-y-2">
-        <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+        <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
           Insured Logistics Tracking
         </span>
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+        <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
           Track Your Order
         </h1>
         <p className="text-sm text-neutral-500">
@@ -1159,12 +1159,12 @@ export const TrackOrderPage: React.FC = () => {
           value={orderNumInput}
           onChange={(e) => setOrderNumInput(e.target.value.toUpperCase())}
           placeholder="Order Reference (e.g. MS-001)"
-          className="flex-1 px-4 py-3.5 bg-white border border-neutral-300 rounded-lg font-mono-code text-sm uppercase focus:outline-none focus:border-[#0D0D0D]"
+          className="flex-1 px-4 py-3.5 bg-white border border-neutral-300 rounded-lg font-mono-code text-sm uppercase focus:outline-none focus:border-[#F2EFE9]"
         />
         <button
           type="submit"
           disabled={loading}
-          className="px-7 py-3.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-semibold rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
+          className="px-7 py-3.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-semibold rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
         >
           <Search className="w-4 h-4" />
           <span>{loading ? 'Searching...' : 'Track Order'}</span>
@@ -1184,13 +1184,13 @@ export const TrackOrderPage: React.FC = () => {
               <span className="text-xs text-neutral-400 uppercase tracking-wider block">
                 Order Reference
               </span>
-              <h2 className="font-mono-code text-2xl font-bold text-[#0D0D0D]">
+              <h2 className="font-mono-code text-2xl font-bold text-[#F2EFE9]">
                 {order.orderNumber}
               </h2>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 rounded-full bg-[#0D0D0D] text-[#C5A059] text-xs font-bold uppercase tracking-wider">
+              <span className="px-3 py-1 rounded-full bg-[#F2EFE9] text-[#C5A059] text-xs font-bold uppercase tracking-wider">
                 {order.fulfillmentStatus}
               </span>
               <span className="px-3 py-1 rounded-full bg-neutral-100 text-neutral-800 text-xs font-semibold uppercase tracking-wider">
@@ -1200,14 +1200,14 @@ export const TrackOrderPage: React.FC = () => {
           </div>
 
           {order.trackingNumber && (
-            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#C5A059]/40 flex items-center justify-between gap-4">
+            <div className="p-4 rounded-xl bg-[#1C1C1F] border border-[#C5A059]/40 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Truck className="w-6 h-6 text-[#9E7B36]" />
+                <Truck className="w-6 h-6 text-[#D4B06A]" />
                 <div>
-                  <p className="text-xs uppercase tracking-wider font-semibold text-[#9E7B36]">
+                  <p className="text-xs uppercase tracking-wider font-semibold text-[#D4B06A]">
                     Courier Partner: {order.courierName || 'Insured Express'}
                   </p>
-                  <p className="text-sm font-mono-code font-bold text-[#0D0D0D]">
+                  <p className="text-sm font-mono-code font-bold text-[#F2EFE9]">
                     Tracking Number: {order.trackingNumber}
                   </p>
                 </div>
@@ -1224,7 +1224,7 @@ export const TrackOrderPage: React.FC = () => {
               {order.statusHistory.map((hist, i) => (
                 <div key={i} className="relative space-y-0.5">
                   <span className="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full bg-[#C5A059] border-2 border-white" />
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0D0D0D]">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#F2EFE9]">
                     <span>{hist.status}</span>
                     <span className="text-neutral-400 font-normal">
                       • {formatDateTime(hist.timestamp)}

@@ -82,7 +82,7 @@ const AppShell: React.FC = () => {
   }, [isAdminRoute]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#0D0D0D]">
+    <div className="min-h-screen flex flex-col bg-[#1C1C1F] text-[#F2EFE9]">
       {!isAdminRoute && (
         <>
           <AnnouncementBar />
@@ -96,7 +96,7 @@ const AppShell: React.FC = () => {
       <main className={`flex-1 ${!isAdminRoute ? 'pb-16 lg:pb-0' : ''}`}>
         <Suspense
           fallback={
-            <div className="py-32 text-center text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+            <div className="py-32 text-center text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
               Loading MS Velora Vault...
             </div>
           }

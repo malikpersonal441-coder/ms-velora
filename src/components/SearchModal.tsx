@@ -76,19 +76,19 @@ export const SearchModal: React.FC = () => {
             aria-label="Search jewellery"
           >
             <form onSubmit={handleSubmit} className="relative flex items-center border-b border-neutral-200 bg-white px-5 py-4">
-              <Search className="w-5 h-5 text-[#9E7B36] shrink-0" />
+              <Search className="w-5 h-5 text-[#D4B06A] shrink-0" />
               <input
                 type="text"
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search necklaces, earrings, rings..."
-                className="w-full px-4 text-sm sm:text-base text-[#0D0D0D] placeholder:text-neutral-400 focus:outline-none"
+                className="w-full px-4 text-sm sm:text-base text-[#F2EFE9] placeholder:text-neutral-400 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(false)}
-                className="p-1.5 text-neutral-400 hover:text-[#0D0D0D]"
+                className="p-1.5 text-neutral-400 hover:text-[#F2EFE9]"
                 aria-label="Close search"
               >
                 <X className="w-5 h-5" />
@@ -116,7 +116,7 @@ export const SearchModal: React.FC = () => {
                         key={term}
                         type="button"
                         onClick={() => setQuery(term)}
-                        className="px-3.5 py-1.5 rounded-full bg-white border border-neutral-200 hover:border-[#C5A059] text-xs font-medium text-[#0D0D0D] transition-colors"
+                        className="px-3.5 py-1.5 rounded-full bg-white border border-neutral-200 hover:border-[#C5A059] text-xs font-medium text-[#F2EFE9] transition-colors"
                       >
                         {term}
                       </button>
@@ -144,7 +144,7 @@ export const SearchModal: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className="text-[#9E7B36] hover:underline font-semibold inline-flex items-center gap-1"
+                      className="text-[#D4B06A] hover:underline font-semibold inline-flex items-center gap-1"
                     >
                       <span>View all results</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -156,25 +156,25 @@ export const SearchModal: React.FC = () => {
                         key={prod._id}
                         to={`/product/${prod.slug}`}
                         onClick={() => setIsSearchOpen(false)}
-                        className="flex items-center gap-4 p-3 hover:bg-[#FAF8F5] transition-colors"
+                        className="flex items-center gap-4 p-3 hover:bg-[#1C1C1F] transition-colors"
                       >
                         <img
                           src={prod.mainImage}
                           alt={prod.name}
-                          className="w-14 h-14 rounded object-cover bg-[#F3EFE6] shrink-0"
+                          className="w-14 h-14 rounded object-cover bg-[#26262B] shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] uppercase tracking-wider text-[#9E7B36] font-semibold">
+                          <p className="text-[10px] uppercase tracking-wider text-[#D4B06A] font-semibold">
                             {prod.brand}
                           </p>
-                          <h4 className="font-serif-luxury text-base font-semibold text-[#0D0D0D] truncate">
+                          <h4 className="font-serif-luxury text-base font-semibold text-[#F2EFE9] truncate">
                             {prod.name}
                           </h4>
                           <p className="text-xs text-neutral-500">
                             {prod.specifications?.movement} • {prod.specifications?.caseMaterial}
                           </p>
                         </div>
-                        <div className="text-right font-mono-code text-sm font-bold text-[#0D0D0D]">
+                        <div className="text-right font-mono-code text-sm font-bold text-[#F2EFE9]">
                           {formatPrice(prod.salePrice || prod.price, symbol)}
                         </div>
                       </Link>

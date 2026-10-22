@@ -64,10 +64,10 @@ export const LoginPage: React.FC = () => {
     <div className="max-w-md mx-auto px-4 py-16 pb-24">
       <div className="bg-white p-8 rounded-2xl border border-black/10 shadow-lg space-y-6">
         <div className="text-center space-y-2">
-          <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+          <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
             MS Velora Vault Access
           </span>
-          <h1 className="font-serif-luxury text-3xl font-semibold text-[#0D0D0D]">
+          <h1 className="font-serif-luxury text-3xl font-semibold text-[#F2EFE9]">
             Sign In to Your Account
           </h1>
         </div>
@@ -83,7 +83,7 @@ export const LoginPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="collector@msvelora.pk"
-              className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+              className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
             />
           </div>
 
@@ -94,7 +94,7 @@ export const LoginPage: React.FC = () => {
               </label>
               <Link
                 to="/forgot-password"
-                className="text-xs text-[#9E7B36] hover:underline font-medium"
+                className="text-xs text-[#D4B06A] hover:underline font-medium"
               >
                 Forgot password?
               </Link>
@@ -105,14 +105,14 @@ export const LoginPage: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#0D0D0D]"
+              className="w-full px-4 py-3 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#F2EFE9]"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors"
+            className="w-full py-3.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors"
           >
             {loading ? 'Authenticating...' : 'Sign In'}
           </button>
@@ -120,7 +120,7 @@ export const LoginPage: React.FC = () => {
 
         <p className="text-center text-xs text-neutral-500">
           New to MS Velora?{' '}
-          <Link to="/register" className="text-[#9E7B36] font-semibold hover:underline">
+          <Link to="/register" className="text-[#D4B06A] font-semibold hover:underline">
             Create a Collector Account
           </Link>
         </p>
@@ -166,10 +166,10 @@ export const RegisterPage: React.FC = () => {
     <div className="max-w-md mx-auto px-4 py-16 pb-24">
       <div className="bg-white p-8 rounded-2xl border border-black/10 shadow-lg space-y-6">
         <div className="text-center space-y-2">
-          <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+          <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
             Collector Membership
           </span>
-          <h1 className="font-serif-luxury text-3xl font-semibold text-[#0D0D0D]">
+          <h1 className="font-serif-luxury text-3xl font-semibold text-[#F2EFE9]">
             Create Your Account
           </h1>
         </div>
@@ -233,7 +233,7 @@ export const RegisterPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors"
+            className="w-full py-3.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors"
           >
             {loading ? 'Creating Account...' : 'Register Account'}
           </button>
@@ -241,7 +241,7 @@ export const RegisterPage: React.FC = () => {
 
         <p className="text-center text-xs text-neutral-500">
           Already registered?{' '}
-          <Link to="/login" className="text-[#9E7B36] font-semibold hover:underline">
+          <Link to="/login" className="text-[#D4B06A] font-semibold hover:underline">
             Sign In
           </Link>
         </p>
@@ -325,7 +325,7 @@ export const ForgotPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded-lg"
+              className="w-full py-3.5 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest font-semibold rounded-lg"
             >
               {loading ? 'Sending...' : 'Request Reset Token'}
             </button>
@@ -359,7 +359,7 @@ export const ForgotPasswordPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#C5A059] text-[#0D0D0D] text-xs uppercase tracking-widest font-bold rounded-lg"
+              className="w-full py-3.5 bg-[#C5A059] text-[#F2EFE9] text-xs uppercase tracking-widest font-bold rounded-lg"
             >
               {loading ? 'Updating Password...' : 'Set New Password'}
             </button>
@@ -524,10 +524,10 @@ export const AccountDashboardPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-neutral-200">
         <div>
-          <span className="text-xs uppercase tracking-[0.22em] text-[#9E7B36] font-semibold">
+          <span className="text-xs uppercase tracking-[0.22em] text-[#D4B06A] font-semibold">
             Private Collector Portal
           </span>
-          <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+          <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
             Welcome, {user.name}
           </h1>
           <p className="text-xs text-neutral-500 mt-1">{user.email}</p>
@@ -567,7 +567,7 @@ export const AccountDashboardPage: React.FC = () => {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-xs uppercase tracking-[0.15em] font-semibold transition-all ${
                   active
-                    ? 'bg-[#0D0D0D] text-[#C5A059]'
+                    ? 'bg-[#F2EFE9] text-[#C5A059]'
                     : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-black/5'
                 }`}
               >
@@ -595,7 +595,7 @@ export const AccountDashboardPage: React.FC = () => {
                   <p className="text-base font-medium">You have not placed any orders yet.</p>
                   <Link
                     to="/shop"
-                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
+                    className="inline-block px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest rounded"
                   >
                     Explore Jewellery
                   </Link>
@@ -608,7 +608,7 @@ export const AccountDashboardPage: React.FC = () => {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-neutral-100">
                       <div>
-                        <span className="font-mono-code text-base font-bold text-[#0D0D0D]">
+                        <span className="font-mono-code text-base font-bold text-[#F2EFE9]">
                           {order.orderNumber}
                         </span>
                         <span className="text-xs text-neutral-400 block">
@@ -616,7 +616,7 @@ export const AccountDashboardPage: React.FC = () => {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="px-3 py-1 rounded-full bg-[#0D0D0D] text-[#C5A059] text-[11px] font-bold uppercase tracking-wider">
+                        <span className="px-3 py-1 rounded-full bg-[#F2EFE9] text-[#C5A059] text-[11px] font-bold uppercase tracking-wider">
                           {order.fulfillmentStatus}
                         </span>
                         <span className="px-3 py-1 rounded-full bg-neutral-100 text-neutral-700 text-[11px] font-semibold uppercase tracking-wider">
@@ -624,7 +624,7 @@ export const AccountDashboardPage: React.FC = () => {
                         </span>
                         <Link
                           to={`/order-confirmation/${order.orderNumber}`}
-                          className="px-3 py-1 rounded border border-neutral-300 hover:border-[#0D0D0D] text-xs font-medium"
+                          className="px-3 py-1 rounded border border-neutral-300 hover:border-[#F2EFE9] text-xs font-medium"
                         >
                           Invoice / Details
                         </Link>
@@ -638,12 +638,12 @@ export const AccountDashboardPage: React.FC = () => {
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="w-12 h-14 rounded object-cover bg-[#F3EFE6]"
+                              className="w-12 h-14 rounded object-cover bg-[#26262B]"
                             />
                             <div>
                               <Link
                                 to={`/product/${item.slug}`}
-                                className="font-serif-luxury text-base font-semibold hover:text-[#9E7B36]"
+                                className="font-serif-luxury text-base font-semibold hover:text-[#D4B06A]"
                               >
                                 {item.name}
                               </Link>
@@ -665,7 +665,7 @@ export const AccountDashboardPage: React.FC = () => {
                           ? `Courier: ${order.courierName} (#${order.trackingNumber})`
                           : `Delivery to ${order.shippingAddress.city}`}
                       </span>
-                      <span className="font-mono-code font-bold text-[#0D0D0D]">
+                      <span className="font-mono-code font-bold text-[#F2EFE9]">
                         Total: {formatPrice(order.totalAmount)}
                       </span>
                     </div>
@@ -717,7 +717,7 @@ export const AccountDashboardPage: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-widest font-semibold rounded-lg transition-colors"
+                className="px-6 py-3 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-widest font-semibold rounded-lg transition-colors"
               >
                 Save Changes
               </button>
@@ -734,7 +734,7 @@ export const AccountDashboardPage: React.FC = () => {
                   >
                     <div className="space-y-1 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold uppercase tracking-wider text-[#9E7B36]">
+                        <span className="font-bold uppercase tracking-wider text-[#D4B06A]">
                           {addr.label}
                         </span>
                         {addr.isDefault && (
@@ -743,7 +743,7 @@ export const AccountDashboardPage: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <p className="font-bold text-sm text-[#0D0D0D]">{addr.fullName}</p>
+                      <p className="font-bold text-sm text-[#F2EFE9]">{addr.fullName}</p>
                       <p className="text-neutral-600">{addr.streetAddress}</p>
                       <p className="text-neutral-600">
                         {addr.city}, {addr.province} {addr.postalCode}
@@ -833,7 +833,7 @@ export const AccountDashboardPage: React.FC = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded-lg"
+                  className="px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest font-semibold rounded-lg"
                 >
                   Save Address
                 </button>
@@ -891,7 +891,7 @@ export const AccountDashboardPage: React.FC = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded-lg"
+                  className="px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest font-semibold rounded-lg"
                 >
                   Update Password
                 </button>
@@ -907,7 +907,7 @@ export const AccountDashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleInvalidateSessions}
-                  className="px-5 py-2.5 border border-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg transition-colors"
+                  className="px-5 py-2.5 border border-[#F2EFE9] hover:bg-[#F2EFE9] hover:text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded-lg transition-colors"
                 >
                   Revoke Other Device Sessions
                 </button>
@@ -930,10 +930,10 @@ export const WishlistPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
       <div className="mb-8">
-        <span className="text-xs uppercase tracking-[0.22em] text-[#9E7B36] font-semibold">
+        <span className="text-xs uppercase tracking-[0.22em] text-[#D4B06A] font-semibold">
           Curated Favorites
         </span>
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+        <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
           Your Wishlist ({wishlistProducts.length})
         </h1>
       </div>
@@ -947,7 +947,7 @@ export const WishlistPage: React.FC = () => {
           </p>
           <Link
             to="/shop"
-            className="inline-block px-7 py-3.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded"
+            className="inline-block px-7 py-3.5 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest font-semibold rounded"
           >
             Explore Jewellery
           </Link>
@@ -985,7 +985,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14 pb-24 space-y-10">
         <div className="text-center space-y-2">
-          <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+          <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
             Customer Support
           </span>
           <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold">
@@ -994,8 +994,8 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white text-[#0D0D0D] p-8 rounded-2xl border border-[#C5A059]/25 shadow-xl space-y-6">
-            <h2 className="font-serif-luxury text-2xl font-semibold text-[#9E7B36]">
+          <div className="bg-white text-[#F2EFE9] p-8 rounded-2xl border border-[#C5A059]/25 shadow-xl space-y-6">
+            <h2 className="font-serif-luxury text-2xl font-semibold text-[#D4B06A]">
               Visit MS Velora
             </h2>
             <div className="space-y-4 text-sm text-neutral-600">
@@ -1008,7 +1008,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-[#C5A059] shrink-0" />
-                <a href={`tel:${(settings?.contactPhone || '+92 300 0000000').replace(/[^+\d]/g, '')}`} className="hover:text-[#9E7B36] transition-colors">{settings?.contactPhone || '+92 300 0000000'}</a>
+                <a href={`tel:${(settings?.contactPhone || '+92 300 0000000').replace(/[^+\d]/g, '')}`} className="hover:text-[#D4B06A] transition-colors">{settings?.contactPhone || '+92 300 0000000'}</a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[#C5A059] shrink-0" />
@@ -1061,7 +1061,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
             />
             <button
               type="submit"
-              className="w-full py-3.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-widest font-bold rounded-lg transition-colors"
+              className="w-full py-3.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-widest font-bold rounded-lg transition-colors"
             >
               Submit Inquiry
             </button>
@@ -1074,10 +1074,10 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 pb-24">
       <div className="bg-white p-8 sm:p-12 rounded-2xl border border-black/10 space-y-6">
-        <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+        <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
           MS Velora Official Charter
         </span>
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+        <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
           {type === 'shipping'
             ? 'Shipping, Returns & Official Warranty'
             : type === 'privacy'
@@ -1088,21 +1088,21 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
         <div className="prose prose-neutral max-w-none space-y-4 text-sm text-neutral-700 leading-relaxed">
           {type === 'shipping' && (
             <>
-              <h3 className="font-serif-luxury text-xl font-bold text-[#0D0D0D]">
+              <h3 className="font-serif-luxury text-xl font-bold text-[#F2EFE9]">
                 1. Insured Nationwide Delivery
               </h3>
               <p>
                 {settings?.policies?.shippingPolicy ||
                   'All orders are dispatched in tamper-evident luxury packaging via insured courier partners across Pakistan.'}
               </p>
-              <h3 className="font-serif-luxury text-xl font-bold text-[#0D0D0D]">
+              <h3 className="font-serif-luxury text-xl font-bold text-[#F2EFE9]">
                 2. 7-Day Inspection & Exchange Policy
               </h3>
               <p>
                 {settings?.policies?.returnPolicy ||
                   'We offer a 7-day inspection and exchange guarantee from the date of delivery for unworn jewellery in its original box.'}
               </p>
-              <h3 className="font-serif-luxury text-xl font-bold text-[#0D0D0D]">
+              <h3 className="font-serif-luxury text-xl font-bold text-[#F2EFE9]">
                 3. 2-Year Official Mechanical & Movement Warranty
               </h3>
               <p>
@@ -1135,13 +1135,13 @@ export const NotFoundPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-24 text-center space-y-5">
-      <div className="w-16 h-16 rounded-full bg-[#0D0D0D] text-[#C5A059] flex items-center justify-center mx-auto border border-[#C5A059]">
+      <div className="w-16 h-16 rounded-full bg-[#F2EFE9] text-[#C5A059] flex items-center justify-center mx-auto border border-[#C5A059]">
         <Gem className="w-8 h-8" />
       </div>
-      <span className="text-xs uppercase tracking-[0.26em] text-[#9E7B36] font-semibold block">
+      <span className="text-xs uppercase tracking-[0.26em] text-[#D4B06A] font-semibold block">
         Error 404
       </span>
-      <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#0D0D0D]">
+      <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#F2EFE9]">
         Page Not Found
       </h1>
       <p className="text-sm text-neutral-500 max-w-md mx-auto">
@@ -1150,13 +1150,13 @@ export const NotFoundPage: React.FC = () => {
       <div className="flex items-center justify-center gap-4 pt-2">
         <Link
           to="/"
-          className="px-6 py-3.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded"
+          className="px-6 py-3.5 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest font-semibold rounded"
         >
           Return Home
         </Link>
         <Link
           to="/shop"
-          className="px-6 py-3.5 border border-[#0D0D0D] text-[#0D0D0D] text-xs uppercase tracking-widest font-semibold rounded"
+          className="px-6 py-3.5 border border-[#F2EFE9] text-[#F2EFE9] text-xs uppercase tracking-widest font-semibold rounded"
         >
           Browse Catalog
         </Link>

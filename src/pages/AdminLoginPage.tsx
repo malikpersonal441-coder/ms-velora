@@ -49,7 +49,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090B] flex items-center justify-center px-4 grain relative">
+    <div className="min-h-screen bg-[#E8E4DC] flex items-center justify-center px-4 grain relative">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(197,160,89,0.12),transparent_60%)]" />
       <form
         onSubmit={handleSubmit}
@@ -65,11 +65,11 @@ export const AdminLoginPage: React.FC = () => {
               className="h-full w-full rounded-full object-cover bg-black"
             />
           </div>
-          <h1 className="font-serif-luxury text-3xl text-[#FAF8F5] font-semibold">Staff Console</h1>
-          <p className="text-xs text-[#FAF8F5]/50">Authorized personnel only. Access is logged.</p>
+          <h1 className="font-serif-luxury text-3xl text-[#1C1C1F] font-semibold">Staff Console</h1>
+          <p className="text-xs text-[#1C1C1F]/50">Authorized personnel only. Access is logged.</p>
         </div>
 
-        <label className="block text-xs text-[#FAF8F5]/70">
+        <label className="block text-xs text-[#1C1C1F]/70">
           Email
           <input
             type="email"
@@ -77,10 +77,10 @@ export const AdminLoginPage: React.FC = () => {
             autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1.5 w-full px-3.5 py-3 rounded-lg bg-[#08090B] border border-white/10 text-[#FAF8F5] focus:border-[#C5A059] outline-none placeholder:text-white/20"
+            className="mt-1.5 w-full px-3.5 py-3 rounded-lg bg-[#E8E4DC] border border-white/10 text-[#1C1C1F] focus:border-[#C5A059] outline-none placeholder:text-white/20"
           />
         </label>
-        <label className="block text-xs text-[#FAF8F5]/70">
+        <label className="block text-xs text-[#1C1C1F]/70">
           Password
           <input
             type="password"
@@ -88,7 +88,7 @@ export const AdminLoginPage: React.FC = () => {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1.5 w-full px-3.5 py-3 rounded-lg bg-[#08090B] border border-white/10 text-[#FAF8F5] focus:border-[#C5A059] outline-none placeholder:text-white/20"
+            className="mt-1.5 w-full px-3.5 py-3 rounded-lg bg-[#E8E4DC] border border-white/10 text-[#1C1C1F] focus:border-[#C5A059] outline-none placeholder:text-white/20"
           />
         </label>
 

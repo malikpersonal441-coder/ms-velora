@@ -16,12 +16,12 @@ export const CollectionsPage: React.FC = () => {
 
   return (
     <div className="pb-20">
-      <div className="bg-[#FAF8F5] text-[#0D0D0D] py-16 border-b border-[#C5A059]/20">
+      <div className="bg-[#1C1C1F] text-[#F2EFE9] py-16 border-b border-[#C5A059]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl space-y-3">
-          <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+          <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
             The MS Velora Vault
           </span>
-          <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#0D0D0D]">
+          <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#F2EFE9]">
             Curated Jewellery Collections
           </h1>
           <p className="text-sm text-neutral-600">
@@ -31,7 +31,7 @@ export const CollectionsPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
-        <p className="text-center text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-medium mb-8">
+        <p className="text-center text-xs uppercase tracking-[0.2em] text-[#D4B06A] font-medium mb-8">
           Tap or hover any card to turn it over and explore the story behind each collection
         </p>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -85,7 +85,7 @@ export const CollectionDetailPage: React.FC = () => {
         <h1 className="font-serif-luxury text-3xl font-semibold">Collection Not Found</h1>
         <Link
           to="/collections"
-          className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
+          className="inline-block px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest rounded"
         >
           Browse All Collections
         </Link>
@@ -95,21 +95,21 @@ export const CollectionDetailPage: React.FC = () => {
 
   return (
     <div className="pb-20">
-      <div className="relative bg-[#FAF8F5] text-[#0D0D0D] py-20 overflow-hidden border-b border-[#C5A059]/20">
+      <div className="relative bg-[#1C1C1F] text-[#F2EFE9] py-20 overflow-hidden border-b border-[#C5A059]/20">
         <img
           src={collection.bannerImage || collection.image}
           alt={collection.name}
           className="absolute inset-0 w-full h-full object-cover opacity-15"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-medium">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#D4B06A] font-medium">
             <Link to="/collections" className="hover:underline">
               Collections
             </Link>
             <span>/</span>
             <span>{collection.name}</span>
           </div>
-          <h1 className="font-serif-luxury text-4xl sm:text-6xl font-semibold text-[#0D0D0D]">
+          <h1 className="font-serif-luxury text-4xl sm:text-6xl font-semibold text-[#F2EFE9]">
             {collection.name}
           </h1>
           <p className="text-base text-neutral-600 max-w-2xl">
@@ -124,7 +124,7 @@ export const CollectionDetailPage: React.FC = () => {
             <p className="text-base font-medium">No pieces currently assigned to this collection.</p>
             <Link
               to="/shop"
-              className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
+              className="inline-block px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest rounded"
             >
               Explore Full Catalog
             </Link>

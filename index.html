@@ -27,7 +27,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="theme-color" content="#1C1C1F" />
     <meta property="og:image" content="/brand/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -35,7 +35,7 @@
     <!-- Preload the header logo so it appears instantly -->
     <link rel="preload" as="image" href="/brand/logo.jpg" type="image/jpeg" />
   </head>
-  <body class="bg-white text-[#0D0D0D] antialiased selection:bg-[#C5A059]/25 selection:text-[#0D0D0D]">
+  <body class="bg-white text-[#F2EFE9] antialiased selection:bg-[#C5A059]/25 selection:text-[#F2EFE9]">
     <!-- Opening loader: Round luxury gold medallion with rotating shimmer halo and breathing glow -->
     <div id="msv-loader" role="status" aria-live="polite" aria-label="Loading MS Velora">
       <div class="msv-loader-container">
@@ -51,14 +51,14 @@
       </div>
     </div>
     <style>
-      #msv-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#FFFFFF;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility .7s}
+      #msv-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#1C1C1F;transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility .7s}
       .msv-loader-container{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
       .msv-halo-ring{position:absolute;inset:-6px;border-radius:50%;padding:2px;background:conic-gradient(from 0deg,transparent 0%,#C5A059 25%,#DFBD78 50%,#C5A059 75%,transparent 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:msv-spin 3.2s linear infinite}
       .msv-logo-disc{width:140px;height:140px;border-radius:50%;overflow:hidden;padding:2px;background:linear-gradient(135deg,#DFBD78,#C5A059 50%,#9E7B36);box-shadow:0 12px 35px rgba(197,160,89,.22),0 4px 15px rgba(0,0,0,.06);position:relative;z-index:2;animation:msv-float 3s ease-in-out infinite alternate}
       .msv-logo{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
       .msv-caption{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-      .msv-brand-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.28em;color:#9E7B36;text-transform:uppercase;animation:msv-fade 1.2s ease forwards}
-      .msv-brand-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.32em;color:rgba(13,13,13,.55);text-transform:uppercase}
+      .msv-brand-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.28em;color:#DFBD78;text-transform:uppercase;animation:msv-fade 1.2s ease forwards}
+      .msv-brand-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.32em;color:rgba(242,239,233,.6);text-transform:uppercase}
       .msv-line{display:block;height:1px;width:140px;margin-top:4px;background:linear-gradient(90deg,transparent,#C5A059 30%,#DFBD78 50%,#C5A059 70%,transparent);transform:scaleX(0);animation:msv-line 1.2s cubic-bezier(.65,0,.35,1) .4s forwards}
       #msv-loader.msv-done{opacity:0;visibility:hidden;pointer-events:none}
       @keyframes msv-spin{to{transform:rotate(360deg)}}

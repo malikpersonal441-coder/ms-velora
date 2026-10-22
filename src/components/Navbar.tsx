@@ -56,8 +56,8 @@ export const Navbar: React.FC = () => {
       <header
         className={`sticky top-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'bg-white/95 backdrop-blur-md text-[#0D0D0D] shadow-[0_4px_25px_rgba(0,0,0,0.06)] py-3.5 border-b border-[#C5A059]/20'
-            : 'bg-white text-[#0D0D0D] py-5 border-b border-black/5'
+            ? 'bg-white/95 backdrop-blur-md text-[#F2EFE9] shadow-[0_4px_25px_rgba(0,0,0,0.06)] py-3.5 border-b border-[#C5A059]/20'
+            : 'bg-white text-[#F2EFE9] py-5 border-b border-black/5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,7 +66,7 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 -ml-2 text-[#0D0D0D] hover:text-[#C5A059] transition-colors"
+              className="lg:hidden p-2 -ml-2 text-[#F2EFE9] hover:text-[#C5A059] transition-colors"
               aria-label="Open navigation menu"
             >
               <Menu className="w-6 h-6" />
@@ -84,7 +84,7 @@ export const Navbar: React.FC = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif-luxury text-base sm:text-xl font-bold tracking-[0.16em] sm:tracking-[0.18em] text-[#0D0D0D] leading-none group-hover:text-[#9E7B36] transition-colors">
+                <span className="font-serif-luxury text-base sm:text-xl font-bold tracking-[0.16em] sm:tracking-[0.18em] text-[#F2EFE9] leading-none group-hover:text-[#D4B06A] transition-colors">
                   MS VELORA
                 </span>
                 <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.26em] sm:tracking-[0.32em] text-[#C5A059] font-medium mt-0.5">
@@ -105,10 +105,10 @@ export const Navbar: React.FC = () => {
                     className={({ isActive }) =>
                       `relative whitespace-nowrap text-[11px] xl:text-xs uppercase tracking-[0.14em] font-medium py-1 transition-colors ${
                         isSale
-                          ? 'text-[#9E7B36] font-semibold hover:text-[#0D0D0D]'
+                          ? 'text-[#D4B06A] font-semibold hover:text-[#F2EFE9]'
                           : isActive
                           ? 'text-[#C5A059] font-semibold'
-                          : 'text-[#0D0D0D]/75 hover:text-[#C5A059]'
+                          : 'text-[#F2EFE9]/75 hover:text-[#C5A059]'
                       }`
                     }
                   >
@@ -124,7 +124,7 @@ export const Navbar: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-[#0D0D0D]/80 hover:text-[#C5A059] transition-colors"
+                className="p-2 text-[#F2EFE9]/80 hover:text-[#C5A059] transition-colors"
                 aria-label="Search jewellery"
               >
                 <Search className="w-5 h-5" />
@@ -132,12 +132,12 @@ export const Navbar: React.FC = () => {
 
               <InstallAppButton
                 label="Install"
-                className="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#C5A059]/50 text-[#9E7B36] hover:bg-[#C5A059] hover:text-white text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors"
+                className="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#C5A059]/50 text-[#D4B06A] hover:bg-[#C5A059] hover:text-white text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors"
               />
 
               <Link
                 to="/wishlist"
-                className="p-2 text-[#0D0D0D]/80 hover:text-[#C5A059] transition-colors relative"
+                className="p-2 text-[#F2EFE9]/80 hover:text-[#C5A059] transition-colors relative"
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
@@ -152,7 +152,7 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => setIsCartOpen(true)}
                 data-cart-target
-                className="p-2 text-[#0D0D0D]/80 hover:text-[#C5A059] transition-colors relative flex items-center gap-1.5"
+                className="p-2 text-[#F2EFE9]/80 hover:text-[#C5A059] transition-colors relative flex items-center gap-1.5"
                 aria-label="Shopping bag"
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -184,7 +184,7 @@ export const Navbar: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.28 }}
-              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white text-[#0D0D0D] z-50 flex flex-col border-r border-[#C5A059]/30 shadow-2xl lg:hidden"
+              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white text-[#F2EFE9] z-50 flex flex-col border-r border-[#C5A059]/30 shadow-2xl lg:hidden"
             >
               <div className="p-5 border-b border-black/5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ export const Navbar: React.FC = () => {
                     <img src="/brand/logo.jpg" alt="MS Velora" width={44} height={44} className="h-11 w-11 rounded-full object-cover" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-serif-luxury text-base font-bold tracking-[0.16em] text-[#0D0D0D]">MS VELORA</span>
+                    <span className="font-serif-luxury text-base font-bold tracking-[0.16em] text-[#F2EFE9]">MS VELORA</span>
                     <span className="text-[8px] uppercase tracking-[0.28em] text-[#C5A059] font-medium">Fine Jewellery</span>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export const Navbar: React.FC = () => {
                   <Link
                     key={link.label}
                     to={link.to}
-                    className="flex items-center justify-between py-3.5 px-3 rounded hover:bg-neutral-50 text-sm uppercase tracking-[0.15em] border-b border-black/5 text-[#0D0D0D]"
+                    className="flex items-center justify-between py-3.5 px-3 rounded hover:bg-neutral-50 text-sm uppercase tracking-[0.15em] border-b border-black/5 text-[#F2EFE9]"
                   >
                     <span>{link.label}</span>
                     <ChevronRight className="w-4 h-4 text-[#C5A059]" />
@@ -219,21 +219,21 @@ export const Navbar: React.FC = () => {
                 ))}
                 <Link
                   to="/track-order"
-                  className="flex items-center justify-between py-3.5 px-3 rounded hover:bg-neutral-50 text-sm uppercase tracking-[0.15em] border-b border-black/5 text-[#9E7B36] font-semibold"
+                  className="flex items-center justify-between py-3.5 px-3 rounded hover:bg-neutral-50 text-sm uppercase tracking-[0.15em] border-b border-black/5 text-[#D4B06A] font-semibold"
                 >
                   <span>Track Your Order</span>
                   <ChevronRight className="w-4 h-4 text-[#C5A059]" />
                 </Link>
               </div>
 
-              <div className="p-5 border-t border-black/5 bg-[#FAFAFA] space-y-3">
+              <div className="p-5 border-t border-black/5 bg-[#1F1F23] space-y-3">
                 <div className="grid grid-cols-2 gap-2">
-                  <PushToggleButton topic="new-arrivals" onLabel="New Arrivals" offLabel="Alerts On" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60 !px-3 !tracking-[0.1em]" />
-                  <InstallAppButton label="Install" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60 !px-3 !tracking-[0.1em]" />
+                  <PushToggleButton topic="new-arrivals" onLabel="New Arrivals" offLabel="Alerts On" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60 !px-3 !tracking-[0.1em]" />
+                  <InstallAppButton label="Install" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60 !px-3 !tracking-[0.1em]" />
                 </div>
                 <Link
                   to="/track-order"
-                  className="block w-full py-3 px-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.16em] text-center rounded transition-colors"
+                  className="block w-full py-3 px-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] font-semibold text-xs uppercase tracking-[0.16em] text-center rounded transition-colors"
                 >
                   Track Your Order
                 </Link>
@@ -253,7 +253,7 @@ export const Navbar: React.FC = () => {
           end
           className={({ isActive }) =>
             `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium transition-colors ${
-              isActive ? 'text-[#C5A059] font-bold' : 'text-[#0D0D0D]/65 hover:text-[#C5A059]'
+              isActive ? 'text-[#C5A059] font-bold' : 'text-[#F2EFE9]/65 hover:text-[#C5A059]'
             }`
           }
         >
@@ -265,7 +265,7 @@ export const Navbar: React.FC = () => {
           to="/shop"
           className={({ isActive }) =>
             `flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium transition-colors ${
-              isActive ? 'text-[#C5A059] font-bold' : 'text-[#0D0D0D]/65 hover:text-[#C5A059]'
+              isActive ? 'text-[#C5A059] font-bold' : 'text-[#F2EFE9]/65 hover:text-[#C5A059]'
             }`
           }
         >
@@ -276,7 +276,7 @@ export const Navbar: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsSearchOpen(true)}
-          className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium text-[#0D0D0D]/65 hover:text-[#C5A059] transition-colors"
+          className="flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium text-[#F2EFE9]/65 hover:text-[#C5A059] transition-colors"
           aria-label="Search catalogue"
         >
           <Search className="w-5 h-5 mb-0.5" />
@@ -287,7 +287,7 @@ export const Navbar: React.FC = () => {
           to="/wishlist"
           className={({ isActive }) =>
             `relative flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium transition-colors ${
-              isActive ? 'text-[#C5A059] font-bold' : 'text-[#0D0D0D]/65 hover:text-[#C5A059]'
+              isActive ? 'text-[#C5A059] font-bold' : 'text-[#F2EFE9]/65 hover:text-[#C5A059]'
             }`
           }
         >
@@ -305,7 +305,7 @@ export const Navbar: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsCartOpen(true)}
-          className="relative flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium text-[#0D0D0D]/65 hover:text-[#C5A059] transition-colors"
+          className="relative flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[9px] uppercase tracking-wider font-medium text-[#F2EFE9]/65 hover:text-[#C5A059] transition-colors"
           aria-label="Shopping bag"
         >
           <div className="relative">

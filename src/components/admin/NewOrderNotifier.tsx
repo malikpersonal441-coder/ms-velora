@@ -184,14 +184,14 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
           setToast(null);
         }}
         className={`relative inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white border transition-colors shadow-sm ${
-          open ? 'border-[#C5A059] text-[#9E7B36]' : 'border-black/10 text-neutral-600 hover:border-[#C5A059] hover:text-[#9E7B36]'
+          open ? 'border-[#C5A059] text-[#D4B06A]' : 'border-black/10 text-neutral-600 hover:border-[#C5A059] hover:text-[#D4B06A]'
         }`}
         aria-label={count ? `${count} new orders` : 'Notifications'}
         aria-expanded={open}
       >
         <Bell className={`w-[18px] h-[18px] ${count ? 'animate-[wiggle_1s_ease-in-out_1]' : ''}`} key={count} />
         {count > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#F5F3EE] badge-pop">
+          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C5A059] text-[#F2EFE9] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#26262B] badge-pop">
             {count > 9 ? '9+' : count}
           </span>
         )}
@@ -207,7 +207,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.25 }}
             onClick={() => (toast.more > 0 ? setOpen(true) : openOrder(toast.order))}
-            className="absolute right-0 top-12 z-[80] w-[min(320px,calc(100vw-24px))] text-left flex items-center gap-3 p-3 rounded-xl bg-[#0B0B0D] text-[#FAF8F5] border border-[#C5A059]/40 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)]"
+            className="absolute right-0 top-12 z-[80] w-[min(320px,calc(100vw-24px))] text-left flex items-center gap-3 p-3 rounded-xl bg-[#E8E4DC] text-[#1C1C1F] border border-[#C5A059]/40 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)]"
             role="status"
           >
             <span className="w-8 h-8 rounded-full bg-[#C5A059]/15 text-[#DFBD78] flex items-center justify-center shrink-0">
@@ -239,14 +239,14 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-black/5">
               <div>
-                <p className="text-sm font-semibold text-[#0D0D0D]">New orders</p>
+                <p className="text-sm font-semibold text-[#F2EFE9]">New orders</p>
                 <p className="text-[11px] text-neutral-500">{count ? `${count} waiting` : 'You are all caught up'}</p>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={toggleSound}
-                  className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-[#0D0D0D]"
+                  className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-[#F2EFE9]"
                   aria-label={soundOn ? 'Mute sound' : 'Turn sound on'}
                   title={soundOn ? 'Sound on' : 'Sound off'}
                 >
@@ -255,7 +255,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-[#0D0D0D]"
+                  className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-[#F2EFE9]"
                   aria-label="Close"
                 >
                   <X className="w-4 h-4" />
@@ -275,9 +275,9 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                     <button
                       type="button"
                       onClick={() => openOrder(o)}
-                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-[#FAF8F5] transition-colors"
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-[#1C1C1F] transition-colors"
                     >
-                      <span className="w-9 h-9 shrink-0 rounded-full bg-[#F3EFE6] text-[#9E7B36] text-[11px] font-bold flex items-center justify-center">
+                      <span className="w-9 h-9 shrink-0 rounded-full bg-[#26262B] text-[#D4B06A] text-[11px] font-bold flex items-center justify-center">
                         {o.shippingAddress.fullName
                           .split(/\s+/)
                           .slice(0, 2)
@@ -286,7 +286,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                           .toUpperCase()}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#0D0D0D] truncate">
+                        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#F2EFE9] truncate">
                           {o.shippingAddress.fullName}
                           {o.orderSource === 'whatsapp' && <MessageCircle className="w-3 h-3 text-[#128C7E] shrink-0" />}
                         </span>
@@ -294,7 +294,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                           {o.orderNumber} • {o.shippingAddress.city} • {timeAgo(o.createdAt)}
                         </span>
                       </span>
-                      <span className="text-[13px] font-semibold text-[#0D0D0D] tabular-nums whitespace-nowrap">
+                      <span className="text-[13px] font-semibold text-[#F2EFE9] tabular-nums whitespace-nowrap">
                         {formatPrice(o.totalAmount)}
                       </span>
                     </button>
@@ -303,18 +303,18 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               </ul>
             )}
 
-            <div className="px-4 py-2.5 border-t border-black/5 flex items-center justify-between gap-3 bg-[#FAF8F5]">
+            <div className="px-4 py-2.5 border-t border-black/5 flex items-center justify-between gap-3 bg-[#1C1C1F]">
               <PushToggleButton
                 topic="admin-orders"
                 onLabel="Alerts on this device"
                 offLabel="Device alerts on"
-                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#9E7B36] hover:text-[#0D0D0D] disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#D4B06A] hover:text-[#F2EFE9] disabled:opacity-60"
               />
               {count > 0 && (
                 <button
                   type="button"
                   onClick={() => setUnread([])}
-                  className="text-[11px] font-semibold text-neutral-500 hover:text-[#0D0D0D]"
+                  className="text-[11px] font-semibold text-neutral-500 hover:text-[#F2EFE9]"
                 >
                   Mark all as seen
                 </button>

@@ -113,8 +113,8 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
         {[
           { label: 'Messages Sent Today', value: stats?.sentToday ?? '—', accent: 'text-[#128C7E]' },
           { label: 'Pending Actions', value: stats?.pendingActions ?? '—', accent: 'text-amber-700' },
-          { label: 'WhatsApp Orders', value: stats?.whatsappOrders ?? '—', accent: 'text-[#0D0D0D]' },
-          { label: 'Share of All Orders', value: stats ? `${share}%` : '—', accent: 'text-[#9E7B36]' },
+          { label: 'WhatsApp Orders', value: stats?.whatsappOrders ?? '—', accent: 'text-[#F2EFE9]' },
+          { label: 'Share of All Orders', value: stats ? `${share}%` : '—', accent: 'text-[#D4B06A]' },
         ].map((s) => (
           <div key={s.label} className="bg-white p-5 rounded-xl border border-black/8">
             <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">{s.label}</p>
@@ -138,14 +138,14 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
                   className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
                     activeQueue === q.key
                       ? 'bg-[#075E54] text-white'
-                      : 'bg-neutral-100 text-[#0D0D0D] hover:bg-neutral-200'
+                      : 'bg-neutral-100 text-[#F2EFE9] hover:bg-neutral-200'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {q.label}
                   <span
                     className={`min-w-5 px-1.5 rounded-full text-[10px] ${
-                      activeQueue === q.key ? 'bg-[#25D366] text-[#0D0D0D]' : 'bg-white text-neutral-600'
+                      activeQueue === q.key ? 'bg-[#25D366] text-[#F2EFE9]' : 'bg-white text-neutral-600'
                     }`}
                   >
                     {count}
@@ -157,7 +157,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
           <button
             type="button"
             onClick={load}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-[#0D0D0D]"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-[#F2EFE9]"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
@@ -170,9 +170,9 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
         ) : (
           <ul className="divide-y divide-neutral-100">
             {queueOrders.map((o) => (
-              <li key={o._id} className="flex flex-wrap items-center justify-between gap-3 p-4 hover:bg-[#FAF8F5]">
+              <li key={o._id} className="flex flex-wrap items-center justify-between gap-3 p-4 hover:bg-[#1C1C1F]">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#0D0D0D] flex items-center gap-2">
+                  <p className="text-sm font-semibold text-[#F2EFE9] flex items-center gap-2">
                     {o.shippingAddress.fullName}
                     {o.orderSource === 'whatsapp' && (
                       <span className="px-1.5 py-0.5 rounded bg-[#25D366]/15 text-[#128C7E] text-[10px] font-bold uppercase">
@@ -188,7 +188,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
                 <button
                   type="button"
                   onClick={() => setComposer({ order: o, template: activeQueue })}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#F2EFE9] text-xs font-bold uppercase tracking-wider transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" /> Message
                 </button>
@@ -208,7 +208,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider font-semibold rounded-lg disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5 text-[#C5A059]" /> {saving ? 'Saving…' : 'Save'}
             </button>
@@ -224,7 +224,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
                 className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded-lg font-mono-code"
               />
             </label>
-            <label className="text-xs flex items-center gap-3 p-3 rounded-lg bg-[#FAF8F5] border border-neutral-200 cursor-pointer">
+            <label className="text-xs flex items-center gap-3 p-3 rounded-lg bg-[#1C1C1F] border border-neutral-200 cursor-pointer">
               <input
                 type="checkbox"
                 checked={orderingEnabled}
@@ -241,7 +241,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
           <div className="flex flex-wrap gap-1.5">
             <span className="text-[11px] text-neutral-500 mr-1">Placeholders:</span>
             {PLACEHOLDERS.map((p) => (
-              <code key={p} className="px-1.5 py-0.5 rounded bg-neutral-100 text-[11px] text-[#9E7B36]">
+              <code key={p} className="px-1.5 py-0.5 rounded bg-neutral-100 text-[11px] text-[#D4B06A]">
                 {p}
               </code>
             ))}
@@ -254,7 +254,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
                 <button
                   type="button"
                   onClick={() => setTemplates((t) => ({ ...t, [key]: DEFAULT_TEMPLATES[key] }))}
-                  className="text-[10px] uppercase tracking-wider text-neutral-500 hover:text-[#0D0D0D]"
+                  className="text-[10px] uppercase tracking-wider text-neutral-500 hover:text-[#F2EFE9]"
                 >
                   Reset
                 </button>
@@ -272,7 +272,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
         {/* Recent log */}
         <div className="xl:col-span-2 bg-white rounded-xl border border-black/8 p-5">
           <h3 className="font-serif-luxury text-2xl font-semibold flex items-center gap-2 mb-4">
-            <History className="w-5 h-5 text-[#9E7B36]" /> Recent Messages
+            <History className="w-5 h-5 text-[#D4B06A]" /> Recent Messages
           </h3>
           {!overview?.recentMessages?.length ? (
             <p className="text-sm text-neutral-500">No messages sent yet.</p>
@@ -281,7 +281,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
               {overview.recentMessages.map((m, i) => (
                 <li key={i} className="p-3 rounded-lg bg-[#DCF8C6]/50 border border-[#25D366]/20 text-xs">
                   <div className="flex justify-between gap-2">
-                    <span className="font-semibold text-[#0D0D0D]">{m.customerName}</span>
+                    <span className="font-semibold text-[#F2EFE9]">{m.customerName}</span>
                     <span className="text-neutral-500">{formatDateTime(m.sentAt)}</span>
                   </div>
                   <p className="text-neutral-500 font-mono-code mt-0.5">

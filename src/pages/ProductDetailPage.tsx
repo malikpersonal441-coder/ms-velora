@@ -114,7 +114,7 @@ export const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center space-y-4">
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
+        <h1 className="font-serif-luxury text-4xl font-semibold text-[#F2EFE9]">
           Piece Not Found
         </h1>
         <p className="text-sm text-neutral-500">
@@ -122,7 +122,7 @@ export const ProductDetailPage: React.FC = () => {
         </p>
         <Link
           to="/shop"
-          className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
+          className="inline-block px-6 py-3 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-widest rounded"
         >
           Return to Catalog
         </Link>
@@ -248,23 +248,23 @@ export const ProductDetailPage: React.FC = () => {
       />
 
       {/* Breadcrumbs */}
-      <div className="bg-[#F3EFE6] border-b border-black/8 py-3.5 px-4">
+      <div className="bg-[#26262B] border-b border-black/8 py-3.5 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-neutral-600">
           <div className="flex items-center gap-2 truncate">
-            <Link to="/" className="hover:text-[#0D0D0D]">
+            <Link to="/" className="hover:text-[#F2EFE9]">
               Home
             </Link>
             <span>/</span>
-            <Link to="/shop" className="hover:text-[#0D0D0D]">
+            <Link to="/shop" className="hover:text-[#F2EFE9]">
               Shop
             </Link>
             <span>/</span>
-            <span className="text-[#0D0D0D] font-semibold truncate">{product.name}</span>
+            <span className="text-[#F2EFE9] font-semibold truncate">{product.name}</span>
           </div>
           <button
             type="button"
             onClick={handleCopyLink}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#0D0D0D] hover:text-[#9E7B36] shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#F2EFE9] hover:text-[#D4B06A] shrink-0"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>Share Link</span>
@@ -278,7 +278,7 @@ export const ProductDetailPage: React.FC = () => {
           {/* Left: Gallery & Thumbnails */}
           <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24 self-start">
             <div
-              className="relative aspect-square rounded-xl overflow-hidden bg-[#F3EFE6] border border-black/10 group"
+              className="relative aspect-square rounded-xl overflow-hidden bg-[#26262B] border border-black/10 group"
               onPointerMove={(e) => {
                 if (e.pointerType !== 'mouse') return;
                 const r = e.currentTarget.getBoundingClientRect();
@@ -296,13 +296,13 @@ export const ProductDetailPage: React.FC = () => {
                 className="w-full h-full object-cover object-center transition-transform duration-300 ease-out cursor-zoom-in animate-[fade-in_0.5s_ease]"
                 onClick={() => setLightboxOpen(true)}
               />
-              <span className="pointer-events-none absolute top-4 left-4 px-2.5 py-1 rounded-full bg-white/85 text-[10px] uppercase tracking-[0.2em] font-semibold text-[#0D0D0D] transition-opacity duration-300 group-hover:opacity-0 hidden sm:inline">
+              <span className="pointer-events-none absolute top-4 left-4 px-2.5 py-1 rounded-full bg-white/85 text-[10px] uppercase tracking-[0.2em] font-semibold text-[#F2EFE9] transition-opacity duration-300 group-hover:opacity-0 hidden sm:inline">
                 Hover to zoom
               </span>
               <button
                 type="button"
                 onClick={() => setLightboxOpen(true)}
-                className="absolute bottom-4 right-4 px-3.5 py-2 rounded-lg bg-[#0D0D0D]/80 text-[#FAF8F5] hover:bg-[#C5A059] hover:text-[#0D0D0D] text-xs font-medium flex items-center gap-1.5 transition-colors backdrop-blur-xs"
+                className="absolute bottom-4 right-4 px-3.5 py-2 rounded-lg bg-[#F2EFE9]/80 text-[#1C1C1F] hover:bg-[#C5A059] hover:text-[#F2EFE9] text-xs font-medium flex items-center gap-1.5 transition-colors backdrop-blur-xs"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
                 <span>High-Res Zoom</span>
@@ -337,12 +337,12 @@ export const ProductDetailPage: React.FC = () => {
           <div className="lg:col-span-7 space-y-5 lg:pl-4">
             <div className="space-y-2 border-b border-neutral-200 pb-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-bold">
+                <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-bold">
                   {product.brand} • {product.specifications?.movement || 'Jewellery'}
                 </span>
               </div>
 
-              <h1 className="font-serif-luxury text-3xl lg:text-4xl font-semibold text-[#0D0D0D] leading-tight">
+              <h1 className="font-serif-luxury text-3xl lg:text-4xl font-semibold text-[#F2EFE9] leading-tight">
                 {product.name}
               </h1>
 
@@ -358,12 +358,12 @@ export const ProductDetailPage: React.FC = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-xs font-semibold text-[#0D0D0D]">
+                  <span className="text-xs font-semibold text-[#F2EFE9]">
                     {product.averageRating.toFixed(1)}
                 </span>
                   <a
                     href="#reviews-section"
-                    className="text-xs text-neutral-500 hover:text-[#9E7B36] underline"
+                    className="text-xs text-neutral-500 hover:text-[#D4B06A] underline"
                   >
                     ({product.reviewCount} verified {product.reviewCount === 1 ? 'review' : 'reviews'})
                   </a>
@@ -372,7 +372,7 @@ export const ProductDetailPage: React.FC = () => {
 
               {/* Price Display */}
               <div className="pt-3 flex items-baseline gap-4">
-                <span className="text-2xl font-semibold text-[#0D0D0D] tabular-nums">
+                <span className="text-2xl font-semibold text-[#F2EFE9] tabular-nums">
                   {formatProductPrice(effectivePrice, symbol)}
                   </span>
                 {hasSale && (
@@ -380,7 +380,7 @@ export const ProductDetailPage: React.FC = () => {
                     <span className="text-base text-neutral-400 line-through font-mono-code">
                       {formatPrice(regularPrice, symbol)}
                 </span>
-                    <span className="px-2.5 py-0.5 bg-[#C5A059]/20 text-[#9E7B36] border border-[#C5A059]/40 rounded text-xs font-bold uppercase tracking-wider">
+                    <span className="px-2.5 py-0.5 bg-[#C5A059]/20 text-[#D4B06A] border border-[#C5A059]/40 rounded text-xs font-bold uppercase tracking-wider">
                       Save {formatPrice(regularPrice - effectivePrice, symbol)}
                     </span>
                   </>
@@ -396,7 +396,7 @@ export const ProductDetailPage: React.FC = () => {
             {/* Variants Selection */}
             {product.variants && product.variants.length > 0 && (
               <div className="space-y-2.5">
-                <label className="block text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+                <label className="block text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
                   Select Option
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -413,8 +413,8 @@ export const ProductDetailPage: React.FC = () => {
                         }}
                         className={`p-3 rounded-lg border text-left transition-all ${
                           isSelected
-                            ? 'border-[#0D0D0D] bg-[#0D0D0D] text-[#FAF8F5]'
-                            : 'border-neutral-300 bg-white text-[#0D0D0D] hover:border-[#C5A059]'
+                            ? 'border-[#F2EFE9] bg-[#F2EFE9] text-[#1C1C1F]'
+                            : 'border-neutral-300 bg-white text-[#F2EFE9] hover:border-[#C5A059]'
                         }`}
                       >
                         <div className="text-xs font-semibold">{v.name}</div>
@@ -454,7 +454,7 @@ export const ProductDetailPage: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-3">
                 {/* Quantity Control */}
-                <div className="flex items-center border border-neutral-300 rounded-lg bg-[#FAF8F5]">
+                <div className="flex items-center border border-neutral-300 rounded-lg bg-[#1C1C1F]">
                   <button
                     type="button"
                     disabled={availableStock <= 0 || quantity <= 1}
@@ -486,8 +486,8 @@ export const ProductDetailPage: React.FC = () => {
                   aria-live="polite"
                   className={`flex-1 min-w-[160px] py-3 px-5 font-semibold text-xs uppercase tracking-[0.2em] rounded-lg flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50 ${
                     addState === 'added'
-                      ? 'bg-[#C5A059] text-[#0D0D0D]'
-                      : 'bg-[#0D0D0D] hover:bg-[#1A1A1E] text-[#FAF8F5]'
+                      ? 'bg-[#C5A059] text-[#F2EFE9]'
+                      : 'bg-[#F2EFE9] hover:bg-[#E8E4DC] text-[#1C1C1F]'
                   }`}
                 >
                   {addState === 'added' ? (
@@ -509,7 +509,7 @@ export const ProductDetailPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsCartOpen(true)}
-                    className="link-underline text-xs uppercase tracking-[0.2em] font-semibold text-[#9E7B36] badge-pop"
+                    className="link-underline text-xs uppercase tracking-[0.2em] font-semibold text-[#D4B06A] badge-pop"
                   >
                     View Bag →
                   </button>
@@ -520,7 +520,7 @@ export const ProductDetailPage: React.FC = () => {
                   type="button"
                   disabled={availableStock <= 0}
                   onClick={handleBuyNow}
-                  className="flex-1 min-w-[140px] py-3 px-5 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-bold text-xs uppercase tracking-[0.2em] rounded-lg transition-colors disabled:opacity-50"
+                  className="flex-1 min-w-[140px] py-3 px-5 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] font-bold text-xs uppercase tracking-[0.2em] rounded-lg transition-colors disabled:opacity-50"
                 >
                   Buy Now
                 </button>
@@ -532,8 +532,8 @@ export const ProductDetailPage: React.FC = () => {
                   aria-label="Save to wishlist"
                   className={`p-3.5 rounded-lg border transition-colors ${
                     wished
-                      ? 'bg-[#0D0D0D] text-[#C5A059] border-[#0D0D0D]'
-                      : 'bg-white text-[#0D0D0D] border-neutral-300 hover:border-[#0D0D0D]'
+                      ? 'bg-[#F2EFE9] text-[#C5A059] border-[#F2EFE9]'
+                      : 'bg-white text-[#F2EFE9] border-neutral-300 hover:border-[#F2EFE9]'
                   }`}
                 >
                   <Heart key={String(wished)} className={`w-5 h-5 ${wished ? 'fill-current heart-beat' : ''}`} />
@@ -552,8 +552,8 @@ export const ProductDetailPage: React.FC = () => {
                   rel="noopener noreferrer"
                   className={`group/wa flex items-center justify-center gap-2.5 w-full py-3 rounded-lg border text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 ${
                     availableStock <= 0
-                      ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D] hover:bg-[#C5A059] hover:text-[#0D0D0D] hover:border-[#C5A059]'
-                      : 'border-neutral-300 text-[#0D0D0D] hover:border-[#25D366] hover:text-[#128C7E]'
+                      ? 'bg-[#F2EFE9] text-[#1C1C1F] border-[#F2EFE9] hover:bg-[#C5A059] hover:text-[#F2EFE9] hover:border-[#C5A059]'
+                      : 'border-neutral-300 text-[#F2EFE9] hover:border-[#25D366] hover:text-[#128C7E]'
                   }`}
                 >
                   {availableStock <= 0 ? <Bell className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
@@ -565,28 +565,28 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Guarantees */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3.5 rounded-lg bg-[#F3EFE6] flex items-start gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-[#9E7B36] shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-lg bg-[#26262B] flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-[#D4B06A] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold block text-[#0D0D0D]">2-Year Official Warranty</span>
+                  <span className="font-bold block text-[#F2EFE9]">2-Year Official Warranty</span>
                   <span className="text-neutral-600 text-[11px]">
                     Stamped MS Velora warranty card included.
                   </span>
                 </div>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#F3EFE6] flex items-start gap-2.5">
-                <Truck className="w-4 h-4 text-[#9E7B36] shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-lg bg-[#26262B] flex items-start gap-2.5">
+                <Truck className="w-4 h-4 text-[#D4B06A] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold block text-[#0D0D0D]">Insured Express Delivery</span>
+                  <span className="font-bold block text-[#F2EFE9]">Insured Express Delivery</span>
                   <span className="text-neutral-600 text-[11px]">
                     Free nationwide shipping over Rs. 25,000.
                   </span>
                 </div>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#F3EFE6] flex items-start gap-2.5">
-                <RotateCcw className="w-4 h-4 text-[#9E7B36] shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-lg bg-[#26262B] flex items-start gap-2.5">
+                <RotateCcw className="w-4 h-4 text-[#D4B06A] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold block text-[#0D0D0D]">7-Day Inspection</span>
+                  <span className="font-bold block text-[#F2EFE9]">7-Day Inspection</span>
                   <span className="text-neutral-600 text-[11px]">
                     Hassle-free exchange on unworn jewellery.
                   </span>
@@ -596,8 +596,8 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Technical Specifications Table */}
             <div className="bg-white rounded-xl border border-black/8 overflow-hidden shadow-xs">
-              <div className="px-5 py-3.5 bg-[#FAF8F5] text-[#0D0D0D] border-b border-black/8 flex items-center justify-between">
-                <h2 className="font-serif-luxury text-lg tracking-wider uppercase text-[#9E7B36] font-semibold">
+              <div className="px-5 py-3.5 bg-[#1C1C1F] text-[#F2EFE9] border-b border-black/8 flex items-center justify-between">
+                <h2 className="font-serif-luxury text-lg tracking-wider uppercase text-[#D4B06A] font-semibold">
                   Specifications
                 </h2>
                 <span className="text-[11px] font-mono-code text-neutral-500">
@@ -622,10 +622,10 @@ export const ProductDetailPage: React.FC = () => {
                 ].map((spec, idx) => (
                   <div
                     key={idx}
-                    className="grid grid-cols-2 px-5 py-3 hover:bg-[#FAF8F5] transition-colors"
+                    className="grid grid-cols-2 px-5 py-3 hover:bg-[#1C1C1F] transition-colors"
                   >
                     <span className="text-neutral-500 font-medium">{spec.label}</span>
-                    <span className="font-semibold text-[#0D0D0D]">{spec.value || '—'}</span>
+                    <span className="font-semibold text-[#F2EFE9]">{spec.value || '—'}</span>
                   </div>
                 ))}
               </div>
@@ -638,10 +638,10 @@ export const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-5 space-y-6">
               <div>
-                <span className="text-xs uppercase tracking-[0.22em] text-[#9E7B36] font-semibold">
+                <span className="text-xs uppercase tracking-[0.22em] text-[#D4B06A] font-semibold">
                   Collector Feedback
                 </span>
-                <h2 className="font-serif-luxury text-3xl font-semibold text-[#0D0D0D] mt-1">
+                <h2 className="font-serif-luxury text-3xl font-semibold text-[#F2EFE9] mt-1">
                   Client Reviews ({reviews.length})
                 </h2>
               </div>
@@ -687,7 +687,7 @@ export const ProductDetailPage: React.FC = () => {
                       value={reviewTitle}
                       onChange={(e) => setReviewTitle(e.target.value)}
                       placeholder="e.g. Exceptional craftsmanship and weight"
-                      className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded focus:outline-none focus:border-[#0D0D0D]"
+                      className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded focus:outline-none focus:border-[#F2EFE9]"
                     />
                   </div>
 
@@ -701,21 +701,21 @@ export const ProductDetailPage: React.FC = () => {
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
                       placeholder="Share your experience with the finish, shine and comfort..."
-                      className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded focus:outline-none focus:border-[#0D0D0D]"
+                      className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded focus:outline-none focus:border-[#F2EFE9]"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={submittingReview}
-                    className="w-full py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold rounded transition-colors"
+                    className="w-full py-3 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-semibold rounded transition-colors"
                   >
                     {submittingReview ? 'Submitting...' : 'Submit Review'}
                   </button>
                 </form>
               ) : (
-                <div className="p-6 bg-[#F3EFE6] rounded-xl border border-black/8 space-y-3">
-                  <p className="text-sm font-medium text-[#0D0D0D]">
+                <div className="p-6 bg-[#26262B] rounded-xl border border-black/8 space-y-3">
+                  <p className="text-sm font-medium text-[#F2EFE9]">
                     Have you bought this piece?
                   </p>
                   <p className="text-xs text-neutral-600">
@@ -743,7 +743,7 @@ export const ProductDetailPage: React.FC = () => {
                             <Star key={idx} className="w-4 h-4 fill-current" />
                           ))}
                         </div>
-                        <span className="text-sm font-bold text-[#0D0D0D]">{rev.userName}</span>
+                        <span className="text-sm font-bold text-[#F2EFE9]">{rev.userName}</span>
                         {rev.verifiedPurchase && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold uppercase tracking-wider">
                             <CheckCircle2 className="w-3 h-3" /> Verified Purchase
@@ -755,7 +755,7 @@ export const ProductDetailPage: React.FC = () => {
                           </span>
                     </div>
 
-                    <h4 className="font-serif-luxury text-lg font-semibold text-[#0D0D0D]">
+                    <h4 className="font-serif-luxury text-lg font-semibold text-[#F2EFE9]">
                       {rev.title}
                     </h4>
                     <p className="text-sm text-neutral-600 leading-relaxed">{rev.comment}</p>
@@ -769,7 +769,7 @@ export const ProductDetailPage: React.FC = () => {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <section className="mt-20 pt-14 border-t border-neutral-200">
-            <h2 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#0D0D0D] mb-8">
+            <h2 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#F2EFE9] mb-8">
               You May Also Like
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
@@ -783,7 +783,7 @@ export const ProductDetailPage: React.FC = () => {
         {/* Recently Viewed */}
         {filteredRecent.length > 0 && (
           <section className="mt-20 pt-14 border-t border-neutral-200">
-            <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#0D0D0D] mb-6">
+            <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#F2EFE9] mb-6">
               Recently Viewed in Your Session
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
@@ -827,8 +827,8 @@ export const ProductDetailPage: React.FC = () => {
             className="w-10 h-10 rounded-md object-cover border border-[#C5A059]/30 shrink-0"
           />
           <div className="min-w-0">
-            <p className="font-serif-luxury text-sm font-bold text-[#0D0D0D] truncate leading-tight">{product.name}</p>
-            <p className="font-mono-code text-xs font-bold text-[#9E7B36]">
+            <p className="font-serif-luxury text-sm font-bold text-[#F2EFE9] truncate leading-tight">{product.name}</p>
+            <p className="font-mono-code text-xs font-bold text-[#D4B06A]">
               {formatProductPrice(product.salePrice ?? product.price, symbol)}
             </p>
           </div>
@@ -840,8 +840,8 @@ export const ProductDetailPage: React.FC = () => {
             onClick={handleAddToCart}
             className={`px-4 py-2.5 active:scale-95 text-xs font-bold uppercase tracking-wider rounded-md transition-all flex items-center gap-1.5 shadow-md disabled:opacity-50 ${
               addState === 'added'
-                ? 'bg-[#DFBD78] text-[#0D0D0D]'
-                : 'bg-[#C5A059] text-[#0D0D0D]'
+                ? 'bg-[#DFBD78] text-[#F2EFE9]'
+                : 'bg-[#C5A059] text-[#F2EFE9]'
             }`}
           >
             {addState === 'added' ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}

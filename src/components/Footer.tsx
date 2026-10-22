@@ -31,33 +31,33 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-white text-[#0D0D0D] border-t border-[#C5A059]/20 no-print">
+    <footer className="bg-white text-[#F2EFE9] border-t border-[#C5A059]/20 no-print">
       {/* App + new-arrival alerts */}
-      <div className="border-b border-black/5 bg-[radial-gradient(ellipse_at_20%_0%,rgba(197,160,89,0.08),transparent_60%)] bg-[#FAF8F5]">
+      <div className="border-b border-black/5 bg-[radial-gradient(ellipse_at_20%_0%,rgba(197,160,89,0.08),transparent_60%)] bg-[#1C1C1F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
             <img src="/brand/icon-192.png" alt="" width={52} height={52} className="w-13 h-13 rounded-xl shrink-0 shadow-xs" />
             <div>
-              <p className="font-serif-luxury text-2xl text-[#0D0D0D]">Never miss a new arrival</p>
+              <p className="font-serif-luxury text-2xl text-[#F2EFE9]">Never miss a new arrival</p>
               <p className="text-sm text-neutral-600">Get a notification when new jewellery arrives, and install our app for faster shopping.</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <PushToggleButton topic="new-arrivals" onLabel="Notify Me" offLabel="Notifications On" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-bold transition-colors disabled:opacity-60" />
-            <InstallAppButton className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/60 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60" />
+            <PushToggleButton topic="new-arrivals" onLabel="Notify Me" offLabel="Notifications On" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-bold transition-colors disabled:opacity-60" />
+            <InstallAppButton className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/60 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60" />
           </div>
         </div>
       </div>
 
       {/* Newsletter Collector Banner */}
-      <div className="border-b border-black/5 bg-[#FCFBF8]">
+      <div className="border-b border-black/5 bg-[#1F1F23]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-2">
-              <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-semibold">
+              <span className="text-xs uppercase tracking-[0.24em] text-[#D4B06A] font-semibold">
                 Newsletter
               </span>
-              <h3 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#0D0D0D]">
+              <h3 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-[#F2EFE9]">
                 Get News About New Arrivals & Offers
               </h3>
               <p className="text-sm text-neutral-600 max-w-xl">
@@ -72,12 +72,12 @@ export const Footer: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address"
-                  className="flex-1 px-4 py-3.5 bg-white border border-black/15 rounded text-sm text-[#0D0D0D] placeholder:text-neutral-400 focus:outline-none focus:border-[#C5A059]"
+                  className="flex-1 px-4 py-3.5 bg-white border border-black/15 rounded text-sm text-[#F2EFE9] placeholder:text-neutral-400 focus:outline-none focus:border-[#C5A059]"
                 />
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-3.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-white hover:text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded inline-flex items-center justify-center gap-2 transition-colors shrink-0"
+                  className="px-6 py-3.5 bg-[#F2EFE9] hover:bg-[#C5A059] text-white hover:text-[#F2EFE9] font-semibold text-xs uppercase tracking-[0.2em] rounded inline-flex items-center justify-center gap-2 transition-colors shrink-0"
                 >
                   <span>{submitting ? 'Joining...' : 'Subscribe'}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -105,7 +105,7 @@ export const Footer: React.FC = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif-luxury text-2xl font-bold tracking-[0.2em] text-[#0D0D0D] group-hover:text-[#9E7B36] transition-colors">
+                <span className="font-serif-luxury text-2xl font-bold tracking-[0.2em] text-[#F2EFE9] group-hover:text-[#D4B06A] transition-colors">
                   MS VELORA
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.32em] text-[#C5A059] font-medium">
@@ -139,7 +139,7 @@ export const Footer: React.FC = () => {
 
           {/* Curated Collections */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-[#D4B06A] font-semibold">
               Collections
             </h4>
             <ul className="space-y-2.5 text-sm text-neutral-600">
@@ -178,7 +178,7 @@ export const Footer: React.FC = () => {
 
           {/* Help */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-[#D4B06A] font-semibold">
               Help
             </h4>
             <ul className="space-y-2.5 text-sm text-neutral-600">
@@ -207,7 +207,7 @@ export const Footer: React.FC = () => {
 
           {/* Legal & Authenticity */}
           <div className="space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-[#D4B06A] font-semibold">
               Legal & Warranty
             </h4>
             <ul className="space-y-2.5 text-sm text-neutral-600">
@@ -228,8 +228,8 @@ export const Footer: React.FC = () => {
               </li>
             </ul>
 
-            <div className="pt-2 p-3.5 rounded-lg bg-[#FAF8F5] border border-black/8 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#9E7B36]">
+            <div className="pt-2 p-3.5 rounded-lg bg-[#1C1C1F] border border-black/8 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#D4B06A]">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Verified Payment & Delivery</span>
               </div>

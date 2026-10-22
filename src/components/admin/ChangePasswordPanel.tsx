@@ -82,7 +82,7 @@ export const ChangePasswordPanel: React.FC<Props> = ({ addToast }) => {
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-[#0D0D0D]"
+            className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-[#F2EFE9]"
           >
             {show ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             {show ? 'Hide' : 'Show'}
@@ -113,17 +113,17 @@ export const ChangePasswordPanel: React.FC<Props> = ({ addToast }) => {
         <button
           type="submit"
           disabled={saving || !strong || !matches || !current}
-          className="w-full py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-[#FAF8F5]"
+          className="w-full py-3 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors disabled:opacity-40 disabled:hover:bg-[#F2EFE9] disabled:hover:text-[#1C1C1F]"
         >
           {saving ? 'Updating…' : 'Update Password'}
         </button>
       </form>
 
-      <div className="lg:col-span-2 bg-[#0D0D0D] text-[#FAF8F5] rounded-xl p-6 space-y-4 text-sm">
+      <div className="lg:col-span-2 bg-[#F2EFE9] text-[#1C1C1F] rounded-xl p-6 space-y-4 text-sm">
         <h3 className="font-serif-luxury text-2xl font-semibold flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-[#C5A059]" /> How your login is protected
         </h3>
-        <ul className="space-y-3 text-xs text-[#FAF8F5]/75 leading-relaxed">
+        <ul className="space-y-3 text-xs text-[#1C1C1F]/75 leading-relaxed">
           <li>• Your password is stored in MongoDB only as a bcrypt hash — nobody, including us, can read it.</li>
           <li>• Changing it signs out every other device that was logged in as admin.</li>
           <li>• Only one admin account can exist; the database rejects a second.</li>

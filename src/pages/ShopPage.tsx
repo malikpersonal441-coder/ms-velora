@@ -137,7 +137,7 @@ export const ShopPage: React.FC = () => {
     <div className="space-y-6 text-sm">
       {/* Availability Checkboxes */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Availability & Highlights
         </h3>
         <label className="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-700">
@@ -145,7 +145,7 @@ export const ShopPage: React.FC = () => {
             type="checkbox"
             checked={inStock}
             onChange={(e) => updateParam('inStock', e.target.checked ? 'true' : null)}
-            className="rounded border-neutral-300 accent-[#0D0D0D]"
+            className="rounded border-neutral-300 accent-[#F2EFE9]"
           />
           <span>In Stock Only</span>
         </label>
@@ -154,7 +154,7 @@ export const ShopPage: React.FC = () => {
             type="checkbox"
             checked={onSale}
             onChange={(e) => updateParam('onSale', e.target.checked ? 'true' : null)}
-            className="rounded border-neutral-300 accent-[#0D0D0D]"
+            className="rounded border-neutral-300 accent-[#F2EFE9]"
           />
           <span>On Sale</span>
         </label>
@@ -163,7 +163,7 @@ export const ShopPage: React.FC = () => {
             type="checkbox"
             checked={bestSeller}
             onChange={(e) => updateParam('bestSeller', e.target.checked ? 'true' : null)}
-            className="rounded border-neutral-300 accent-[#0D0D0D]"
+            className="rounded border-neutral-300 accent-[#F2EFE9]"
           />
           <span>Best Sellers</span>
         </label>
@@ -172,7 +172,7 @@ export const ShopPage: React.FC = () => {
             type="checkbox"
             checked={newArrival}
             onChange={(e) => updateParam('newArrival', e.target.checked ? 'true' : null)}
-            className="rounded border-neutral-300 accent-[#0D0D0D]"
+            className="rounded border-neutral-300 accent-[#F2EFE9]"
           />
           <span>New Arrivals</span>
         </label>
@@ -180,7 +180,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Category Filter */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Category
         </h3>
         <div className="space-y-1.5">
@@ -188,7 +188,7 @@ export const ShopPage: React.FC = () => {
             type="button"
             onClick={() => updateParam('category', null)}
             className={`block w-full text-left text-xs py-1 ${
-              !selectedCategory ? 'font-bold text-[#9E7B36]' : 'text-neutral-600 hover:text-[#0D0D0D]'
+              !selectedCategory ? 'font-bold text-[#D4B06A]' : 'text-neutral-600 hover:text-[#F2EFE9]'
             }`}
           >
             All Categories
@@ -200,8 +200,8 @@ export const ShopPage: React.FC = () => {
               onClick={() => updateParam('category', cat.slug)}
               className={`block w-full text-left text-xs py-1 ${
                 selectedCategory === cat.slug
-                  ? 'font-bold text-[#9E7B36]'
-                  : 'text-neutral-600 hover:text-[#0D0D0D]'
+                  ? 'font-bold text-[#D4B06A]'
+                  : 'text-neutral-600 hover:text-[#F2EFE9]'
               }`}
             >
               {cat.name}
@@ -212,7 +212,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Collection Filter */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Collection
         </h3>
         <div className="space-y-1.5">
@@ -220,7 +220,7 @@ export const ShopPage: React.FC = () => {
             type="button"
             onClick={() => updateParam('collection', null)}
             className={`block w-full text-left text-xs py-1 ${
-              !selectedCollection ? 'font-bold text-[#9E7B36]' : 'text-neutral-600 hover:text-[#0D0D0D]'
+              !selectedCollection ? 'font-bold text-[#D4B06A]' : 'text-neutral-600 hover:text-[#F2EFE9]'
             }`}
           >
             All Collections
@@ -232,8 +232,8 @@ export const ShopPage: React.FC = () => {
               onClick={() => updateParam('collection', col.slug)}
               className={`block w-full text-left text-xs py-1 ${
                 selectedCollection === col.slug
-                  ? 'font-bold text-[#9E7B36]'
-                  : 'text-neutral-600 hover:text-[#0D0D0D]'
+                  ? 'font-bold text-[#D4B06A]'
+                  : 'text-neutral-600 hover:text-[#F2EFE9]'
               }`}
             >
               {col.name}
@@ -244,7 +244,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Gender */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Gender
         </h3>
         <div className="flex flex-wrap gap-2">
@@ -255,7 +255,7 @@ export const ShopPage: React.FC = () => {
               onClick={() => updateParam('gender', selectedGender === g ? null : g)}
               className={`px-3 py-1.5 rounded text-xs font-medium border transition-colors ${
                 selectedGender === g
-                  ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D]'
+                  ? 'bg-[#F2EFE9] text-[#1C1C1F] border-[#F2EFE9]'
                   : 'bg-white text-neutral-700 border-neutral-300 hover:border-[#C5A059]'
               }`}
             >
@@ -267,7 +267,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Brand */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Maison / Brand
         </h3>
         <div className="space-y-1.5">
@@ -278,7 +278,7 @@ export const ShopPage: React.FC = () => {
                 name="brand_filter"
                 checked={selectedBrand === b}
                 onChange={() => updateParam('brand', selectedBrand === b ? null : b)}
-                className="accent-[#0D0D0D]"
+                className="accent-[#F2EFE9]"
               />
               <span>{b}</span>
             </label>
@@ -288,7 +288,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Movement */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Jewellery Type
         </h3>
         <div className="flex flex-wrap gap-1.5">
@@ -299,7 +299,7 @@ export const ShopPage: React.FC = () => {
               onClick={() => updateParam('movement', selectedMovement === m ? null : m)}
               className={`px-2.5 py-1 rounded text-xs border ${
                 selectedMovement === m
-                  ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D]'
+                  ? 'bg-[#F2EFE9] text-[#1C1C1F] border-[#F2EFE9]'
                   : 'bg-white text-neutral-700 border-neutral-200 hover:border-[#C5A059]'
               }`}
             >
@@ -311,7 +311,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Finish */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Finish
         </h3>
         <div className="flex flex-wrap gap-1.5">
@@ -322,7 +322,7 @@ export const ShopPage: React.FC = () => {
               onClick={() => updateParam('strapMaterial', selectedStrap === s ? null : s)}
               className={`px-2.5 py-1 rounded text-xs border ${
                 selectedStrap === s
-                  ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D]'
+                  ? 'bg-[#F2EFE9] text-[#1C1C1F] border-[#F2EFE9]'
                   : 'bg-white text-neutral-700 border-neutral-200 hover:border-[#C5A059]'
               }`}
             >
@@ -334,7 +334,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Colour */}
       <div className="space-y-2.5 pb-5 border-b border-neutral-200">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Colour
         </h3>
         <div className="flex flex-wrap gap-1.5">
@@ -345,7 +345,7 @@ export const ShopPage: React.FC = () => {
               onClick={() => updateParam('dialColor', selectedDial === d ? null : d)}
               className={`px-2.5 py-1 rounded text-xs border ${
                 selectedDial === d
-                  ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D]'
+                  ? 'bg-[#F2EFE9] text-[#1C1C1F] border-[#F2EFE9]'
                   : 'bg-white text-neutral-700 border-neutral-200 hover:border-[#C5A059]'
               }`}
             >
@@ -357,7 +357,7 @@ export const ShopPage: React.FC = () => {
 
       {/* Price Range */}
       <div className="space-y-2.5">
-        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
+        <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#F2EFE9]">
           Price Range (PKR)
         </h3>
         <div className="grid grid-cols-2 gap-2">
@@ -366,14 +366,14 @@ export const ShopPage: React.FC = () => {
             placeholder="Min Rs."
             value={minPrice}
             onChange={(e) => updateParam('minPrice', e.target.value || null)}
-            className="px-3 py-2 text-xs bg-white border border-neutral-300 rounded focus:outline-none focus:border-[#0D0D0D]"
+            className="px-3 py-2 text-xs bg-white border border-neutral-300 rounded focus:outline-none focus:border-[#F2EFE9]"
           />
           <input
             type="number"
             placeholder="Max Rs."
             value={maxPrice}
             onChange={(e) => updateParam('maxPrice', e.target.value || null)}
-            className="px-3 py-2 text-xs bg-white border border-neutral-300 rounded focus:outline-none focus:border-[#0D0D0D]"
+            className="px-3 py-2 text-xs bg-white border border-neutral-300 rounded focus:outline-none focus:border-[#F2EFE9]"
           />
         </div>
         <p className="text-[11px] text-neutral-400">
@@ -386,17 +386,17 @@ export const ShopPage: React.FC = () => {
   return (
     <div className="min-h-screen pb-20">
       {/* Page Banner */}
-      <div className="bg-[#FAF8F5] text-[#0D0D0D] py-12 sm:py-16 border-b border-[#C5A059]/20">
+      <div className="bg-[#1C1C1F] text-[#F2EFE9] py-12 sm:py-16 border-b border-[#C5A059]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2 text-xs text-[#9E7B36] uppercase tracking-[0.22em] mb-2 font-medium">
+            <div className="flex items-center gap-2 text-xs text-[#D4B06A] uppercase tracking-[0.22em] mb-2 font-medium">
               <Link to="/" className="hover:underline">
                 Home
               </Link>
               <span>/</span>
               <span>Shop</span>
             </div>
-            <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#0D0D0D]">
+            <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#F2EFE9]">
               All Jewellery
             </h1>
             <p className="text-sm text-neutral-600 mt-2 max-w-xl">
@@ -417,11 +417,11 @@ export const ShopPage: React.FC = () => {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search jewellery..."
-              className="w-full pl-4 pr-10 py-3 rounded-lg bg-white border border-black/15 text-sm text-[#0D0D0D] placeholder:text-neutral-400 focus:outline-none focus:border-[#C5A059] shadow-xs"
+              className="w-full pl-4 pr-10 py-3 rounded-lg bg-white border border-black/15 text-sm text-[#F2EFE9] placeholder:text-neutral-400 focus:outline-none focus:border-[#C5A059] shadow-xs"
             />
             <button
               type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9E7B36]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D4B06A]"
               aria-label="Search catalog"
             >
               <Search className="w-4 h-4" />
@@ -437,10 +437,10 @@ export const ShopPage: React.FC = () => {
           <section className="mb-8 pb-6 border-b border-neutral-200">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.24em] text-[#9E7B36] font-semibold block">Curated Jewellery</span>
-                <h2 className="font-serif-luxury text-xl sm:text-2xl font-semibold text-[#0D0D0D]">Shop By Collection</h2>
+                <span className="text-[10px] uppercase tracking-[0.24em] text-[#D4B06A] font-semibold block">Curated Jewellery</span>
+                <h2 className="font-serif-luxury text-xl sm:text-2xl font-semibold text-[#F2EFE9]">Shop By Collection</h2>
               </div>
-              <Link to="/collections" className="text-xs uppercase tracking-wider text-[#9E7B36] hover:text-[#0D0D0D] font-semibold flex items-center gap-1">
+              <Link to="/collections" className="text-xs uppercase tracking-wider text-[#D4B06A] hover:text-[#F2EFE9] font-semibold flex items-center gap-1">
                 All Collections <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -475,15 +475,15 @@ export const ShopPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden inline-flex items-center gap-2 px-4 py-2.5 rounded bg-white border border-black/15 text-[#0D0D0D] hover:border-[#C5A059] text-xs uppercase tracking-wider font-semibold shadow-xs transition-colors"
+              className="lg:hidden inline-flex items-center gap-2 px-4 py-2.5 rounded bg-white border border-black/15 text-[#F2EFE9] hover:border-[#C5A059] text-xs uppercase tracking-wider font-semibold shadow-xs transition-colors"
             >
-              <SlidersHorizontal className="w-4 h-4 text-[#9E7B36]" />
+              <SlidersHorizontal className="w-4 h-4 text-[#D4B06A]" />
               <span>Filters ({activeChips.length})</span>
             </button>
 
             <p className="text-xs sm:text-sm text-neutral-600">
-              Showing <strong className="text-[#0D0D0D]">{products.length}</strong> of{' '}
-              <strong className="text-[#0D0D0D]">{pagination.total}</strong> pieces
+              Showing <strong className="text-[#F2EFE9]">{products.length}</strong> of{' '}
+              <strong className="text-[#F2EFE9]">{pagination.total}</strong> pieces
             </p>
           </div>
 
@@ -495,7 +495,7 @@ export const ShopPage: React.FC = () => {
               id="sort-select"
               value={sort}
               onChange={(e) => updateParam('sort', e.target.value)}
-              className="px-3.5 py-2 rounded bg-white border border-neutral-300 text-xs font-medium text-[#0D0D0D] focus:outline-none focus:border-[#0D0D0D]"
+              className="px-3.5 py-2 rounded bg-white border border-neutral-300 text-xs font-medium text-[#F2EFE9] focus:outline-none focus:border-[#F2EFE9]"
             >
               <option value="featured">Featured</option>
               <option value="newest">Newest Arrivals</option>
@@ -513,13 +513,13 @@ export const ShopPage: React.FC = () => {
             {activeChips.map((chip) => (
               <span
                 key={chip.key}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#C5A059]/50 text-[#0D0D0D] text-xs shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#C5A059]/50 text-[#F2EFE9] text-xs shadow-2xs"
               >
                 <span>{chip.label}</span>
                 <button
                   type="button"
                   onClick={() => updateParam(chip.key, null)}
-                  className="text-[#9E7B36] hover:text-[#0D0D0D]"
+                  className="text-[#D4B06A] hover:text-[#F2EFE9]"
                   aria-label={`Remove ${chip.label} filter`}
                 >
                   <X className="w-3.5 h-3.5" />
@@ -529,7 +529,7 @@ export const ShopPage: React.FC = () => {
             <button
               type="button"
               onClick={clearAllFilters}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-[#9E7B36] hover:text-[#0D0D0D] ml-2"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4B06A] hover:text-[#F2EFE9] ml-2"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Clear All</span>
@@ -542,14 +542,14 @@ export const ShopPage: React.FC = () => {
           <aside className="hidden lg:block lg:col-span-3">
             <div className="sticky top-28 bg-white p-6 rounded-xl border border-black/8 shadow-xs">
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-neutral-200">
-                <h2 className="font-serif-luxury text-xl font-semibold text-[#0D0D0D]">
+                <h2 className="font-serif-luxury text-xl font-semibold text-[#F2EFE9]">
                   Filters
                 </h2>
                 {activeChips.length > 0 && (
                   <button
                     type="button"
                     onClick={clearAllFilters}
-                    className="text-xs text-[#9E7B36] hover:underline font-medium"
+                    className="text-xs text-[#D4B06A] hover:underline font-medium"
                   >
                     Reset
                   </button>
@@ -583,7 +583,7 @@ export const ShopPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={fetchProducts}
-                  className="px-5 py-2.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider rounded"
+                  className="px-5 py-2.5 bg-[#F2EFE9] text-[#1C1C1F] text-xs uppercase tracking-wider rounded"
                 >
                   Retry
                 </button>
@@ -591,7 +591,7 @@ export const ShopPage: React.FC = () => {
             ) : products.length === 0 ? (
               <div className="bg-white border border-black/8 rounded-xl p-12 text-center space-y-4">
                 <Gem className="w-12 h-12 text-[#C5A059] mx-auto" />
-                <h3 className="font-serif-luxury text-2xl font-semibold text-[#0D0D0D]">
+                <h3 className="font-serif-luxury text-2xl font-semibold text-[#F2EFE9]">
                   No Matching Jewellery Found
                 </h3>
                 <p className="text-sm text-neutral-500 max-w-md mx-auto">
@@ -600,7 +600,7 @@ export const ShopPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="px-6 py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold rounded transition-colors"
+                  className="px-6 py-3 bg-[#F2EFE9] hover:bg-[#C5A059] text-[#1C1C1F] hover:text-[#F2EFE9] text-xs uppercase tracking-[0.18em] font-semibold rounded transition-colors"
                 >
                   Reset All Filters
                 </button>
@@ -620,7 +620,7 @@ export const ShopPage: React.FC = () => {
                       type="button"
                       disabled={page <= 1}
                       onClick={() => updateParam('page', String(page - 1))}
-                      className="p-2.5 rounded border border-neutral-300 bg-white text-[#0D0D0D] disabled:opacity-40 hover:border-[#C5A059]"
+                      className="p-2.5 rounded border border-neutral-300 bg-white text-[#F2EFE9] disabled:opacity-40 hover:border-[#C5A059]"
                       aria-label="Previous page"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -635,8 +635,8 @@ export const ShopPage: React.FC = () => {
                           onClick={() => updateParam('page', String(pNum))}
                           className={`w-10 h-10 rounded text-xs font-bold transition-colors ${
                             pNum === page
-                              ? 'bg-[#0D0D0D] text-[#C5A059] border border-[#C5A059]'
-                              : 'bg-white text-[#0D0D0D] border border-neutral-300 hover:border-[#0D0D0D]'
+                              ? 'bg-[#F2EFE9] text-[#C5A059] border border-[#C5A059]'
+                              : 'bg-white text-[#F2EFE9] border border-neutral-300 hover:border-[#F2EFE9]'
                           }`}
                         >
                           {pNum}
@@ -648,7 +648,7 @@ export const ShopPage: React.FC = () => {
                       type="button"
                       disabled={page >= pagination.totalPages}
                       onClick={() => updateParam('page', String(page + 1))}
-                      className="p-2.5 rounded border border-neutral-300 bg-white text-[#0D0D0D] disabled:opacity-40 hover:border-[#C5A059]"
+                      className="p-2.5 rounded border border-neutral-300 bg-white text-[#F2EFE9] disabled:opacity-40 hover:border-[#C5A059]"
                       aria-label="Next page"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -670,7 +670,7 @@ export const ShopPage: React.FC = () => {
           />
           <div className="relative z-10 w-[88%] max-w-sm bg-white h-full overflow-y-auto p-6 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
-              <h2 className="font-serif-luxury text-2xl font-semibold text-[#0D0D0D]">Filter Jewellery</h2>
+              <h2 className="font-serif-luxury text-2xl font-semibold text-[#F2EFE9]">Filter Jewellery</h2>
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
@@ -684,7 +684,7 @@ export const ShopPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] text-xs uppercase tracking-widest font-semibold rounded shadow-xs transition-colors"
+                className="w-full py-3 bg-[#C5A059] hover:bg-[#DFBD78] text-[#F2EFE9] text-xs uppercase tracking-widest font-semibold rounded shadow-xs transition-colors"
               >
                 Apply Filters ({pagination.total})
               </button>
