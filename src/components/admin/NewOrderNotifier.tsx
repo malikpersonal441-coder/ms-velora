@@ -423,89 +423,75 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
         )}
       </button>
 
-      {/* Prominent Full-Screen Modal with Customer Name and Immediate Actions */}
+      {/* Floating Side Order Notification (Desktop Bottom-Right / Mobile Floating Banner) */}
       <AnimatePresence>
         {alert && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#0D0D0D]/75 backdrop-blur-md"
+          <motion.aside
+            initial={{ opacity: 0, y: 30, scale: 0.95, x: 20 }}
+            animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95, x: 30 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 26 }}
+            className="fixed z-[250] bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:w-[420px] max-w-[calc(100vw-24px)] rounded-2xl bg-white text-left shadow-[0_25px_65px_-15px_rgba(13,13,13,0.45)] border-2 border-[#C5A059] overflow-hidden"
             role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="new-order-alert-title"
+            aria-modal="false"
+            aria-labelledby="new-order-side-title"
           >
-            <motion.div
-              initial={{ scale: 0.85, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-              className="relative w-full max-w-md rounded-3xl bg-white text-center shadow-[0_40px_100px_-20px_rgba(0,0,0,0.65)] overflow-hidden border border-[#C5A059]/40"
-            >
-              {/* Header Badge */}
-              <div className="relative flex flex-col items-center justify-center bg-gradient-to-br from-[#C5A059] via-[#DFBD78] to-[#9E7B36] px-6 py-7">
-                <span className="absolute w-28 h-28 rounded-full bg-white/35 animate-ping pointer-events-none" aria-hidden />
-                <span className="relative w-20 h-20 rounded-full bg-white text-[#9E7B36] flex items-center justify-center shadow-xl">
-                  <Bell className="w-10 h-10 animate-[wiggle_0.5s_ease-in-out_infinite]" />
+            {/* Top Accent Strip with Sound Indicator & Close */}
+            <div className="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-[#DFBD78] via-[#C5A059] to-[#9E7B36] text-[#0D0D0D]">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-white" />
                 </span>
-                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/20 text-white text-[11px] uppercase tracking-[0.22em] font-bold">
-                  <Sparkles className="w-3 h-3 text-[#FFF1CA]" />
-                  <span>{alert.count > 1 ? `${alert.count} NEW ORDERS WAITING` : 'NEW ORDER RECEIVED'}</span>
-                </div>
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#0D0D0D]">
+                  {alert.count > 1 ? `🚨 ${alert.count} New Orders Received!` : '🚨 New Order Received!'}
+                </span>
               </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={toggleSound}
+                  className="p-1 rounded text-[#0D0D0D]/80 hover:text-black hover:bg-black/10 transition-colors cursor-pointer"
+                  title={soundOn ? 'Sound On' : 'Sound Muted'}
+                >
+                  {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissAlert}
+                  className="p-1 rounded text-[#0D0D0D]/80 hover:text-black hover:bg-black/10 transition-colors cursor-pointer"
+                  aria-label="Dismiss alert"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-              {/* Order Info & Customer Name */}
-              <div className="px-6 pt-5 pb-5 space-y-3">
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase tracking-[0.24em] font-bold text-[#9E7B36] block">
+            {/* Body: Customer Name & Order Details */}
+            <div className="p-4 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] uppercase tracking-wider text-[#9E7B36] font-bold block">
                     Customer Name
                   </span>
-                  <h2 id="new-order-alert-title" className="font-serif-luxury text-3xl font-bold text-[#0D0D0D] leading-tight">
+                  <h3 id="new-order-side-title" className="font-serif-luxury text-2xl font-bold text-[#0D0D0D] leading-tight truncate">
                     {alert.order.shippingAddress.fullName}
-                  </h2>
-                  <p className="text-xs text-neutral-500 font-medium">
+                  </h3>
+                  <p className="text-xs text-neutral-500 font-medium mt-0.5 truncate">
                     Order #{alert.order.orderNumber} • {alert.order.shippingAddress.city}
                     {alert.order.orderSource === 'whatsapp' && ' • WhatsApp'}
                   </p>
                 </div>
-
-                {/* Amount Box */}
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#C5A059]/30 space-y-1">
-                  <span className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold block">Total Payable</span>
-                  <p className="text-3xl font-bold text-[#0D0D0D] tabular-nums tracking-tight">
+                <div className="text-right shrink-0">
+                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold block">Total</span>
+                  <p className="text-xl font-bold text-[#0D0D0D] tabular-nums">
                     {formatPrice(alert.order.totalAmount)}
                   </p>
-                  <p className="text-[11px] text-neutral-600">
-                    {alert.order.paymentMethod === 'cod' ? '💵 Cash on Delivery' : '💳 Online Payment'} • {alert.order.items?.length || 1} item(s)
-                  </p>
                 </div>
-
-                {/* WhatsApp Quick Link */}
-                {alert.order.shippingAddress.phone && (
-                  <a
-                    href={`https://wa.me/${alert.order.shippingAddress.phone.replace(/[^0-9]/g, '').replace(/^0/, '92')}?text=${encodeURIComponent(
-                      `Hello ${alert.order.shippingAddress.fullName}, thank you for placing order #${alert.order.orderNumber} with MS Velora Fine Jewellery! We are preparing your order.`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-semibold hover:bg-emerald-100 transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4 text-emerald-600" />
-                    <span>WhatsApp {alert.order.shippingAddress.fullName}</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-60" />
-                  </a>
-                )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2.5 px-6 pb-6">
-                <button
-                  type="button"
-                  onClick={dismissAlert}
-                  className="py-3 rounded-xl border border-black/15 text-xs font-bold uppercase tracking-wider text-neutral-600 hover:bg-neutral-100 transition-colors"
-                >
-                  Silence / Dismiss
-                </button>
+              {/* Quick Action Buttons */}
+              <div className="pt-1 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   autoFocus
@@ -517,13 +503,36 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
                       openOrder(alert.order);
                     }
                   }}
-                  className="py-3 rounded-xl bg-[#0D0D0D] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#C5A059] hover:text-[#0D0D0D] transition-colors shadow-md"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-[#0D0D0D] text-white hover:bg-[#C5A059] hover:text-[#0D0D0D] text-xs font-bold uppercase tracking-wider transition-colors shadow-sm text-center cursor-pointer"
                 >
-                  {alert.count > 1 ? 'View All' : 'Open Order'}
+                  {alert.count > 1 ? 'View All Orders' : 'View Order Details'}
+                </button>
+
+                {alert.order.shippingAddress.phone && (
+                  <a
+                    href={`https://wa.me/${alert.order.shippingAddress.phone.replace(/[^0-9]/g, '').replace(/^0/, '92')}?text=${encodeURIComponent(
+                      `Hello ${alert.order.shippingAddress.fullName}, thank you for placing order #${alert.order.orderNumber} with MS Velora Fine Jewellery! We are preparing your order.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Open WhatsApp chat with customer"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
+
+                <button
+                  type="button"
+                  onClick={dismissAlert}
+                  className="py-2.5 px-3 rounded-xl border border-black/15 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
+                >
+                  Dismiss
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </motion.aside>
         )}
       </AnimatePresence>
 
@@ -589,7 +598,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               <div className="p-3 bg-amber-50 border-b border-amber-200/80 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-[11px] text-amber-900 leading-tight">
                   <Smartphone className="w-4 h-4 text-amber-700 shrink-0" />
-                  <span>Receive push sound on this device even when screen is locked?</span>
+                  <span>Receive push sound on this mobile/desktop device even when locked?</span>
                 </div>
                 <button
                   type="button"
@@ -606,7 +615,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               <div className="px-6 py-10 text-center text-neutral-400">
                 <Inbox className="w-8 h-8 mx-auto mb-2 text-neutral-300" />
                 <p className="text-xs font-medium text-neutral-500">No new orders right now.</p>
-                <p className="text-[11px] text-neutral-400 mt-1">When an order arrives, an alarm will ring with customer name.</p>
+                <p className="text-[11px] text-neutral-400 mt-1">When an order arrives, an alarm will ring with customer name on the side of the screen.</p>
               </div>
             ) : (
               <ul className="max-h-[min(420px,60vh)] overflow-y-auto overscroll-contain divide-y divide-black/5">

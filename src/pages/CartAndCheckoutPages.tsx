@@ -27,6 +27,7 @@ import {
 import { Order } from '../types';
 import { customerOrderMessage, waLink } from '../lib/whatsapp';
 import { WalletPaymentModal, isWalletMethod } from '../components/WalletPaymentModal';
+import { OrderDetailsModal } from '../components/OrderDetailsModal';
 
 export const CartPage: React.FC = () => {
   const {
@@ -676,6 +677,8 @@ export const CheckoutPage: React.FC = () => {
                       <span>Online Payment</span>
                       <span className="px-1.5 py-0.5 rounded bg-[#C8102E] text-white text-[9px] font-bold">JazzCash</span>
                       <span className="px-1.5 py-0.5 rounded bg-[#1BA548] text-white text-[9px] font-bold">EasyPaisa</span>
+                      <span className="px-1.5 py-0.5 rounded bg-[#0066CC] text-white text-[9px] font-bold">NayaPay</span>
+                      <span className="px-1.5 py-0.5 rounded bg-[#FF6600] text-white text-[9px] font-bold">SadaPay</span>
                     </div>
                     <p className="text-xs text-neutral-500 mt-1">
                       After placing the order you'll see our account number. Send the amount and share the screenshot on WhatsApp.
@@ -855,6 +858,7 @@ export const OrderConfirmationPage: React.FC = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(true);
   const { settings } = useStore();
   const [searchParams] = useSearchParams();
   const [payOpen, setPayOpen] = useState(searchParams.get('pay') === '1');
@@ -1097,6 +1101,13 @@ export const OrderConfirmationPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Order Details Modal */}
+      <OrderDetailsModal
+        isOpen={isOrderDetailsOpen}
+        onClose={() => setIsOrderDetailsOpen(false)}
+        order={order}
+      />
     </div>
   );
 };
@@ -1106,6 +1117,7 @@ export const TrackOrderPage: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
 
   const handleLookup = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -1196,6 +1208,13 @@ export const TrackOrderPage: React.FC = () => {
               <span className="px-3 py-1 rounded-full bg-neutral-100 text-neutral-800 text-xs font-semibold uppercase tracking-wider">
                 Payment: {order.paymentStatus}
               </span>
+              <button
+                type="button"
+                onClick={() => setIsOrderDetailsOpen(true)}
+                className="px-3 py-1 rounded-full bg-[#C5A059] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#DFBD78] transition-colors"
+              >
+                View Details
+              </button>
             </div>
           </div>
 
@@ -1236,6 +1255,15 @@ export const TrackOrderPage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Order Details Modal */}
+      {order && (
+        <OrderDetailsModal
+          isOpen={isOrderDetailsOpen}
+          onClose={() => setIsOrderDetailsOpen(false)}
+          order={order}
+        />
       )}
     </div>
   );

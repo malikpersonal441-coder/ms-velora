@@ -9,10 +9,12 @@ import { waLink } from '../lib/whatsapp';
 const WALLETS = [
   { key: 'jazzcash', name: 'JazzCash', badge: 'JC', bg: 'bg-[#C8102E]' },
   { key: 'easypaisa', name: 'EasyPaisa', badge: 'EP', bg: 'bg-[#1BA548]' },
+  { key: 'nayapay', name: 'NayaPay', badge: 'NP', bg: 'bg-[#0066CC]' },
+  { key: 'sadapay', name: 'SadaPay', badge: 'SP', bg: 'bg-[#FF6600]' },
 ] as const;
 
-/** Online (JazzCash / EasyPaisa) orders: payment is sent manually + screenshot on WhatsApp. */
-export const isWalletMethod = (m: string) => m === 'online' || m === 'jazzcash' || m === 'easypaisa';
+/** Online (JazzCash / EasyPaisa / NayaPay / SadaPay) orders: payment is sent manually + screenshot on WhatsApp. */
+export const isWalletMethod = (m: string) => m === 'online' || m === 'jazzcash' || m === 'easypaisa' || m === 'nayapay' || m === 'sadapay';
 
 const CopyButton: React.FC<{ value: string; label: string }> = ({ value, label }) => {
   const [copied, setCopied] = useState(false);

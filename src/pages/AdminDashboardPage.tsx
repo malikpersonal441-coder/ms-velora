@@ -2397,30 +2397,48 @@ export const AdminDashboardPage: React.FC = () => {
                   </label>
                 </div>
 
-                {/* JazzCash / EasyPaisa accounts */}
+                {/* JazzCash / EasyPaisa / NayaPay / SadaPay accounts */}
                 <div className="space-y-3 pt-2">
                   <div>
-                    <h3 className="font-serif-luxury text-xl font-semibold">JazzCash & EasyPaisa</h3>
+                    <h3 className="font-serif-luxury text-xl font-semibold">Online Payment Methods</h3>
                     <p className="text-[11px] text-neutral-500">
                       Customers see these details after ordering and send the payment screenshot on WhatsApp.
                     </p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {(['jazzcash', 'easypaisa'] as const).map((w) => {
-                      const acc = storeSettings.mobileWallets?.[w] || { enabled: true, accountTitle: '', accountNumber: '' };
+                    {(['jazzcash', 'easypaisa', 'nayapay', 'sadapay'] as const).map((w) => {
+                      const acc = storeSettings.mobileWallets?.[w] || { enabled: false, accountTitle: '', accountNumber: '' };
                       const setAcc = (patch: Record<string, unknown>) =>
                         setStoreSettings({
                           ...storeSettings,
                           mobileWallets: { ...(storeSettings.mobileWallets || {}), [w]: { ...acc, ...patch } },
                         });
+                      const colors = {
+                        jazzcash: 'bg-[#C8102E]',
+                        easypaisa: 'bg-[#1BA548]',
+                        nayapay: 'bg-[#0066CC]',
+                        sadapay: 'bg-[#FF6600]',
+                      };
+                      const labels = {
+                        jazzcash: 'JazzCash',
+                        easypaisa: 'EasyPaisa',
+                        nayapay: 'NayaPay',
+                        sadapay: 'SadaPay',
+                      };
+                      const abbrevs = {
+                        jazzcash: 'JC',
+                        easypaisa: 'EP',
+                        nayapay: 'NP',
+                        sadapay: 'SP',
+                      };
                       return (
                         <div key={w} className={`p-4 rounded-xl border space-y-3 ${acc.enabled ? 'border-[#C5A059]/50 bg-[#C5A059]/5' : 'border-neutral-200'}`}>
                           <label className="flex items-center justify-between gap-2 font-semibold">
                             <span className="flex items-center gap-2">
-                              <span className={`w-6 h-6 rounded-md text-white text-[10px] font-bold flex items-center justify-center ${w === 'jazzcash' ? 'bg-[#C8102E]' : 'bg-[#1BA548]'}`}>
-                                {w === 'jazzcash' ? 'JC' : 'EP'}
+                              <span className={`w-6 h-6 rounded-md text-white text-[10px] font-bold flex items-center justify-center ${colors[w]}`}>
+                                {abbrevs[w]}
                               </span>
-                              {w === 'jazzcash' ? 'JazzCash' : 'EasyPaisa'}
+                              {labels[w]}
                             </span>
                             <span className="flex items-center gap-2 text-[11px] font-normal text-neutral-500">
                               {acc.enabled ? 'Shown at checkout' : 'Hidden'}

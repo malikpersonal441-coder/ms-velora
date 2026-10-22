@@ -233,11 +233,14 @@ export interface WalletAccount {
   enabled: boolean;
   accountTitle: string;
   accountNumber: string;
+  accountName?: string;
 }
 
 export interface MobileWallets {
   jazzcash: WalletAccount;
   easypaisa: WalletAccount;
+  nayapay?: WalletAccount;
+  sadapay?: WalletAccount;
   instructions: string;
 }
 
