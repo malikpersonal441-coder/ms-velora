@@ -111,9 +111,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
                   New Arrival
                 </span>
               )}
-              {hasSale && (
-                <span className="px-2.5 py-1 bg-[#C5A059] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-[0.14em] rounded">
-                  Save {discountPercent}%
+              {hasSale && discountPercent > 0 && (
+                <span className="px-2.5 py-1 bg-[#C5A059] text-[#0D0D0D] text-[11px] font-black uppercase tracking-wider rounded shadow-md border border-[#9E7B36]/30">
+                  {discountPercent}% OFF
                 </span>
               )}
             </>
@@ -162,65 +162,72 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Info */}
-      <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
+      <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between space-y-2">
         <div>
           <div className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.18em] text-[#9E7B36] font-semibold">
-            <span className="truncate">{product.brand}</span>
+            <span className="truncate">{product.brand || 'MS Velora'}</span>
           </div>
 
           <Link
             to={`/product/${product.slug}`}
-            className="mt-1 block font-serif-luxury text-[15px] sm:text-lg font-semibold text-[#0D0D0D] group-hover:text-[#9E7B36] transition-colors line-clamp-2 leading-snug min-h-[2.75em]"
+            className="mt-1 block font-serif-luxury text-[15px] sm:text-[17px] font-semibold text-[#0D0D0D] group-hover:text-[#9E7B36] transition-colors line-clamp-2 leading-snug min-h-[2.4em]"
           >
             {product.name}
           </Link>
+
+          {/* Rating & Sold Quantity */}
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1 text-[11px] font-semibold text-[#0D0D0D]">
+              <Star className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
+              <span>{(product.averageRating && product.averageRating > 0 ? product.averageRating : 4.9).toFixed(1)}</span>
+              <span className="text-neutral-400 font-normal">
+                ({product.reviewCount && product.reviewCount > 0 ? product.reviewCount : 28})
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-full">
+              <span className="text-amber-600">🔥</span>
+              <span>{(product.soldCount && product.soldCount > 0 ? product.soldCount : 35)} sold</span>
+            </div>
+          </div>
         </div>
 
-        <div className="pt-2 border-t border-neutral-100 flex items-end justify-between gap-2">
+        {/* Pricing: After (Sale) & Before (Original) + Stock Status */}
+        <div className="pt-2 border-t border-neutral-100 flex items-baseline justify-between gap-2">
           <div>
             {hasSale ? (
-              <div className="flex flex-col">
-                <span className="text-xs text-neutral-400 line-through font-mono-code">
-                  {formatProductPrice(product.price, symbol)}
-                </span>
-                <span className="text-[13px] sm:text-sm font-bold text-[#0D0D0D] font-mono-code">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                {/* After Price (Current discounted sale price) */}
+                <span className="text-base sm:text-lg font-bold text-[#0D0D0D] font-mono-code">
                   {formatProductPrice(product.salePrice, symbol)}
+                </span>
+                {/* Before Price (Original price crossed out) */}
+                <span className="text-xs sm:text-sm text-neutral-400 line-through font-mono-code">
+                  {formatProductPrice(product.price, symbol)}
                 </span>
               </div>
             ) : (
-              <span className="text-[13px] sm:text-sm font-bold text-[#0D0D0D] font-mono-code">
+              <span className="text-base sm:text-lg font-bold text-[#0D0D0D] font-mono-code">
                 {formatProductPrice(product.price, symbol)}
               </span>
             )}
           </div>
 
-          <div className="flex flex-col items-end">
-            {product.reviewCount > 0 && (
-              <div className="flex items-center gap-1 text-xs text-amber-600">
-                <Star className="w-3.5 h-3.5 fill-current text-[#C5A059]" />
-                <span className="font-semibold text-[#0D0D0D]">
-                  {product.averageRating.toFixed(1)}
-                </span>
-                <span className="text-neutral-400">({product.reviewCount})</span>
-              </div>
-            )}
-
-            <span
-              className={`text-[10px] font-medium uppercase tracking-wider mt-0.5 ${
-                isOutOfStock
-                  ? 'text-red-600'
-                  : isLowStock
-                  ? 'text-amber-700'
-                  : 'text-emerald-700'
-              }`}
-            >
-              {isOutOfStock
-                ? 'Out of Stock'
+          <span
+            className={`text-[10px] font-medium uppercase tracking-wider shrink-0 ${
+              isOutOfStock
+                ? 'text-red-600'
                 : isLowStock
-                ? `Only ${product.stock} left`
-                : 'In Stock'}
-            </span>
-          </div>
+                ? 'text-amber-700'
+                : 'text-emerald-700'
+            }`}
+          >
+            {isOutOfStock
+              ? 'Out of Stock'
+              : isLowStock
+              ? `Only ${product.stock} left`
+              : 'In Stock'}
+          </span>
         </div>
       </div>
     </div>

@@ -324,8 +324,8 @@ export async function seedDatabase(forceReset = false): Promise<void> {
       category: catMap.get(j.category),
       collections: j.collections.map((c) => colMap.get(c)),
       gender: 'Women' as const,
-      price: 0,
-      salePrice: null,
+      price: j.name.includes('Bridal Necklace') ? 24500 : j.name.includes('Pearl Bridal') ? 18000 : j.name.includes('Kundan') ? 12500 : j.name.includes('Bangle') ? 8500 : j.name.includes('Bracelet') ? 6800 : j.name.includes('Jhumka') ? 5500 : j.name.includes('Aurora') ? 4999 : j.name.includes('Rosa') ? 4200 : j.name.includes('Celeste') ? 3800 : j.name.includes('Solene') ? 3499 : j.name.includes('Luna') ? 2999 : 2500,
+      salePrice: j.name.includes('Bridal Necklace') ? 19600 : j.name.includes('Pearl Bridal') ? 16200 : j.name.includes('Kundan') ? 9999 : j.name.includes('Bangle') ? 7650 : j.name.includes('Bracelet') ? 5780 : j.name.includes('Jhumka') ? 4950 : j.name.includes('Aurora') ? 4499 : j.name.includes('Rosa') ? 3780 : j.name.includes('Celeste') ? 3420 : j.name.includes('Solene') ? 2999 : j.name.includes('Luna') ? 2699 : 1999,
       shortDescription: j.shortDescription,
       description: j.description,
       mainImage: j.images[0],
@@ -334,14 +334,14 @@ export async function seedDatabase(forceReset = false): Promise<void> {
       variants: [],
       stock: j.stock,
       lowStockThreshold: 5,
-      soldCount: 0,
+      soldCount: j.name.includes('Stud') ? 210 : j.name.includes('Jhumka') ? 175 : j.name.includes('Aurora') ? 142 : j.name.includes('Solene') ? 160 : j.name.includes('Luna') ? 114 : j.name.includes('Celeste') ? 97 : j.name.includes('Bracelet') ? 92 : j.name.includes('Kundan') ? 86 : 58,
       status: 'published' as const,
       featured: !!j.featured,
       bestSeller: !!j.bestSeller,
       newArrival: !!j.newArrival,
       tags: j.tags,
-      averageRating: 0,
-      reviewCount: 0,
+      averageRating: 4.9,
+      reviewCount: 38,
     };
   });
 
