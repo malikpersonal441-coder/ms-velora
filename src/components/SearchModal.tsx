@@ -165,7 +165,9 @@ export const SearchModal: React.FC = () => {
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] uppercase tracking-wider text-[#9E7B36] font-semibold">
-                            {prod.brand}
+                            {typeof prod.category === 'object' && prod.category?.name
+                              ? prod.category.name
+                              : prod.specifications?.movement || prod.model || 'Fine Jewellery'}
                           </p>
                           <h4 className="font-serif-luxury text-base font-semibold text-[#0D0D0D] truncate">
                             {prod.name}

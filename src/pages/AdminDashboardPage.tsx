@@ -182,6 +182,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isDeletingProduct, setIsDeletingProduct] = useState(false);
   const [isBulkDeletingProducts, setIsBulkDeletingProducts] = useState(false);
+  const [announceProduct, setAnnounceProduct] = useState<Product | null>(null);
 
   // Customers state
   const [customers, setCustomers] = useState<any[]>([]);
@@ -1537,15 +1538,7 @@ export const AdminDashboardPage: React.FC = () => {
                         {prod.status === 'published' && (
                           <button
                             type="button"
-                            onClick={async () => {
-                              if (!window.confirm(`Send a "New arrival: ${prod.name}" notification to all subscribed customers?`)) return;
-                              try {
-                                const res = await apiRequest(`/api/admin/push/new-arrival/${prod._id}`, { method: 'POST' });
-                                addToast(res.sent ? `Announced to ${res.sent} customer device(s).` : 'No customers have turned on notifications yet.', res.sent ? 'success' : 'info');
-                              } catch (err: any) {
-                                addToast(err.message || 'Could not send the announcement.', 'error');
-                              }
-                            }}
+                            onClick={() => setAnnounceProduct(prod)}
                             className="inline-flex p-1.5 text-neutral-600 hover:text-[#9E7B36]"
                             title="Announce to customers (push notification)"
                           >
@@ -3685,6 +3678,53 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+            {/* Push Announcement Confirmation Modal */}
+      {announceProduct && (
+        <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#C5A059]/30 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#C5A059]/15 text-[#9E7B36] flex items-center justify-center shrink-0">
+                <Megaphone className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[#0D0D0D]">Send Customer Announcement?</h3>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Broadcast a &ldquo;New Arrival&rdquo; push notification for{' '}
+                  <strong className="text-black font-semibold">&ldquo;{announceProduct.name}&rdquo;</strong> to all subscribed customer devices?
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setAnnounceProduct(null)}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-xs font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const p = announceProduct;
+                  setAnnounceProduct(null);
+                  try {
+                    const res = await apiRequest(`/api/admin/push/new-arrival/${p._id}`, { method: 'POST' });
+                    addToast(res.sent ? `Announced to ${res.sent} customer device(s).` : 'No customers have turned on notifications yet.', res.sent ? 'success' : 'info');
+                  } catch (err: any) {
+                    addToast(err.message || 'Could not send the announcement.', 'error');
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0D0D0D] hover:bg-[#C5A059] text-white hover:text-black text-xs font-bold transition-colors"
+              >
+                <Megaphone className="w-3.5 h-3.5" />
+                <span>Broadcast Notification</span>
+              </button>
             </div>
           </div>
         </div>

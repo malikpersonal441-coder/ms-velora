@@ -1,7 +1,7 @@
 import React, { useRef, useState, memo } from 'react';
 import { sized, srcSet } from '../lib/img';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Star, Check } from 'lucide-react';
+import { ShoppingBag, Star, Check, Eye } from 'lucide-react';
 import { Product } from '../types';
 import { formatProductPrice } from '../lib/api';
 import { useStore } from '../context/StoreContext';
@@ -16,6 +16,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
   const {
     addToCart,
     settings,
+    setQuickViewProduct,
   } = useStore();
 
   const symbol = settings?.currencySymbol || 'Rs.';
@@ -104,6 +105,23 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
           <span className="lux-sheen" aria-hidden />
         </Link>
 
+        {/* Top Right Quick View Modal Button */}
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setQuickViewProduct(product);
+            }}
+            className="w-8 h-8 rounded-full bg-white/95 hover:bg-[#C5A059] text-[#0D0D0D] hover:text-white flex items-center justify-center transition-all shadow-md backdrop-blur-xs group/viewBtn hover:scale-110"
+            title="Quick View in Modal"
+            aria-label={`Quick view ${product.name}`}
+          >
+            <Eye className="w-4 h-4 text-neutral-700 group-hover/viewBtn:text-white transition-colors" />
+          </button>
+        </div>
+
         {/* Top Left Badges */}
         <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1 z-10 pointer-events-none scale-90 sm:scale-100 origin-top-left">
           {isOutOfStock ? (
@@ -136,10 +154,24 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
               : 'translate-y-0 opacity-100 sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 sm:group-focus-within:translate-y-0 sm:group-focus-within:opacity-100'
           }`}
         >
-          <button
-            type="button"
-            disabled={isOutOfStock}
-            onClick={handleAdd}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setQuickViewProduct(product);
+              }}
+              className="py-2 px-2.5 rounded bg-white/90 hover:bg-[#C5A059] text-[#0D0D0D] hover:text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1 shrink-0"
+              title="Open full view modal"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">View</span>
+            </button>
+            <button
+              type="button"
+              disabled={isOutOfStock}
+              onClick={handleAdd}
             aria-live="polite"
             className={`w-full py-2 px-2 sm:px-4 rounded text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.16em] font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.97] ${
               isOutOfStock
@@ -166,13 +198,21 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
           </button>
         </div>
       </div>
+    </div>
 
       {/* Product Info */}
       <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between space-y-2">
         <div>
-          <div className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.18em] text-[#9E7B36] font-semibold">
-            <span className="truncate">{product.brand || 'MS Velora'}</span>
-          </div>
+          {(() => {
+            const catLabel = typeof product.category === 'object' && product.category?.name
+              ? product.category.name
+              : (product.specifications?.movement || product.model || '');
+            return catLabel ? (
+              <div className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.18em] text-[#9E7B36] font-semibold">
+                <span className="truncate">{catLabel}</span>
+              </div>
+            ) : null;
+          })()}
 
           <Link
             to={`/product/${product.slug}`}

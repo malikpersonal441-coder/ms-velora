@@ -349,7 +349,9 @@ export const ProductDetailPage: React.FC = () => {
             <div className="space-y-2 border-b border-neutral-200 pb-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs uppercase tracking-[0.24em] text-[#9E7B36] font-bold">
-                  {product.brand} • {product.specifications?.movement || 'Jewellery'}
+                  {typeof product.category === 'object' && product.category?.name
+                    ? product.category.name
+                    : product.specifications?.movement || product.model || 'Fine Jewellery'}
                 </span>
               </div>
 

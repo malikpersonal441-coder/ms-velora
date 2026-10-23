@@ -104,7 +104,9 @@ export const QuickViewModal: React.FC = () => {
             <div className="p-6 sm:p-8 flex flex-col justify-between space-y-5">
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#9E7B36] font-semibold">
-                  <span>{quickViewProduct.brand}</span>
+                  <span>{typeof quickViewProduct.category === 'object' && quickViewProduct.category?.name
+                    ? quickViewProduct.category.name
+                    : (quickViewProduct.model || quickViewProduct.specifications?.movement || 'Fine Jewellery')}</span>
                   <span className="font-mono-code text-neutral-500">{quickViewProduct.specifications?.movement}</span>
                 </div>
 
