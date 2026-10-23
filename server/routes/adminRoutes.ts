@@ -1840,8 +1840,8 @@ router.post('/push/test', async (req: Request, res: Response, next: NextFunction
     }
 
     const result = await sendToTopic('admin-orders', {
-      title: '🚨 New Order! Latest: Store Administrator',
-      body: 'Customer: Store Administrator\nTotal: Rs. 350 • Lahore\nOrder #MS-001',
+      title: '🚨 New Order! Latest: Mahtab Saghir',
+      body: 'Customer: Mahtab Saghir\nTotal: Rs. 350 • Lahore\nOrder #MS-001',
       url: '/admin',
       tag: 'test-admin-push',
       urgent: true,

@@ -59,7 +59,7 @@ export async function connectDatabase(): Promise<{ uri: string; isMemory: boolea
         console.log(`[DB] Auto-seeding primary administrator: ${adminEmail}`);
         const passwordHash = await bcrypt.hash(env.ADMIN_PASSWORD || 'AdminVelora@2026', 12);
         await User.create({
-          name: 'Store Administrator',
+          name: 'Mahtab Saghir',
           email: adminEmail,
           passwordHash,
           role: 'admin',
