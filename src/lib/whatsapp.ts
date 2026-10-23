@@ -46,7 +46,7 @@ export const PLACEHOLDERS = [
   '{storeName}',
 ];
 
-const PAYMENT_LABEL: Record<string, string> = {
+export const PAYMENT_LABEL: Record<string, string> = {
   cod: 'Cash on Delivery',
   bank_transfer: 'Bank Transfer',
   online_card: 'Card Payment',
@@ -135,4 +135,134 @@ export function customerOrderMessage(order: Order, settings: StoreSettings | nul
     `Phone: ${a.phone}`,
     `Address: ${a.streetAddress}, ${a.city}`,
   ].join('\n');
+}
+
+export const POPULAR_PAKISTANI_COURIERS = [
+  'Leopards',
+  'TCS',
+  'Trax',
+  'PostEx',
+  'Call Courier',
+  'M&P',
+  'Rider',
+  'Pakistan Post',
+] as const;
+
+/**
+ * Returns a direct live tracking URL for common Pakistani courier services,
+ * or falls back to MS Velora internal tracking page if tracking number / order number is present.
+ */
+export function getCourierTrackingUrl(
+  courier: string,
+  trackingNumber: string,
+  orderNumber?: string
+): string {
+  const c = (courier || '').trim().toLowerCase();
+  const tr = (trackingNumber || '').trim();
+
+  if (c.includes('leopard')) {
+    return tr ? `https://track.leopardscourier.com/track/${encodeURIComponent(tr)}` : 'https://track.leopardscourier.com';
+  }
+  if (c.includes('tcs')) {
+    return tr ? `https://www.tcsexpress.com/tracking?tracking_no=${encodeURIComponent(tr)}` : 'https://www.tcsexpress.com/tracking';
+  }
+  if (c.includes('trax')) {
+    return tr ? `https://trax.pk/tracking?tracking_id=${encodeURIComponent(tr)}` : 'https://trax.pk/tracking';
+  }
+  if (c.includes('postex')) {
+    return tr ? `https://postex.pk/tracking?tracking_number=${encodeURIComponent(tr)}` : 'https://postex.pk/tracking';
+  }
+  if (c.includes('call courier') || c.includes('callcourier')) {
+    return tr ? `https://callcourier.com.pk/tracking/?tc=${encodeURIComponent(tr)}` : 'https://callcourier.com.pk/tracking';
+  }
+  if (c.includes('m&p') || c.includes('mnp') || c.includes('muller')) {
+    return tr ? `https://mulphilog.com/tracking/${encodeURIComponent(tr)}` : 'https://mulphilog.com';
+  }
+  if (c.includes('rider') || c.includes('withrider')) {
+    return 'https://withrider.com';
+  }
+  if (c.includes('pakistan post') || c.includes('pak post')) {
+    return 'https://ep.gov.pk';
+  }
+  if (orderNumber && typeof window !== 'undefined') {
+    return `${window.location.origin}/track-order?orderNumber=${encodeURIComponent(orderNumber)}`;
+  }
+  return '';
+}
+
+export interface TrackingMessageOptions {
+  order: Order;
+  courier: string;
+  trackingNumber: string;
+  trackingUrl?: string;
+  estimatedDelivery?: string;
+  storeName?: string;
+  currencySymbol?: string;
+  language?: 'urdu' | 'english' | 'short';
+}
+
+export function buildTrackingWhatsAppMessage(opts: TrackingMessageOptions): string {
+  const {
+    order,
+    courier,
+    trackingNumber,
+    trackingUrl,
+    estimatedDelivery = '2-3 Working Days',
+    storeName = 'MS Velora',
+    currencySymbol = 'Rs.',
+    language = 'urdu',
+  } = opts;
+
+  const name = order.shippingAddress.fullName.split(' ')[0] || order.shippingAddress.fullName;
+  const city = order.shippingAddress.city || 'Pakistan';
+  const total = formatPrice(order.totalAmount, currencySymbol);
+  const payMethod = PAYMENT_LABEL[order.paymentMethod] || order.paymentMethod;
+  const cn = trackingNumber ? trackingNumber.trim() : '(Pending)';
+  const linkText = trackingUrl ? `\n🔗 *Live Tracking Link:*\n${trackingUrl}` : '';
+
+  if (language === 'english') {
+    return (
+      `Dear ${name},\n\n` +
+      `Greetings from *${storeName}* Luxury Fine Jewellery! 💍✨\n\n` +
+      `Your bespoke jewellery parcel (*${order.orderNumber}*) has been dispatched via insured courier delivery. 🚚📦\n\n` +
+      `📋 *Shipment Details:*\n` +
+      `• Courier Partner: *${courier}*\n` +
+      `• Tracking Number (CN): *${cn}*\n` +
+      `• Total Amount: *${total}* (${payMethod})\n` +
+      `• Destination: *${city}*\n` +
+      `• Estimated Delivery: *${estimatedDelivery}*` +
+      linkText +
+      `\n\n` +
+      `Kindly inspect the security seal upon delivery. If you need any concierge assistance, please reply directly to this WhatsApp message.\n\n` +
+      `Thank you for choosing *${storeName}* — Timeless Elegance. 🤍`
+    );
+  }
+
+  if (language === 'short') {
+    return (
+      `Assalam-o-Alaikum ${name}! 💍\n` +
+      `Aapka *${storeName}* order *${order.orderNumber}* ship ho chuka hai via *${courier}*.\n` +
+      `Tracking ID: *${cn}*\n` +
+      `Total: *${total}* (${payMethod})\n` +
+      (trackingUrl ? `Track here: ${trackingUrl}\n` : '') +
+      `Expected Delivery: ${estimatedDelivery}. Shukriya!`
+    );
+  }
+
+  // Default: Urdu / Roman Urdu (Polite & Clear)
+  return (
+    `Assalam-o-Alaikum ${name}! 💍✨\n\n` +
+    `Aapka *${storeName}* jewellery order *${order.orderNumber}* dispatch kar diya gaya hai! 🚚📦\n\n` +
+    `📋 *Shipment Details:*\n` +
+    `• Courier Service: *${courier}*\n` +
+    `• Tracking Number (CN): *${cn}*\n` +
+    `• Order Total: *${total}* (${payMethod})\n` +
+    `• Shehar: *${city}*\n` +
+    `• Expected Delivery: *${estimatedDelivery}*` +
+    linkText +
+    `\n\n` +
+    `Rider delivery se pehle call karega, baraye meherbani exact amount ready rakhein.\n` +
+    `Kisi bhi sawal ya rehnumai ke liye aap is WhatsApp par rabta kar saktay hain.\n\n` +
+    `*${storeName}* par aetimad ka bohat shukriya! ✨`
+  );
 }

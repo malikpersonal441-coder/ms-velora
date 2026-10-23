@@ -30,6 +30,7 @@ import {
   Menu,
   Megaphone,
   Printer,
+  Truck,
   LogOut,
   Star,
 } from 'lucide-react';
@@ -44,6 +45,7 @@ import { DELIVERY_LABEL } from '../components/admin/deliveryOptions';
 import { ForceEditOrderModal } from '../components/admin/ForceEditOrderModal';
 import { AdminLoginPage } from './AdminLoginPage';
 import { WhatsAppComposer } from '../components/admin/WhatsAppComposer';
+import { SendTrackingModal } from '../components/admin/SendTrackingModal';
 import { suggestedTemplate } from '../lib/whatsapp';
 import { compressImage, formatBytes, type CompressResult } from '../lib/compressImage';
 import { useStore } from '../context/StoreContext';
@@ -85,6 +87,7 @@ type AdminTab =
 export const AdminDashboardPage: React.FC = () => {
   const { user, authLoading, addToast, refreshStorefront, settings: publicSettings, logout } = useStore();
   const [waOrder, setWaOrder] = useState<Order | null>(null);
+  const [trackingModalOrder, setTrackingModalOrder] = useState<Order | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [slipIds, setSlipIds] = useState<string[]>([]);
@@ -1791,6 +1794,20 @@ export const AdminDashboardPage: React.FC = () => {
                         <td className="p-3.5 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-[#0D0D0D] text-[13px]">{o.orderNumber}</span>
+                            {o.trackingNumber && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setTrackingModalOrder(o);
+                                }}
+                                title="Click to view or send tracking via WhatsApp"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-mono-code font-bold border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer text-left"
+                              >
+                                <Truck className="w-2.5 h-2.5 text-emerald-600" />
+                                <span>{o.courierName || 'Courier'}: {o.trackingNumber}</span>
+                              </button>
+                            )}
                             {o.orderSource === 'whatsapp' && (
                               <span title="Ordered via WhatsApp" className="inline-flex w-5 h-5 rounded-full bg-[#25D366]/15 text-[#128C7E] items-center justify-center">
                                 <MessageCircle className="w-3 h-3" />
@@ -1864,6 +1881,24 @@ export const AdminDashboardPage: React.FC = () => {
                         </td>
                         <td className="p-3.5 pr-5 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           <div className="inline-flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setTrackingModalOrder(o)}
+                              aria-label={`Send tracking for ${o.orderNumber}`}
+                              title={
+                                o.trackingNumber
+                                  ? `Tracking: ${o.courierName || 'Courier'} - ${o.trackingNumber} (Click to re-send/view on WhatsApp)`
+                                  : `Send Courier Tracking to ${o.shippingAddress.fullName} via WhatsApp`
+                              }
+                              className={`relative inline-flex items-center justify-center gap-1.5 px-2.5 h-9 rounded-lg border text-xs font-semibold transition-all shadow-xs ${
+                                o.trackingNumber
+                                  ? 'bg-[#075E54]/10 text-[#075E54] border-[#075E54]/30 hover:bg-[#075E54] hover:text-white'
+                                  : 'bg-[#25D366]/15 text-[#075E54] border-[#25D366]/40 hover:bg-[#25D366] hover:text-[#0D0D0D]'
+                              }`}
+                            >
+                              <Truck className="w-4 h-4" />
+                              <span className="hidden xl:inline">{o.trackingNumber ? 'Tracking' : 'Send Tracking'}</span>
+                            </button>
                             <button
                               type="button"
                               onClick={() => setWaOrder(o)}
@@ -3366,6 +3401,22 @@ export const AdminDashboardPage: React.FC = () => {
       {/* ======================================= */}
       {/* ORDER INSPECTOR & STATUS TRANSITION MODAL */}
       {/* ======================================= */}
+      {trackingModalOrder && (
+        <SendTrackingModal
+          order={trackingModalOrder}
+          settings={publicSettings}
+          onClose={() => setTrackingModalOrder(null)}
+          onSent={async (updated) => {
+            addToast(`Tracking updated & dispatched for order ${updated.orderNumber}.`, 'success');
+            setTrackingModalOrder(null);
+            setAdminOrders((list) => list.map((x) => (x._id === updated._id ? updated : x)));
+            setSelectedOrder((cur) => (cur && cur._id === updated._id ? updated : cur));
+            await loadTabContent();
+          }}
+          onError={(msg) => addToast(msg, 'error')}
+        />
+      )}
+
       {waOrder && (
         <WhatsAppComposer
           order={waOrder}
@@ -3438,6 +3489,14 @@ export const AdminDashboardPage: React.FC = () => {
                 </Link>
                 <button
                   type="button"
+                  onClick={() => setTrackingModalOrder(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#075E54] hover:bg-[#128C7E] text-white text-xs font-bold transition-colors shadow-xs"
+                  title="Send tracking details to customer via WhatsApp"
+                >
+                  <Truck className="w-3.5 h-3.5 text-[#25D366]" /> Send Tracking
+                </button>
+                <button
+                  type="button"
                   onClick={() => setWaOrder(selectedOrder)}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs font-bold"
                 >
@@ -3503,6 +3562,37 @@ export const AdminDashboardPage: React.FC = () => {
                     className="w-full px-3 py-2 border border-neutral-300 rounded"
                   />
                 </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#075E54]/10 via-[#25D366]/10 to-[#C5A059]/10 border border-[#25D366]/30 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-lg bg-[#075E54] text-[#25D366] flex items-center justify-center shrink-0 shadow-xs">
+                    <Truck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#0D0D0D] text-xs flex items-center gap-1.5">
+                      <span>Customer Tracking &amp; WhatsApp Dispatch</span>
+                      {selectedOrder.trackingNumber && (
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono-code font-bold">
+                          Active
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-[11px] text-neutral-600 mt-0.5">
+                      {selectedOrder.trackingNumber
+                        ? `Courier: ${selectedOrder.courierName || 'Courier'} (CN: ${selectedOrder.trackingNumber})`
+                        : 'Customer ko courier tracking number WhatsApp par send karein.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTrackingModalOrder(selectedOrder)}
+                  className="px-3.5 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] font-bold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>{selectedOrder.trackingNumber ? 'Re-send Tracking on WhatsApp' : 'Send Tracking via WhatsApp'}</span>
+                </button>
               </div>
 
               {selectedOrder.inventoryRestored && (

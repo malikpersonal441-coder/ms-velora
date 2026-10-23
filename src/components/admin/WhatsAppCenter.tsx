@@ -14,6 +14,7 @@ import { apiRequest, formatDateTime, formatPrice } from '../../lib/api';
 import { DEFAULT_TEMPLATES, PLACEHOLDERS, TEMPLATE_META } from '../../lib/whatsapp';
 import type { Order, StoreSettings, WhatsAppTemplateKey, WhatsAppTemplates } from '../../types';
 import { WhatsAppComposer } from './WhatsAppComposer';
+import { SendTrackingModal } from './SendTrackingModal';
 
 type QueueKey = 'orderPlaced' | 'shipped' | 'delivered' | 'paymentReminder';
 
@@ -51,6 +52,7 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
   const [storeNumber, setStoreNumber] = useState('');
   const [activeQueue, setActiveQueue] = useState<QueueKey>('orderPlaced');
   const [composer, setComposer] = useState<{ order: Order; template: WhatsAppTemplateKey } | null>(null);
+  const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -185,13 +187,24 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
                     {formatPrice(o.totalAmount)} • {formatDateTime(o.createdAt)}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setComposer({ order: o, template: activeQueue })}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs font-bold uppercase tracking-wider transition-colors"
-                >
-                  <Send className="w-3.5 h-3.5" /> Message
-                </button>
+                {activeQueue === 'shipped' ? (
+                  <button
+                    type="button"
+                    onClick={() => setTrackingOrder(o)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#075E54] hover:bg-[#128C7E] text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-xs"
+                    title="Send courier tracking details via WhatsApp"
+                  >
+                    <Truck className="w-3.5 h-3.5 text-[#25D366]" /> Send Tracking
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setComposer({ order: o, template: activeQueue })}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#25D366] hover:bg-[#1EBE5A] text-[#0D0D0D] text-xs font-bold uppercase tracking-wider transition-colors"
+                  >
+                    <Send className="w-3.5 h-3.5" /> Message
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -298,6 +311,20 @@ export const WhatsAppCenter: React.FC<Props> = ({ addToast }) => {
           )}
         </div>
       </div>
+
+      {trackingOrder && (
+        <SendTrackingModal
+          order={trackingOrder}
+          settings={settings}
+          onClose={() => setTrackingOrder(null)}
+          onSent={() => {
+            addToast('Tracking message dispatched.', 'success');
+            setTrackingOrder(null);
+            load();
+          }}
+          onError={(msg) => addToast(msg, 'error')}
+        />
+      )}
 
       {composer && (
         <WhatsAppComposer
