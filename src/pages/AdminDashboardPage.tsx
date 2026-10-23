@@ -179,6 +179,9 @@ export const AdminDashboardPage: React.FC = () => {
   const [isDeletingOrder, setIsDeletingOrder] = useState(false);
   const [restoreStockOnDelete, setRestoreStockOnDelete] = useState(true);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isDeletingProduct, setIsDeletingProduct] = useState(false);
+  const [isBulkDeletingProducts, setIsBulkDeletingProducts] = useState(false);
 
   // Customers state
   const [customers, setCustomers] = useState<any[]>([]);
@@ -677,6 +680,27 @@ export const AdminDashboardPage: React.FC = () => {
       }
     } catch (err: any) {
       addToast(err.message || 'Could not update order.', 'error');
+    }
+  };
+
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return;
+    setIsDeletingProduct(true);
+    try {
+      const res = await apiRequest(`/api/admin/products/${productToDelete._id}`, {
+        method: 'DELETE',
+      });
+      if (res.success) {
+        addToast(res.message || `Product "${productToDelete.name}" permanently deleted.`, 'success');
+        setAdminProducts((prev) => prev.filter((p) => p._id !== productToDelete._id));
+        setProductToDelete(null);
+        await loadTabContent();
+        await refreshStorefront();
+      }
+    } catch (err: any) {
+      addToast(err.message || 'Failed to delete product.', 'error');
+    } finally {
+      setIsDeletingProduct(false);
     }
   };
 
@@ -1357,11 +1381,7 @@ export const AdminDashboardPage: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        if (window.confirm(`Permanently delete all ${selectedProductIds.length} selected jewellery products? This cannot be undone.`)) {
-                          handleBulkAction('delete');
-                        }
-                      }}
+                      onClick={() => setIsBulkDeletingProducts(true)}
                       className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded font-bold shadow-sm transition-colors"
                       title="Permanently delete all selected products"
                     >
@@ -1534,22 +1554,7 @@ export const AdminDashboardPage: React.FC = () => {
                         )}
                         <button
                           type="button"
-                          onClick={async () => {
-                            if (!window.confirm(`Are you sure you want to permanently delete "${prod.name}"? This action cannot be undone.`)) return;
-                            try {
-                              const res = await apiRequest(`/api/admin/products/${prod._id}`, {
-                                method: 'DELETE',
-                              });
-                              if (res.success) {
-                                addToast(res.message || `Product "${prod.name}" deleted.`, 'success');
-                                setAdminProducts((prev) => prev.filter((p) => p._id !== prod._id));
-                                await loadTabContent();
-                                await refreshStorefront();
-                              }
-                            } catch (err: any) {
-                              addToast(err.message || 'Failed to delete product.', 'error');
-                            }
-                          }}
+                          onClick={() => setProductToDelete(prod)}
                           className="inline-flex p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                           title="Permanently Delete Jewellery"
                         >
@@ -3680,6 +3685,139 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Product Confirmation Dialog */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-100 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[#0D0D0D]">Permanently Delete Jewellery?</h3>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Are you sure you want to permanently delete{' '}
+                  <strong className="text-black font-semibold">&ldquo;{productToDelete.name}&rdquo;</strong>?
+                </p>
+              </div>
+            </div>
+
+            {/* Product Summary Preview */}
+            <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-neutral-100 border border-neutral-200 overflow-hidden shrink-0">
+                <img
+                  src={productToDelete.mainImage || '/brand/logo.jpg'}
+                  alt={productToDelete.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/brand/logo.jpg';
+                  }}
+                />
+              </div>
+              <div className="min-w-0 flex-1 text-xs">
+                <p className="font-bold text-[#0D0D0D] truncate">{productToDelete.name}</p>
+                <p className="text-neutral-500 text-[11px] font-mono-code">
+                  SKU: {productToDelete.sku} • Stock: {productToDelete.stock}
+                </p>
+                <p className="text-[#9E7B36] font-bold text-[11px]">
+                  {formatPrice(productToDelete.salePrice || productToDelete.price)}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200/80 text-xs text-red-800">
+              <p className="font-semibold flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                <span>This action cannot be undone.</span>
+              </p>
+              <p className="text-[11px] text-red-700/80 mt-0.5">
+                This jewellery piece will be permanently purged from your catalogue, store pages, and database.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setProductToDelete(null)}
+                disabled={isDeletingProduct}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-xs font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteProduct}
+                disabled={isDeletingProduct}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors disabled:opacity-50"
+              >
+                {isDeletingProduct ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting…</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Yes, Permanently Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Products Confirmation Dialog */}
+      {isBulkDeletingProducts && (
+        <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-100 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[#0D0D0D]">Delete Selected Products?</h3>
+                <p className="text-xs text-neutral-500 mt-1">
+                  You are about to permanently delete{' '}
+                  <strong className="text-black font-semibold">{selectedProductIds.length} jewellery product(s)</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200/80 text-xs text-red-800">
+              <p className="font-semibold flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                <span>This action cannot be undone.</span>
+              </p>
+              <p className="text-[11px] text-red-700/80 mt-0.5">
+                All {selectedProductIds.length} selected items will be permanently erased from MongoDB Atlas and your shop catalog.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsBulkDeletingProducts(false)}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-xs font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsBulkDeletingProducts(false);
+                  await handleBulkAction('delete');
+                }}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors shadow-sm"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Yes, Delete {selectedProductIds.length} Products</span>
+              </button>
             </div>
           </div>
         </div>
