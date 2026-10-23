@@ -207,8 +207,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
                 <span className="text-base sm:text-lg font-bold text-[#0D0D0D] font-mono-code">
                   {formatProductPrice(product.salePrice, symbol)}
                 </span>
-                {/* Before Price (Original price crossed out) */}
-                <span className="text-xs sm:text-sm text-neutral-400 line-through font-mono-code">
+                {/* Before Price (Market price crossed out) */}
+                <span className="text-xs sm:text-sm text-neutral-400 line-through decoration-red-500/70 decoration-[1.5px] font-mono-code" title="Market Price">
                   {formatProductPrice(product.price, symbol)}
                 </span>
               </div>

@@ -359,18 +359,32 @@ export const AdminDashboardPage: React.FC = () => {
 
       const primaryImage = editingProduct.mainImage || productImages[0]?.url || '';
 
+      let p1 = Number(editingProduct.price || 0);
+      let p2 =
+        editingProduct.salePrice !== null &&
+        editingProduct.salePrice !== undefined &&
+        Number(editingProduct.salePrice) > 0
+          ? Number(editingProduct.salePrice)
+          : null;
+
+      // Smart normalization: higher is Market Price (price, crossed out), lower is Selling Price (salePrice, customer pays)
+      let finalMarketPrice = p1;
+      let finalSellingPrice = p2;
+      if (p1 > 0 && p2 !== null && p2 > 0) {
+        finalMarketPrice = Math.max(p1, p2);
+        finalSellingPrice = Math.min(p1, p2);
+      } else if (p1 === 0 && p2 !== null && p2 > 0) {
+        finalSellingPrice = p2;
+        finalMarketPrice = p2;
+      }
+
       const payload = {
         mainImage: primaryImage,
         images: productImages,
         ...editingProduct,
         brand: editingProduct.brand || 'MS Velora',
-        price: Number(editingProduct.price),
-        salePrice:
-          editingProduct.salePrice !== null &&
-          editingProduct.salePrice !== undefined &&
-          Number(editingProduct.salePrice) > 0
-            ? Number(editingProduct.salePrice)
-            : null,
+        price: finalMarketPrice,
+        salePrice: finalSellingPrice,
         costPrice: Number(editingProduct.costPrice || 0),
         stock: Number(editingProduct.stock || 0),
         lowStockThreshold: Number(editingProduct.lowStockThreshold || 5),
@@ -2911,21 +2925,31 @@ export const AdminDashboardPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold block mb-1">Price (PKR) — 0 = Price on request</label>
+                  <label className="font-bold block mb-1 flex items-center justify-between">
+                    <span>Market / Retail Price (PKR)</span>
+                    <span className="text-[10px] text-neutral-400 font-normal">Shows crossed-out ~~Rs.~~</span>
+                  </label>
                   <input
                     type="number"
                     min={0}
-                    value={editingProduct.price || 0}
+                    placeholder="e.g. 4500 (Market Price)"
+                    value={editingProduct.price || ''}
                     onChange={(e) =>
                       setEditingProduct({ ...editingProduct, price: Number(e.target.value) })
                     }
                     className="w-full px-3 py-2 border border-neutral-300 rounded font-mono-code"
                   />
+                  <span className="text-[10px] text-neutral-500 mt-0.5 block">Original market price with strike-through</span>
                 </div>
                 <div>
-                  <label className="font-bold block mb-1">Sale Price (PKR, optional)</label>
+                  <label className="font-bold block mb-1 flex items-center justify-between">
+                    <span>Our Selling Price (PKR) *</span>
+                    <span className="text-[10px] text-emerald-600 font-bold">Customer Pays</span>
+                  </label>
                   <input
                     type="number"
+                    min={0}
+                    placeholder="e.g. 3499 (Discounted)"
                     value={editingProduct.salePrice ?? ''}
                     onChange={(e) =>
                       setEditingProduct({
@@ -2933,8 +2957,9 @@ export const AdminDashboardPage: React.FC = () => {
                         salePrice: e.target.value ? Number(e.target.value) : null,
                       })
                     }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded font-mono-code"
+                    className="w-full px-3 py-2 border border-[#C5A059] focus:ring-2 focus:ring-[#C5A059]/40 rounded font-mono-code font-bold bg-[#FAF8F5]"
                   />
+                  <span className="text-[10px] text-neutral-500 mt-0.5 block">Actual price the customer pays at checkout</span>
                 </div>
                 <div>
                   <label className="font-bold block mb-1">Stock Quantity *</label>
