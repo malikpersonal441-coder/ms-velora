@@ -46,6 +46,7 @@ import { ForceEditOrderModal } from '../components/admin/ForceEditOrderModal';
 import { AdminLoginPage } from './AdminLoginPage';
 import { WhatsAppComposer } from '../components/admin/WhatsAppComposer';
 import { SendTrackingModal } from '../components/admin/SendTrackingModal';
+import { BulkAddProductsModal } from '../components/admin/BulkAddProductsModal';
 import { suggestedTemplate } from '../lib/whatsapp';
 import { compressImage, formatBytes, type CompressResult } from '../lib/compressImage';
 import { useStore } from '../context/StoreContext';
@@ -88,6 +89,7 @@ export const AdminDashboardPage: React.FC = () => {
   const { user, authLoading, addToast, refreshStorefront, settings: publicSettings, logout } = useStore();
   const [waOrder, setWaOrder] = useState<Order | null>(null);
   const [trackingModalOrder, setTrackingModalOrder] = useState<Order | null>(null);
+  const [isBulkCreateModalOpen, setIsBulkCreateModalOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [slipIds, setSlipIds] = useState<string[]>([]);
@@ -382,9 +384,9 @@ export const AdminDashboardPage: React.FC = () => {
       }
 
       const payload = {
+        ...editingProduct,
         mainImage: primaryImage,
         images: productImages,
-        ...editingProduct,
         brand: editingProduct.brand || 'MS Velora',
         price: finalMarketPrice,
         salePrice: finalSellingPrice,
@@ -457,50 +459,68 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   const handleMultipleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+    const rawFiles = e.target.files;
+    if (!rawFiles || rawFiles.length === 0) return;
+    const fileList = Array.from(rawFiles);
+    // Clear value only after converting to static array
     e.target.value = '';
-    if (!files || files.length === 0) return;
 
     setIsUploadingMultiple(true);
-    setUploadProgress({ current: 0, total: files.length });
+    setUploadProgress({ current: 0, total: fileList.length });
 
     const newUploadedImages: { url: string; alt: string; isMain?: boolean }[] = [];
 
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        setUploadProgress({ current: i + 1, total: files.length });
+      for (let i = 0; i < fileList.length; i++) {
+        const file = fileList[i];
+        setUploadProgress({ current: i + 1, total: fileList.length });
 
-        const result = compressPhotos
-          ? await compressImage(file, { maxDimension: 1600, quality: 0.82 })
-          : { file, originalBytes: file.size, compressedBytes: file.size, width: 0, height: 0, compressed: false };
+        let uploadFile: File = file;
+        if (compressPhotos) {
+          try {
+            const compResult = await compressImage(file, { maxDimension: 1600, quality: 0.82 });
+            uploadFile = compResult.file;
+          } catch (compErr) {
+            console.warn('Compression skipped for:', file.name, compErr);
+            uploadFile = file;
+          }
+        }
 
         const formData = new FormData();
-        formData.append('image', result.file);
+        formData.append('image', uploadFile);
 
-        const res = await apiRequest('/api/admin/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (res.success && res.url) {
-          newUploadedImages.push({
-            url: res.url,
-            alt: file.name.replace(/\.[^.]+$/, ''),
-            isMain: false,
+        try {
+          const res = await apiRequest('/api/admin/upload', {
+            method: 'POST',
+            body: formData,
           });
+
+          if (res.success && res.url) {
+            newUploadedImages.push({
+              url: res.url,
+              alt: file.name.replace(/\.[^.]+$/, '') || 'Jewellery Photo',
+              isMain: false,
+            });
+          }
+        } catch (uploadErr: any) {
+          console.error(`Upload error for ${file.name}:`, uploadErr);
         }
       }
 
       if (newUploadedImages.length > 0) {
         setEditingProduct((prev) => {
           if (!prev) return prev;
+
+          // Helper to check if url is unsplash default placeholder
+          const isDefaultUnsplash = (u?: string) =>
+            !u || u.includes('images.unsplash.com/photo-1599643478518-a784e5dc4c8f');
+
           const currentImages = Array.isArray(prev.images) && prev.images.length > 0
-            ? [...prev.images]
-            : (prev.mainImage ? [{ url: prev.mainImage, alt: 'Primary', isMain: true }] : []);
+            ? prev.images.filter((img) => !isDefaultUnsplash(img.url))
+            : (!isDefaultUnsplash(prev.mainImage) ? [{ url: prev.mainImage, alt: 'Primary', isMain: true }] : []);
 
           const combined = [...currentImages, ...newUploadedImages];
-          const mainImg = prev.mainImage || combined[0]?.url || '';
+          const mainImg = (!isDefaultUnsplash(prev.mainImage) ? prev.mainImage : '') || combined[0]?.url || '';
 
           return {
             ...prev,
@@ -512,7 +532,9 @@ export const AdminDashboardPage: React.FC = () => {
           };
         });
 
-        addToast(`Uploaded ${newUploadedImages.length} photo${newUploadedImages.length > 1 ? 's' : ''} successfully.`, 'success');
+        addToast(`Uploaded and added ${newUploadedImages.length} photo${newUploadedImages.length > 1 ? 's' : ''} to jewellery gallery!`, 'success');
+      } else {
+        addToast('No photos were uploaded. Please try again with valid image files.', 'error');
       }
     } catch (err: any) {
       addToast(err.message || 'Multiple photo upload failed.', 'error');
@@ -1349,14 +1371,25 @@ export const AdminDashboardPage: React.FC = () => {
                 )}
               </div>
 
-              <button
-                type="button"
-                onClick={openCreateProductModal}
-                className="px-5 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-wider font-bold rounded-lg inline-flex items-center gap-2 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Jewellery</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkCreateModalOpen(true)}
+                  className="px-4 py-2.5 bg-white border border-[#C5A059] text-[#9E7B36] hover:bg-[#C5A059] hover:text-[#0D0D0D] text-xs uppercase tracking-wider font-bold rounded-lg inline-flex items-center gap-2 transition-colors shadow-xs"
+                  title="Add multiple jewellery products at once"
+                >
+                  <Layers className="w-4 h-4" />
+                  <span>+ Bulk Add (Multiple)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={openCreateProductModal}
+                  className="px-5 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-wider font-bold rounded-lg inline-flex items-center gap-2 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Jewellery</span>
+                </button>
+              </div>
             </div>
 
             <div className="bg-white rounded-xl border border-black/8 overflow-x-auto">
@@ -3080,7 +3113,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <input
                         type="file"
                         multiple
-                        accept="image/jpeg,image/png,image/webp,image/avif"
+                        accept="image/*"
                         onChange={handleMultipleImagesUpload}
                         className="hidden"
                         disabled={isUploadingMultiple}
@@ -3396,6 +3429,19 @@ export const AdminDashboardPage: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Bulk Add Products Modal */}
+      {isBulkCreateModalOpen && (
+        <BulkAddProductsModal
+          categories={adminCategories}
+          onClose={() => setIsBulkCreateModalOpen(false)}
+          onCreated={async () => {
+            await loadTabContent();
+            await refreshStorefront();
+          }}
+          addToast={addToast}
+        />
       )}
 
       {/* ======================================= */}

@@ -559,6 +559,75 @@ router.post('/products/bulk', async (req: Request, res: Response, next: NextFunc
   }
 });
 
+// POST /api/admin/products/bulk-create
+router.post('/products/bulk-create', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const rawProducts = Array.isArray(req.body.products) ? req.body.products : [];
+    if (rawProducts.length === 0) {
+      throw new AppError('Please provide at least one product to create.', 400);
+    }
+
+    const createdList = [];
+    for (const raw of rawProducts) {
+      const data = productPayloadSchema.parse(raw);
+
+      let slug = data.slug && data.slug.trim() ? slugify(data.slug) : slugify(`${data.brand}-${data.name}`);
+      const existingSlug = await Product.findOne({ slug });
+      if (existingSlug) {
+        slug = `${slug}-${Math.floor(100 + Math.random() * 900)}`;
+      }
+
+      const sku =
+        data.sku && data.sku.trim()
+          ? data.sku.trim().toUpperCase()
+          : generateSku(data.brand, data.model);
+
+      const images =
+        data.images && data.images.length > 0
+          ? data.images
+          : [{ url: data.mainImage, alt: data.name, isMain: true }];
+
+      const product = await Product.create({
+        ...data,
+        slug,
+        sku,
+        category: data.category || undefined,
+        images,
+      });
+
+      await StockMovement.create({
+        product: product._id,
+        sku: product.sku,
+        type: 'addition',
+        quantityChange: product.stock,
+        previousStock: 0,
+        newStock: product.stock,
+        reason: 'Bulk product creation inventory',
+        performedBy: req.user!._id,
+        performedByName: req.user!.name,
+      });
+
+      createdList.push(product);
+    }
+
+    await logAudit({
+      user: req.user,
+      action: 'BULK_CREATE_PRODUCTS',
+      entityType: 'product',
+      details: `Created ${createdList.length} products via Bulk Add`,
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully created ${createdList.length} jewellery products.`,
+      products: createdList,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ==========================================
 // C. INVENTORY MANAGEMENT
 // ==========================================
