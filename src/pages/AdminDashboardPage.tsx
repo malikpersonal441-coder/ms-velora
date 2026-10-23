@@ -93,6 +93,7 @@ export const AdminDashboardPage: React.FC = () => {
     phase: 'compressing' | 'uploading' | 'done';
     result?: CompressResult;
   } | null>(null);
+  const [localPhotoPreview, setLocalPhotoPreview] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
@@ -296,6 +297,8 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Handlers
   const openCreateProductModal = () => {
+    setLocalPhotoPreview(null);
+    setUploadStatus(null);
     setEditingProduct({
       name: '',
       brand: 'MS Velora',
@@ -381,6 +384,11 @@ export const AdminDashboardPage: React.FC = () => {
     const original = e.target.files?.[0];
     e.target.value = ''; // allow re-selecting the same file
     if (!original) return;
+    try {
+      setLocalPhotoPreview(URL.createObjectURL(original));
+    } catch {
+      // ignore
+    }
     setUploadStatus({ phase: 'compressing' });
     try {
       // Compress in the browser first: faster uploads, lighter pages, EXIF/GPS stripped
@@ -2865,12 +2873,30 @@ export const AdminDashboardPage: React.FC = () => {
                     </span>
                   )}
                 </div>
-                {editingProduct.mainImage && (
-                  <img
-                    src={editingProduct.mainImage}
-                    alt="Preview"
-                    className="w-24 h-24 object-cover rounded-lg border border-black/10"
-                  />
+                {(localPhotoPreview || editingProduct.mainImage) && (
+                  <div className="relative inline-block mt-2">
+                    <img
+                      src={localPhotoPreview || editingProduct.mainImage}
+                      alt="Preview"
+                      className="w-28 h-28 object-cover rounded-xl border-2 border-[#C5A059]/40 shadow-sm bg-[#FAF8F5]"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('/brand/logo.jpg')) {
+                          target.src = '/brand/logo.jpg';
+                        }
+                      }}
+                    />
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span className="text-[10px] font-semibold text-neutral-600">
+                        {uploadStatus?.phase === 'uploading'
+                          ? 'Uploading photo…'
+                          : uploadStatus?.phase === 'compressing'
+                          ? 'Compressing photo…'
+                          : 'Photo Ready'}
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
 

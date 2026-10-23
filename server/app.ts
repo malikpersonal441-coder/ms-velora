@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
+import { UploadedMedia } from './models/UploadedMedia';
 import { env } from './config/env';
 import {
   sanitizeNoSqlInjection,
@@ -65,6 +68,43 @@ app.use(csrfProtection);
 app.use('/api', apiRateLimiter);
 
 // Serve local uploaded images
+const serveUploadedImage = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const rawFilename = Array.isArray(req.params.filename) ? req.params.filename[0] : req.params.filename;
+    if (!rawFilename) return next();
+    const filename = path.basename(String(rawFilename));
+
+    // 1. Try local disk first (for local dev speed)
+    const localPath = path.resolve(__dirname, '../uploads', filename);
+    if (fs.existsSync(localPath)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      return res.sendFile(localPath);
+    }
+
+    // Also check os.tmpdir() in case serverless wrote there
+    const tmpPath = path.join(os.tmpdir(), 'msvelora-uploads', filename);
+    if (fs.existsSync(tmpPath)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      return res.sendFile(tmpPath);
+    }
+
+    // 2. Query MongoDB UploadedMedia (works 100% everywhere, even on Vercel)
+    const media = await UploadedMedia.findOne({ filename });
+    if (media && media.data) {
+      res.setHeader('Content-Type', media.contentType || 'image/webp');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('Content-Length', media.data.length);
+      return res.send(media.data);
+    }
+
+    return res.status(404).send('Image not found');
+  } catch (err) {
+    next(err);
+  }
+};
+
+app.get('/uploads/:filename', serveUploadedImage);
+app.get('/api/uploads/:filename', serveUploadedImage);
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 // SEO Sitemap & Robots

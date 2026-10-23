@@ -16,6 +16,7 @@ import { User } from '../models/User';
 import { StockMovement } from '../models/StockMovement';
 import { Coupon } from '../models/Coupon';
 import { HomepageContent } from '../models/HomepageContent';
+import { UploadedMedia } from '../models/UploadedMedia';
 import { StoreSettings } from '../models/StoreSettings';
 import { AuditLog } from '../models/AuditLog';
 import { Review } from '../models/Review';
@@ -2520,6 +2521,29 @@ router.post(
           provider: 'cloudinary',
         });
         return;
+      }
+
+      // Persist image buffer to MongoDB so it is permanent across Vercel and local
+      let fileBuffer: Buffer | null = null;
+      if (req.file.buffer) {
+        fileBuffer = req.file.buffer;
+      } else if (req.file.path && fs.existsSync(req.file.path)) {
+        fileBuffer = fs.readFileSync(req.file.path);
+      }
+
+      if (fileBuffer) {
+        await UploadedMedia.findOneAndUpdate(
+          { filename: req.file.filename },
+          {
+            filename: req.file.filename,
+            originalName: req.file.originalname,
+            contentType: req.file.mimetype || 'image/webp',
+            data: fileBuffer,
+            size: fileBuffer.length,
+            createdAt: new Date(),
+          },
+          { upsert: true, new: true }
+        );
       }
 
       const localUrl = `/uploads/${req.file.filename}`;

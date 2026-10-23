@@ -83,6 +83,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
             loading="lazy"
             width={400}
             height={500}
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.includes('/brand/logo.jpg')) {
+                target.src = '/brand/logo.jpg';
+              }
+            }}
             className={`w-full h-full object-cover object-center transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 ${altImage ? 'group-hover:opacity-0' : ''}`}
           />
           {altImage && (

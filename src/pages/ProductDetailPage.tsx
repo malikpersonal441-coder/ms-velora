@@ -294,6 +294,12 @@ export const ProductDetailPage: React.FC = () => {
                 fetchPriority="high"
                 style={zoomOrigin ? { transformOrigin: zoomOrigin, transform: 'scale(1.8)' } : undefined}
                 className="w-full h-full object-cover object-center transition-transform duration-300 ease-out cursor-zoom-in animate-[fade-in_0.5s_ease]"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes('/brand/logo.jpg')) {
+                    target.src = '/brand/logo.jpg';
+                  }
+                }}
                 onClick={() => setLightboxOpen(true)}
               />
               {hasSale && (
