@@ -493,26 +493,26 @@ router.delete('/products/:id', async (req: Request, res: Response, next: NextFun
       throw new AppError('Product not found.', 404);
     }
 
-    const permanent = req.query.permanent === 'true';
-    if (permanent) {
-      await Product.findByIdAndDelete(product._id);
-    } else {
+    const archiveOnly = req.query.archiveOnly === 'true';
+    if (archiveOnly) {
       product.status = 'archived';
       await product.save();
+    } else {
+      await Product.findByIdAndDelete(product._id);
     }
 
     await logAudit({
       user: req.user,
-      action: permanent ? 'DELETE_PRODUCT' : 'ARCHIVE_PRODUCT',
+      action: archiveOnly ? 'ARCHIVE_PRODUCT' : 'DELETE_PRODUCT',
       entityType: 'product',
       entityId: String(product._id),
-      details: `${permanent ? 'Deleted' : 'Archived'} product "${product.name}" (SKU: ${product.sku})`,
+      details: `${archiveOnly ? 'Archived' : 'Permanently deleted'} product "${product.name}" (SKU: ${product.sku})`,
       ipAddress: req.ip,
     });
 
     res.json({
       success: true,
-      message: permanent ? 'Product permanently deleted.' : 'Product archived.',
+      message: archiveOnly ? `Product "${product.name}" archived.` : `Product "${product.name}" permanently deleted.`,
     });
   } catch (err) {
     next(err);

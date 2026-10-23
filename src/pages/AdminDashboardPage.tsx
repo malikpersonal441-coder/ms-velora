@@ -1330,6 +1330,18 @@ export const AdminDashboardPage: React.FC = () => {
                     >
                       Archive
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(`Permanently delete all ${selectedProductIds.length} selected jewellery products? This cannot be undone.`)) {
+                          handleBulkAction('delete');
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded font-bold shadow-sm transition-colors"
+                      title="Permanently delete all selected products"
+                    >
+                      Delete Selected ({selectedProductIds.length})
+                    </button>
                   </div>
                 )}
               </div>
@@ -1487,14 +1499,23 @@ export const AdminDashboardPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={async () => {
-                            await apiRequest(`/api/admin/products/${prod._id}`, {
-                              method: 'DELETE',
-                            });
-                            addToast('Product archived.', 'info');
-                            loadTabContent();
+                            if (!window.confirm(`Are you sure you want to permanently delete "${prod.name}"? This action cannot be undone.`)) return;
+                            try {
+                              const res = await apiRequest(`/api/admin/products/${prod._id}`, {
+                                method: 'DELETE',
+                              });
+                              if (res.success) {
+                                addToast(res.message || `Product "${prod.name}" deleted.`, 'success');
+                                setAdminProducts((prev) => prev.filter((p) => p._id !== prod._id));
+                                await loadTabContent();
+                                await refreshStorefront();
+                              }
+                            } catch (err: any) {
+                              addToast(err.message || 'Failed to delete product.', 'error');
+                            }
                           }}
-                          className="inline-flex p-1.5 text-neutral-400 hover:text-red-600"
-                          title="Archive item"
+                          className="inline-flex p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Permanently Delete Jewellery"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
