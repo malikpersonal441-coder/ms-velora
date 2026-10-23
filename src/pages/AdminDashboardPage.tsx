@@ -31,6 +31,7 @@ import {
   Megaphone,
   Printer,
   LogOut,
+  Star,
 } from 'lucide-react';
 import { Smartphone, BellRing } from 'lucide-react';
 import { subscribePush, isSubscribedLocally, pushSupported } from '../lib/pwa';
@@ -94,6 +95,9 @@ export const AdminDashboardPage: React.FC = () => {
     result?: CompressResult;
   } | null>(null);
   const [localPhotoPreview, setLocalPhotoPreview] = useState<string | null>(null);
+  const [isUploadingMultiple, setIsUploadingMultiple] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+  const [newPhotoUrl, setNewPhotoUrl] = useState('');
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
@@ -345,7 +349,19 @@ export const AdminDashboardPage: React.FC = () => {
         : '/api/admin/products';
       const method = isEdit ? 'PUT' : 'POST';
 
+      const productImages = (editingProduct.images && editingProduct.images.length > 0)
+        ? editingProduct.images.map((im, idx) => ({
+            url: im.url,
+            alt: im.alt || editingProduct.name || 'Jewellery',
+            isMain: im.url === (editingProduct.mainImage || editingProduct.images![0]?.url) || (!editingProduct.mainImage && idx === 0),
+          }))
+        : (editingProduct.mainImage ? [{ url: editingProduct.mainImage, alt: editingProduct.name || 'Jewellery', isMain: true }] : []);
+
+      const primaryImage = editingProduct.mainImage || productImages[0]?.url || '';
+
       const payload = {
+        mainImage: primaryImage,
+        images: productImages,
         ...editingProduct,
         brand: editingProduct.brand || 'MS Velora',
         price: Number(editingProduct.price),
@@ -421,6 +437,135 @@ export const AdminDashboardPage: React.FC = () => {
       setUploadStatus(null);
       addToast(err.message || 'Image upload failed.', 'error');
     }
+  };
+
+  const handleMultipleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    e.target.value = '';
+    if (!files || files.length === 0) return;
+
+    setIsUploadingMultiple(true);
+    setUploadProgress({ current: 0, total: files.length });
+
+    const newUploadedImages: { url: string; alt: string; isMain?: boolean }[] = [];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadProgress({ current: i + 1, total: files.length });
+
+        const result = compressPhotos
+          ? await compressImage(file, { maxDimension: 1600, quality: 0.82 })
+          : { file, originalBytes: file.size, compressedBytes: file.size, width: 0, height: 0, compressed: false };
+
+        const formData = new FormData();
+        formData.append('image', result.file);
+
+        const res = await apiRequest('/api/admin/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (res.success && res.url) {
+          newUploadedImages.push({
+            url: res.url,
+            alt: file.name.replace(/\.[^.]+$/, ''),
+            isMain: false,
+          });
+        }
+      }
+
+      if (newUploadedImages.length > 0) {
+        setEditingProduct((prev) => {
+          if (!prev) return prev;
+          const currentImages = Array.isArray(prev.images) && prev.images.length > 0
+            ? [...prev.images]
+            : (prev.mainImage ? [{ url: prev.mainImage, alt: 'Primary', isMain: true }] : []);
+
+          const combined = [...currentImages, ...newUploadedImages];
+          const mainImg = prev.mainImage || combined[0]?.url || '';
+
+          return {
+            ...prev,
+            mainImage: mainImg,
+            images: combined.map((im, idx) => ({
+              ...im,
+              isMain: im.url === mainImg || (!mainImg && idx === 0),
+            })),
+          };
+        });
+
+        addToast(`Uploaded ${newUploadedImages.length} photo${newUploadedImages.length > 1 ? 's' : ''} successfully.`, 'success');
+      }
+    } catch (err: any) {
+      addToast(err.message || 'Multiple photo upload failed.', 'error');
+    } finally {
+      setIsUploadingMultiple(false);
+      setUploadProgress(null);
+    }
+  };
+
+  const setPhotoAsMain = (url: string) => {
+    setEditingProduct((prev) => {
+      if (!prev) return prev;
+      const current = Array.isArray(prev.images) && prev.images.length > 0
+        ? prev.images
+        : (prev.mainImage ? [{ url: prev.mainImage, alt: 'Primary', isMain: true }] : []);
+
+      const imgs = current.map((im) => ({
+        ...im,
+        isMain: im.url === url,
+      }));
+      return {
+        ...prev,
+        mainImage: url,
+        images: imgs,
+      };
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    setEditingProduct((prev) => {
+      if (!prev) return prev;
+      const current = [...(prev.images || (prev.mainImage ? [{ url: prev.mainImage, alt: 'Primary', isMain: true }] : []))];
+      const removed = current.splice(index, 1)[0];
+      let newMain = prev.mainImage;
+      if (removed && removed.url === prev.mainImage) {
+        newMain = current[0]?.url || '';
+      }
+      const updated = current.map((im, idx) => ({
+        ...im,
+        isMain: im.url === newMain || (!newMain && idx === 0),
+      }));
+      return {
+        ...prev,
+        mainImage: newMain,
+        images: updated,
+      };
+    });
+  };
+
+  const addPhotoByUrl = () => {
+    if (!newPhotoUrl.trim()) return;
+    const url = newPhotoUrl.trim();
+    setEditingProduct((prev) => {
+      if (!prev) return prev;
+      const current = Array.isArray(prev.images) && prev.images.length > 0
+        ? [...prev.images]
+        : (prev.mainImage ? [{ url: prev.mainImage, alt: 'Primary', isMain: true }] : []);
+
+      const updated = [...current, { url, alt: 'View', isMain: false }];
+      const mainImg = prev.mainImage || url;
+      return {
+        ...prev,
+        mainImage: mainImg,
+        images: updated.map((im, idx) => ({
+          ...im,
+          isMain: im.url === mainImg || (!mainImg && idx === 0),
+        })),
+      };
+    });
+    setNewPhotoUrl('');
   };
 
   const handleBulkAction = async (action: 'publish' | 'draft' | 'archive' | 'delete') => {
@@ -2820,84 +2965,151 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Image URL + Upload */}
-              <div className="space-y-2">
-                <label className="font-bold block">Primary Photo (URL or Upload) *</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    required
-                    value={editingProduct.mainImage || ''}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, mainImage: e.target.value })
-                    }
-                    className="flex-1 px-3 py-2 border border-neutral-300 rounded"
-                  />
-                  <label
-                    className={`px-4 py-2 bg-[#1A1A1E] text-[#FAF8F5] rounded cursor-pointer inline-flex items-center gap-1.5 font-semibold ${
-                      uploadStatus?.phase === 'compressing' || uploadStatus?.phase === 'uploading' ? 'opacity-60 pointer-events-none' : ''
-                    }`}
-                  >
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>
-                      {uploadStatus?.phase === 'compressing'
-                        ? 'Compressing…'
-                        : uploadStatus?.phase === 'uploading'
-                        ? 'Uploading…'
-                        : 'Upload File'}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/avif"
-                      onChange={handleImageFileUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <label className="inline-flex items-center gap-2 text-[11px] text-neutral-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={compressPhotos}
-                      onChange={(e) => setCompressPhotos(e.target.checked)}
-                    />
-                    Compress photo before upload (recommended — max 1600px, WebP)
-                  </label>
-                  {uploadStatus?.result && uploadStatus.phase === 'done' && (
-                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
-                      {uploadStatus.result.compressed
-                        ? `${formatBytes(uploadStatus.result.originalBytes)} → ${formatBytes(uploadStatus.result.compressedBytes)} (−${Math.round(
-                            (1 - uploadStatus.result.compressedBytes / uploadStatus.result.originalBytes) * 100
-                          )}%) · ${uploadStatus.result.width}×${uploadStatus.result.height}`
-                        : 'Already optimised — uploaded as is'}
-                    </span>
-                  )}
-                </div>
-                {(localPhotoPreview || editingProduct.mainImage) && (
-                  <div className="relative inline-block mt-2">
-                    <img
-                      src={localPhotoPreview || editingProduct.mainImage}
-                      alt="Preview"
-                      className="w-28 h-28 object-cover rounded-xl border-2 border-[#C5A059]/40 shadow-sm bg-[#FAF8F5]"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (!target.src.includes('/brand/logo.jpg')) {
-                          target.src = '/brand/logo.jpg';
-                        }
-                      }}
-                    />
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span className="text-[10px] font-semibold text-neutral-600">
-                        {uploadStatus?.phase === 'uploading'
-                          ? 'Uploading photo…'
-                          : uploadStatus?.phase === 'compressing'
-                          ? 'Compressing photo…'
-                          : 'Photo Ready'}
+                            {/* Product Photos & Gallery */}
+              <div className="space-y-3 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-200 pb-3">
+                  <div>
+                    <h4 className="font-bold text-sm text-[#0D0D0D] flex items-center gap-2">
+                      <span>Jewellery Photos & Gallery</span>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#C5A059]/20 text-[#9E7B36]">
+                        {((editingProduct.images?.length || 0) || (editingProduct.mainImage ? 1 : 0))} Photo{((editingProduct.images?.length || 0) || (editingProduct.mainImage ? 1 : 0)) === 1 ? '' : 's'}
                       </span>
-                    </div>
+                    </h4>
+                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                      Upload multiple photos at once. The photo marked as Main appears in the storefront cards.
+                    </p>
                   </div>
-                )}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <label
+                      className={`px-4 py-2 bg-[#0D0D0D] hover:bg-[#C5A059] text-white hover:text-black rounded-lg cursor-pointer inline-flex items-center gap-2 text-xs font-bold transition-colors shadow-sm ${
+                        isUploadingMultiple ? 'opacity-60 pointer-events-none' : ''
+                      }`}
+                    >
+                      {isUploadingMultiple ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Uploading ({uploadProgress?.current}/{uploadProgress?.total})…</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>+ Upload Photos (Multiple)</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/jpeg,image/png,image/webp,image/avif"
+                        onChange={handleMultipleImagesUpload}
+                        className="hidden"
+                        disabled={isUploadingMultiple}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Photo Gallery Grid */}
+                {(() => {
+                  const gallery = (editingProduct.images && editingProduct.images.length > 0)
+                    ? editingProduct.images
+                    : (editingProduct.mainImage ? [{ url: editingProduct.mainImage, alt: 'Primary', isMain: true }] : []);
+
+                  return (
+                    <div className="space-y-3">
+                      {gallery.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 pt-1">
+                          {gallery.map((img, idx) => {
+                            const isMain = img.url === editingProduct.mainImage || (!editingProduct.mainImage && idx === 0);
+                            return (
+                              <div
+                                key={idx}
+                                className={`relative group rounded-xl overflow-hidden border-2 bg-white transition-all shadow-sm ${
+                                  isMain ? 'border-[#C5A059] ring-2 ring-[#C5A059]/30' : 'border-neutral-200 hover:border-neutral-400'
+                                }`}
+                              >
+                                <div className="aspect-square w-full overflow-hidden bg-neutral-100 relative">
+                                  <img
+                                    src={img.url}
+                                    alt={img.alt || `Photo ${idx + 1}`}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      const target = e.currentTarget;
+                                      if (!target.src.includes('/brand/logo.jpg')) {
+                                        target.src = '/brand/logo.jpg';
+                                      }
+                                    }}
+                                  />
+                                  {isMain && (
+                                    <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-[#C5A059] text-[#0D0D0D] text-[10px] font-black uppercase tracking-wider shadow">
+                                      ★ Main
+                                    </span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => removePhoto(idx)}
+                                    title="Delete photo"
+                                    className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/70 hover:bg-red-600 text-white transition-colors"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                                <div className="p-2 bg-white text-center border-t border-neutral-100">
+                                  {isMain ? (
+                                    <span className="text-[11px] font-bold text-[#9E7B36] flex items-center justify-center gap-1">
+                                      <Star className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" /> Primary View
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => setPhotoAsMain(img.url)}
+                                      className="text-[11px] font-semibold text-neutral-600 hover:text-[#C5A059] transition-colors"
+                                    >
+                                      Set as Main
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="py-6 text-center text-neutral-400 text-xs border border-dashed border-neutral-300 rounded-xl">
+                          No photos added yet. Tap <strong>"+ Upload Photos (Multiple)"</strong> to select all photos for this jewellery.
+                        </div>
+                      )}
+
+                      {/* Or add via URL */}
+                      <div className="flex gap-2 pt-1">
+                        <input
+                          type="text"
+                          placeholder="Or paste an image web link (URL) and tap Add…"
+                          value={newPhotoUrl}
+                          onChange={(e) => setNewPhotoUrl(e.target.value)}
+                          className="flex-1 px-3 py-1.5 border border-neutral-300 rounded-lg text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={addPhotoByUrl}
+                          disabled={!newPhotoUrl.trim()}
+                          className="px-3.5 py-1.5 bg-neutral-200 hover:bg-neutral-800 hover:text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-40"
+                        >
+                          + Add URL
+                        </button>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] text-neutral-500 pt-1">
+                        <label className="inline-flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={compressPhotos}
+                            onChange={(e) => setCompressPhotos(e.target.checked)}
+                          />
+                          Compress photos before upload (recommended — max 1600px, WebP)
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Specifications */}
