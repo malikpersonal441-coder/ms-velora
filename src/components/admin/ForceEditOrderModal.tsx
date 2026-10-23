@@ -49,6 +49,7 @@ export const ForceEditOrderModal: React.FC<ForceEditOrderModalProps> = ({
   // Admin Audit Note & Options
   const [adminReason, setAdminReason] = useState('');
   const [adjustStock, setAdjustStock] = useState(true);
+  const [overwriteOrder, setOverwriteOrder] = useState(false);
   const [saving, setSaving] = useState(false);
 
   if (!isOpen) return null;
@@ -89,6 +90,7 @@ export const ForceEditOrderModal: React.FC<ForceEditOrderModalProps> = ({
         deliveryPerson: deliveryPerson.trim(),
         deliveryPhone: deliveryPhone.trim(),
         adminReason: adminReason.trim() || 'Administrative modification',
+        overwriteOrder,
         adjustStock,
       };
 
@@ -136,7 +138,7 @@ export const ForceEditOrderModal: React.FC<ForceEditOrderModalProps> = ({
                   {order.orderNumber}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-[#0D0D0D]">Force Edit Order Details</h3>
+              <h3 className="text-lg font-bold text-[#0D0D0D]">Overwrite / Master Edit Order</h3>
             </div>
           </div>
           <button
@@ -191,7 +193,18 @@ export const ForceEditOrderModal: React.FC<ForceEditOrderModalProps> = ({
                   className="w-full px-3 py-2 border border-neutral-300 rounded-lg font-mono-code font-bold uppercase focus:ring-1 focus:ring-[#C5A059]"
                   required
                 />
-                <p className="text-[10px] text-neutral-400 mt-0.5">Must be unique (e.g. MS-001)</p>
+                <p className="text-[10px] text-neutral-400 mt-0.5">e.g. MS-001, MS-002...</p>
+                <label className="flex items-center gap-1.5 mt-1 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={overwriteOrder}
+                    onChange={(e) => setOverwriteOrder(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded text-[#C5A059] focus:ring-[#C5A059]"
+                  />
+                  <span className="text-[10px] text-neutral-600 font-semibold">
+                    Overwrite if ID already exists
+                  </span>
+                </label>
               </div>
 
               <div>
@@ -508,7 +521,7 @@ export const ForceEditOrderModal: React.FC<ForceEditOrderModalProps> = ({
               ) : (
                 <>
                   <Save className="w-3.5 h-3.5" />
-                  <span>Save Forceful Changes</span>
+                  <span>Overwrite & Save Order</span>
                 </>
               )}
             </button>

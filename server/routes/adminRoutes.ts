@@ -1018,11 +1018,86 @@ router.delete('/orders/:id', async (req: Request, res: Response, next: NextFunct
   }
 });
 
+// POST /api/admin/orders/bulk — Bulk actions for orders (bulk delete, etc.)
+router.post('/orders/bulk', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const schema = z.object({
+      orderIds: z.array(z.string()).min(1, 'Select at least one order.'),
+      action: z.enum(['delete']),
+      restoreStock: z.boolean().default(true),
+    });
+
+    const { orderIds, action, restoreStock } = schema.parse(req.body);
+    let deletedCount = 0;
+    let totalStockRestored = 0;
+
+    if (action === 'delete') {
+      for (const id of orderIds) {
+        const order = await Order.findById(id);
+        if (!order) continue;
+
+        if (restoreStock && !order.inventoryRestored) {
+          for (const item of order.items) {
+            const prod = await Product.findById(item.product);
+            if (prod) {
+              const prevStock = prod.stock;
+              prod.stock += item.quantity;
+              prod.soldCount = Math.max(0, (prod.soldCount || 0) - item.quantity);
+
+              if (item.variantSku && prod.variants && prod.variants.length > 0) {
+                const v = prod.variants.find((vr) => vr.sku === item.variantSku);
+                if (v) v.stock += item.quantity;
+              }
+              await prod.save();
+
+              await StockMovement.create({
+                product: prod._id,
+                sku: item.sku,
+                variantSku: item.variantSku,
+                type: 'order_cancelled',
+                quantityChange: item.quantity,
+                previousStock: prevStock,
+                newStock: prod.stock,
+                reason: `Stock returned to vault from bulk deleted order ${order.orderNumber}`,
+                orderId: order._id,
+                orderNumber: order.orderNumber,
+                performedBy: req.user!._id,
+                performedByName: req.user!.name,
+              });
+              totalStockRestored += item.quantity;
+            }
+          }
+        }
+
+        await Order.findByIdAndDelete(order._id);
+        deletedCount++;
+      }
+
+      await logAudit({
+        user: req.user,
+        action: 'BULK_DELETE_ORDERS',
+        entityType: 'order',
+        details: `Bulk deleted ${deletedCount} order(s) by ${req.user!.name}. Restored ${totalStockRestored} item(s) to stock.`,
+        ipAddress: req.ip,
+      });
+
+      res.json({
+        success: true,
+        message: `Successfully deleted ${deletedCount} order(s). ${totalStockRestored > 0 ? `(${totalStockRestored} items returned to inventory)` : ''}`,
+        deletedCount,
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH / PUT /api/admin/orders/:id/force-update — Admin forceful override of any order field
 const forceUpdateHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const schema = z.object({
       orderNumber: z.string().trim().min(2).max(40).optional(),
+      overwriteOrder: z.boolean().default(false).optional(),
       fulfillmentStatus: z
         .enum(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'])
         .optional(),
@@ -1067,12 +1142,18 @@ const forceUpdateHandler = async (req: Request, res: Response, next: NextFunctio
     const prevFulfillment = order.fulfillmentStatus;
     const prevPayment = order.paymentStatus;
 
-    // 1. Order Number override
+    // 1. Order Number override & overwrite capability
     if (data.orderNumber && data.orderNumber.toUpperCase() !== order.orderNumber) {
       const newNum = data.orderNumber.trim().toUpperCase();
       const existing = await Order.findOne({ orderNumber: newNum, _id: { $ne: order._id } });
       if (existing) {
-        throw new AppError(`Order number ${newNum} is already assigned to another order.`, 400);
+        if (data.overwriteOrder) {
+          // If overwrite requested, safely delete the old conflicting duplicate
+          await Order.findByIdAndDelete(existing._id);
+          changes.push(`Overwrote existing order ${newNum}`);
+        } else {
+          throw new AppError(`Order number ${newNum} already exists. Select 'Overwrite existing order' if you wish to replace it.`, 400);
+        }
       }
       changes.push(`Order ID [${order.orderNumber} -> ${newNum}]`);
       order.orderNumber = newNum;

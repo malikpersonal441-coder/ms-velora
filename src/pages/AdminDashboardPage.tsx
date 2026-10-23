@@ -168,6 +168,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [forceEditOrder, setForceEditOrder] = useState<Order | null>(null);
   const [isDeletingOrder, setIsDeletingOrder] = useState(false);
   const [restoreStockOnDelete, setRestoreStockOnDelete] = useState(true);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   // Customers state
   const [customers, setCustomers] = useState<any[]>([]);
