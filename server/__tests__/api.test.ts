@@ -171,7 +171,7 @@ describe('MS Velora — Automated Unit & Integration Test Suite', () => {
 
     it('calculates authoritative server-side prices and applies coupon ROYAL10 accurately', async () => {
       // Seeded jewellery is "price on request" (0), so give the test product a real price
-      await Product.findByIdAndUpdate(testProductId, { $set: { price: 50000 } });
+      await Product.findByIdAndUpdate(testProductId, { $set: { price: 50000, salePrice: 45000 } });
       const prod = await Product.findById(testProductId);
       const expectedUnit =
         prod!.salePrice && prod!.salePrice > 0 ? prod!.salePrice : prod!.price;

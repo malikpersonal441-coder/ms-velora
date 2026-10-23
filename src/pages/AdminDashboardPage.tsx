@@ -487,6 +487,59 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
+    setIsDeletingOrder(true);
+    try {
+      const res = await apiRequest(`/api/admin/orders/${orderToDelete._id}?restoreStock=${restoreStockOnDelete}`, {
+        method: 'DELETE',
+      });
+      if (res.success) {
+        addToast(res.message || `Order ${orderToDelete.orderNumber} deleted successfully.`, 'success');
+        setAdminOrders((prev) => prev.filter((o) => o._id !== orderToDelete._id));
+        if (selectedOrder && selectedOrder._id === orderToDelete._id) {
+          setSelectedOrder(null);
+        }
+        setOrderToDelete(null);
+        await loadTabContent();
+      } else {
+        throw new Error(res.message || 'Failed to delete order');
+      }
+    } catch (err: any) {
+      addToast(err.message || 'Could not delete order.', 'error');
+    } finally {
+      setIsDeletingOrder(false);
+    }
+  };
+
+  const handleBulkDeleteOrders = async () => {
+    if (slipIds.length === 0) return;
+    setIsDeletingOrder(true);
+    try {
+      const res = await apiRequest('/api/admin/orders/bulk', {
+        method: 'POST',
+        body: JSON.stringify({
+          orderIds: slipIds,
+          action: 'delete',
+          restoreStock: restoreStockOnDelete,
+        }),
+      });
+      if (res.success) {
+        addToast(res.message || `Deleted ${slipIds.length} orders successfully.`, 'success');
+        setAdminOrders((prev) => prev.filter((o) => !slipIds.includes(o._id)));
+        setSlipIds([]);
+        setIsBulkDeleting(false);
+        await loadTabContent();
+      } else {
+        throw new Error(res.message || 'Bulk delete failed');
+      }
+    } catch (err: any) {
+      addToast(err.message || 'Could not delete selected orders.', 'error');
+    } finally {
+      setIsDeletingOrder(false);
+    }
+  };
+
   const handleToggleCustomerStatus = async (customerId: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'active' ? 'suspended' : 'active';
     try {
@@ -1473,6 +1526,17 @@ export const AdminDashboardPage: React.FC = () => {
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print slips{slipIds.length ? ` (${slipIds.length})` : ''}</span>
               </button>
+              {slipIds.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsBulkDeleting(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors shadow-sm"
+                  title="Delete all selected orders permanently"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Selected ({slipIds.length})</span>
+                </button>
+              )}
               <a
                 href="/api/admin/reports/export/orders"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg"
@@ -1633,6 +1697,24 @@ export const AdminDashboardPage: React.FC = () => {
                               className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-black/15 text-neutral-600 hover:border-[#0D0D0D] hover:text-[#0D0D0D] transition-colors"
                             >
                               <Printer className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setForceEditOrder(o)}
+                              aria-label={`Overwrite / Edit ${o.orderNumber}`}
+                              title={`Overwrite & Edit ${o.orderNumber}`}
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[#C5A059] text-[#9E7B36] hover:bg-[#C5A059] hover:text-[#0D0D0D] transition-colors"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setOrderToDelete(o)}
+                              aria-label={`Delete order ${o.orderNumber}`}
+                              title={`Delete order ${o.orderNumber}`}
+                              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </button>
                             <button
                               type="button"
@@ -3058,6 +3140,22 @@ export const AdminDashboardPage: React.FC = () => {
                 </h3>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForceEditOrder(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[#C5A059] bg-[#FAF8F5] hover:bg-[#C5A059] text-[#0D0D0D] text-xs font-bold transition-colors shadow-xs"
+                  title="Overwrite order details (ID, customer, amounts, status)"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-[#9E7B36]" /> Overwrite / Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderToDelete(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-red-200 hover:border-red-400 text-red-600 hover:bg-red-50 text-xs font-bold transition-colors shadow-xs"
+                  title="Permanently delete this order"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </button>
                 <Link
                   to={`/order-confirmation/${selectedOrder.orderNumber}`}
                   target="_blank"
@@ -3176,6 +3274,152 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Delete Order Confirmation Dialog */}
+      {orderToDelete && (
+        <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-100 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[#0D0D0D]">Delete Order Permanently?</h3>
+                <p className="text-xs text-neutral-500 mt-1">
+                  You are about to permanently delete order{' '}
+                  <span className="font-mono-code font-bold text-black">{orderToDelete.orderNumber}</span> ({orderToDelete.shippingAddress.fullName} • {formatPrice(orderToDelete.totalAmount)}).
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs space-y-2">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={restoreStockOnDelete}
+                  onChange={(e) => setRestoreStockOnDelete(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#C5A059] focus:ring-[#C5A059] mt-0.5"
+                />
+                <span className="text-neutral-700 font-medium">
+                  Return allocated items back to inventory stock ({orderToDelete.items.reduce((sum, i) => sum + i.quantity, 0)} item(s))
+                </span>
+              </label>
+              <p className="text-[11px] text-neutral-400 pl-6.5">
+                {orderToDelete.inventoryRestored
+                  ? 'Note: Stock was already restored when the order was cancelled/refunded.'
+                  : 'Keeps vault stock accurate when deleting unfulfilled orders.'}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setOrderToDelete(null)}
+                disabled={isDeletingOrder}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-xs font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteOrder}
+                disabled={isDeletingOrder}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors disabled:opacity-50"
+              >
+                {isDeletingOrder ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting…</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Yes, Delete Order</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Orders Confirmation Dialog */}
+      {isBulkDeleting && (
+        <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-100 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[#0D0D0D]">Delete {slipIds.length} Orders?</h3>
+                <p className="text-xs text-neutral-500 mt-1">
+                  You are about to permanently delete <span className="font-bold text-black">{slipIds.length} selected orders</span>. This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs space-y-2">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={restoreStockOnDelete}
+                  onChange={(e) => setRestoreStockOnDelete(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#C5A059] focus:ring-[#C5A059] mt-0.5"
+                />
+                <span className="text-neutral-700 font-medium">
+                  Return allocated items from unfulfilled orders back to vault stock
+                </span>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsBulkDeleting(false)}
+                disabled={isDeletingOrder}
+                className="px-4 py-2 rounded-lg border border-neutral-300 text-xs font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleBulkDeleteOrders}
+                disabled={isDeletingOrder}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors disabled:opacity-50"
+              >
+                {isDeletingOrder ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting…</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Yes, Delete All {slipIds.length} Orders</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Force Edit / Overwrite Order Modal */}
+      {forceEditOrder && (
+        <ForceEditOrderModal
+          order={forceEditOrder}
+          isOpen={true}
+          onClose={() => setForceEditOrder(null)}
+          onSaved={(updated) => {
+            addToast(`Order ${updated.orderNumber} successfully updated.`, 'success');
+            setSelectedOrder(updated);
+            setAdminOrders((prev) => prev.map((o) => (o._id === updated._id ? updated : o)));
+            setForceEditOrder(null);
+          }}
+          onError={(msg) => addToast(msg, 'error')}
+        />
       )}
     </div>
   );
