@@ -112,7 +112,7 @@ const ProductSchema = new Schema<IProduct>(
   {
     name: { type: String, required: true, trim: true, maxlength: 180, index: true },
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-    brand: { type: String, required: true, trim: true, index: true },
+    brand: { type: String, default: 'MS Velora', trim: true, index: true },
     model: { type: String, default: '', trim: true },
     sku: { type: String, required: true, unique: true, uppercase: true, trim: true, index: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', index: true },

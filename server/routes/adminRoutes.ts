@@ -244,7 +244,7 @@ router.get('/overview', async (_req: Request, res: Response, next: NextFunction)
 const productPayloadSchema = z.object({
   name: z.string().min(2, 'Product name is required').max(180),
   slug: z.string().optional(),
-  brand: z.string().min(1, 'Brand is required'),
+  brand: z.string().default('MS Velora'),
   model: z.string().optional().default(''),
   sku: z.string().optional(),
   category: z.string().optional().nullable(),

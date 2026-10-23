@@ -344,6 +344,7 @@ export const AdminDashboardPage: React.FC = () => {
 
       const payload = {
         ...editingProduct,
+        brand: editingProduct.brand || 'MS Velora',
         price: Number(editingProduct.price),
         salePrice:
           editingProduct.salePrice !== null &&
@@ -2727,18 +2728,6 @@ export const AdminDashboardPage: React.FC = () => {
                     value={editingProduct.name || ''}
                     onChange={(e) =>
                       setEditingProduct({ ...editingProduct, name: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold block mb-1">Brand *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingProduct.brand || ''}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, brand: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-neutral-300 rounded"
                   />
