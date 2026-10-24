@@ -73,8 +73,6 @@ export interface Product {
   shortDescription: string;
   description: string;
   mainImage: string;
-  /** Optional transparent PNG for the virtual try-on overlay */
-  tryOnImage?: string;
   images: ProductImage[];
   specifications: ProductSpecifications;
   variants: ProductVariant[];

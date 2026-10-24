@@ -23,7 +23,6 @@ const NAV_LINKS = [
   { label: 'Pearl Edit', to: '/collections/pearl-edit' },
   { label: 'New Arrivals', to: '/shop?newArrival=true' },
   { label: 'Sale', to: '/shop?onSale=true' },
-  { label: 'Try-On', to: '/virtual-try-on' },
 ];
 
 export const Navbar: React.FC = () => {

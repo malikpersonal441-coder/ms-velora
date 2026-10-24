@@ -41,7 +41,6 @@ const OrderConfirmationPage = lazy(() =>
 const TrackOrderPage = lazy(() =>
   import('./pages/CartAndCheckoutPages').then((m) => ({ default: m.TrackOrderPage }))
 );
-const VirtualTryOnPage = lazy(() => import('./pages/VirtualTryOnPage'));
 const WishlistPage = lazy(() =>
   import('./pages/AccountAndStaticPages').then((m) => ({ default: m.WishlistPage }))
 );
@@ -127,7 +126,6 @@ const AppShell: React.FC = () => {
             <Route path="/forgot-password" element={<Navigate to="/" replace />} />
             <Route path="/account" element={<Navigate to="/" replace />} />
             <Route path="/wishlist" element={<WishlistPage />} />
-            <Route path="/virtual-try-on" element={<VirtualTryOnPage />} />
             <Route path="/shipping-returns" element={<PolicyPage type="shipping" />} />
             <Route path="/privacy-policy" element={<PolicyPage type="privacy" />} />
             <Route path="/terms" element={<PolicyPage type="terms" />} />
