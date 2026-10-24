@@ -76,7 +76,7 @@ export const Navbar: React.FC = () => {
             <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="MS Velora — home">
               <div className="relative rounded-full p-0.5 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-sm group-hover:shadow-[0_0_18px_rgba(197,160,89,0.35)] group-hover:scale-105 transition-all duration-300">
                 <img
-                  src="/brand/logo.jpg"
+                  src="/brand/logo-128.webp"
                   alt="MS Velora"
                   width={52}
                   height={52}
@@ -189,7 +189,7 @@ export const Navbar: React.FC = () => {
               <div className="p-5 border-b border-black/5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="rounded-full p-0.5 bg-gradient-to-tr from-[#C5A059] via-[#DFBD78] to-[#9E7B36] shadow-sm">
-                    <img src="/brand/logo.jpg" alt="MS Velora" width={44} height={44} className="h-11 w-11 rounded-full object-cover" />
+                    <img src="/brand/logo-128.webp" alt="MS Velora" width={44} height={44} className="h-11 w-11 rounded-full object-cover" />
                   </div>
                   <div className="flex flex-col">
                     <span className="font-serif-luxury text-base font-bold tracking-[0.16em] text-[#0D0D0D]">MS VELORA</span>

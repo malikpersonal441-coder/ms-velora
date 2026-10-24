@@ -9,7 +9,7 @@ export default defineConfig({
       output: {
         // Long-lived vendor chunks: app deploys don't invalidate cached libraries
         manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
+          react: ['react', 'react-dom', 'react-dom/client', 'react-router-dom', 'scheduler'],
           motion: ['framer-motion'],
           icons: ['lucide-react'],
         },
