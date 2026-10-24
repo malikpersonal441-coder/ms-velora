@@ -11,3 +11,4 @@ export * from './HomepageContent';
 export * from './StoreSettings';
 export * from './AuditLog';
 export * from './NewsletterSubscriber';
+export * from './Expense';

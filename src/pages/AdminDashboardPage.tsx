@@ -33,10 +33,12 @@ import {
   Truck,
   LogOut,
   Star,
+  Receipt,
 } from 'lucide-react';
 import { Smartphone, BellRing } from 'lucide-react';
 import { subscribePush, isSubscribedLocally, pushSupported } from '../lib/pwa';
 import { WhatsAppCenter } from '../components/admin/WhatsAppCenter';
+import { ExpensesPanel } from '../components/admin/ExpensesPanel';
 import { ChangePasswordPanel } from '../components/admin/ChangePasswordPanel';
 import { NewOrderNotifier } from '../components/admin/NewOrderNotifier';
 import { CreateOrderModal } from '../components/admin/CreateOrderModal';
@@ -78,6 +80,7 @@ type AdminTab =
   | 'inventory'
   | 'orders'
   | 'whatsapp'
+  | 'expenses'
   | 'security'
   | 'customers'
   | 'catalog'
@@ -328,7 +331,7 @@ export const AdminDashboardPage: React.FC = () => {
       mainImage:
         'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=85',
       status: 'published',
-      featured: false,
+      featured: true,
       bestSeller: false,
       newArrival: true,
       specifications: {
@@ -408,6 +411,25 @@ export const AdminDashboardPage: React.FC = () => {
         body: JSON.stringify(payload),
       });
       if (res.success) {
+        if (res.product) {
+          if (isEdit) {
+            setAdminProducts((prev) =>
+              prev.map((p) => (p._id === res.product._id ? res.product : p))
+            );
+            setInventoryList((prev) =>
+              prev.map((p) => (p._id === res.product._id ? res.product : p))
+            );
+          } else {
+            setAdminProducts((prev) => [
+              res.product,
+              ...prev.filter((p) => p._id !== res.product._id),
+            ]);
+            setInventoryList((prev) => [
+              res.product,
+              ...prev.filter((p) => p._id !== res.product._id),
+            ]);
+          }
+        }
         addToast(res.message, 'success');
         setIsProductModalOpen(false);
         setEditingProduct(null);
@@ -836,6 +858,7 @@ export const AdminDashboardPage: React.FC = () => {
     { id: 'inventory', label: 'Stock', icon: Boxes },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
+    { id: 'expenses', label: 'Expenses', icon: Receipt },
     { id: 'security', label: 'Change Password', icon: KeyRound },
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'catalog', label: 'Categories', icon: Layers },
@@ -847,7 +870,7 @@ export const AdminDashboardPage: React.FC = () => {
   const NAV_GROUPS: { label: string; ids: AdminTab[] }[] = [
     { label: 'Dashboard', ids: ['overview'] },
     { label: 'Catalogue', ids: ['products', 'inventory', 'catalog'] },
-    { label: 'Sales', ids: ['orders', 'whatsapp', 'customers', 'coupons'] },
+    { label: 'Sales & Finance', ids: ['orders', 'whatsapp', 'expenses', 'customers', 'coupons'] },
     { label: 'Store', ids: ['homepage', 'reports_settings', 'security'] },
   ];
 
@@ -1993,6 +2016,7 @@ export const AdminDashboardPage: React.FC = () => {
         {/* 5. CUSTOMERS TAB */}
         {/* ======================================= */}
         {activeTab === 'whatsapp' && <WhatsAppCenter addToast={addToast} />}
+        {activeTab === 'expenses' && <ExpensesPanel addToast={addToast} />}
         {activeTab === 'security' && <ChangePasswordPanel addToast={addToast} />}
 
         {activeTab === 'customers' && (
@@ -3434,7 +3458,12 @@ export const AdminDashboardPage: React.FC = () => {
         <BulkAddProductsModal
           categories={adminCategories}
           onClose={() => setIsBulkCreateModalOpen(false)}
-          onCreated={async () => {
+          onCreated={async (createdProducts?: any[]) => {
+            if (Array.isArray(createdProducts) && createdProducts.length > 0) {
+              const ids = new Set(createdProducts.map((p) => p._id));
+              setAdminProducts((prev) => [...createdProducts, ...prev.filter((p) => !ids.has(p._id))]);
+              setInventoryList((prev) => [...createdProducts, ...prev.filter((p) => !ids.has(p._id))]);
+            }
             await loadTabContent();
             await refreshStorefront();
           }}

@@ -111,20 +111,28 @@ export const HomePage: React.FC = () => {
             link={{ to: '/shop?bestSeller=true', label: 'Shop All Best Sellers' }}
           />
 
-          <div className="flex justify-center mt-8">
+          {bestSellers && bestSellers.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5 mb-8">
+              {bestSellers.slice(0, 5).map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-center mt-6">
             <button
               type="button"
               onClick={() => setIsBestSellersModalOpen(true)}
               className="px-8 py-4 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.2em] rounded transition-colors shadow-md"
             >
-              View Best Sellers
+              View Best Sellers ({bestSellers.length})
             </button>
           </div>
         </section>
       )}
 
       {/* The Rotunda — 3D rotating showcase */}
-      {[...bestSellers, ...newArrivals].length >= 3 && (
+      {[...bestSellers, ...newArrivals].length >= 1 && (
         <section className="relative bg-[#FAF8F5] py-16 sm:py-20 overflow-hidden border-y border-[#C5A059]/20">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(197,160,89,0.1),transparent_60%)]" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

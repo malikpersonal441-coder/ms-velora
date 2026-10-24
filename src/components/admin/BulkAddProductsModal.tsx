@@ -19,7 +19,7 @@ interface BulkProductRow {
 interface BulkAddProductsModalProps {
   categories: Category[];
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (createdProducts?: any[]) => void;
   addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
@@ -170,7 +170,7 @@ export const BulkAddProductsModal: React.FC<BulkAddProductsModalProps> = ({
 
       if (res.success) {
         addToast(res.message || `Successfully created ${validRows.length} products!`, 'success');
-        onCreated();
+        onCreated(res.products);
         onClose();
       }
     } catch (err: any) {

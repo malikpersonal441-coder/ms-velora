@@ -385,3 +385,25 @@ export interface Coupon {
   isActive: boolean;
   createdAt: string;
 }
+
+export interface Expense {
+  _id: string;
+  title: string;
+  amount: number;
+  category:
+    | 'courier_shipping'
+    | 'packaging'
+    | 'marketing_ads'
+    | 'inventory_materials'
+    | 'rent_utilities'
+    | 'salaries'
+    | 'repairs_maintenance'
+    | 'miscellaneous';
+  paymentMethod: 'cash' | 'bank_transfer' | 'easypaisa' | 'jazzcash' | 'credit_card';
+  date: string;
+  referenceNumber?: string;
+  notes?: string;
+  loggedBy?: string;
+  loggedByName?: string;
+  createdAt: string;
+}

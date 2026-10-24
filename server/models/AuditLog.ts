@@ -5,7 +5,7 @@ export interface IAuditLog extends Document {
   actorName: string;
   actorEmail: string;
   action: string;
-  entityType: 'product' | 'inventory' | 'order' | 'customer' | 'category' | 'collection' | 'coupon' | 'settings' | 'homepage' | 'auth';
+  entityType: 'product' | 'inventory' | 'order' | 'customer' | 'category' | 'collection' | 'coupon' | 'settings' | 'homepage' | 'auth' | 'expense';
   entityId?: string;
   details: string;
   ipAddress?: string;
@@ -20,7 +20,7 @@ const AuditLogSchema = new Schema<IAuditLog>(
     action: { type: String, required: true, index: true },
     entityType: {
       type: String,
-      enum: ['product', 'inventory', 'order', 'customer', 'category', 'collection', 'coupon', 'settings', 'homepage', 'auth'],
+      enum: ['product', 'inventory', 'order', 'customer', 'category', 'collection', 'coupon', 'settings', 'homepage', 'auth', 'expense'],
       required: true,
       index: true,
     },

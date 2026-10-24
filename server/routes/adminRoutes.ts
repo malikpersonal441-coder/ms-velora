@@ -20,6 +20,7 @@ import { UploadedMedia } from '../models/UploadedMedia';
 import { StoreSettings } from '../models/StoreSettings';
 import { AuditLog } from '../models/AuditLog';
 import { Review } from '../models/Review';
+import { Expense } from '../models/Expense';
 import {
   slugify,
   generateSku,
@@ -2644,6 +2645,145 @@ router.get('/reviews', async (_req: Request, res: Response, next: NextFunction) 
       .populate('product', 'name slug sku mainImage')
       .sort({ createdAt: -1 });
     res.json({ success: true, reviews });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/expenses - List & Summary of Business Expenses
+router.get('/expenses', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { q, category, page = '1', limit = '100' } = req.query as Record<string, string | undefined>;
+    const filter: Record<string, unknown> = {};
+
+    if (category && category !== 'all') {
+      filter.category = category;
+    }
+
+    if (q && q.trim()) {
+      const regex = new RegExp(q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      filter.$or = [{ title: regex }, { referenceNumber: regex }, { notes: regex }, { loggedByName: regex }];
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10) || 100));
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [expenses, total, allForSummary] = await Promise.all([
+      Expense.find(filter)
+        .sort({ date: -1, createdAt: -1 })
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum),
+      Expense.countDocuments(filter),
+      Expense.find({}, 'amount date category'),
+    ]);
+
+    let totalAmount = 0;
+    let todayAmount = 0;
+    let monthAmount = 0;
+    const categoryTotals: Record<string, number> = {};
+
+    for (const exp of allForSummary) {
+      const amt = Number(exp.amount) || 0;
+      totalAmount += amt;
+      const d = new Date(exp.date);
+      if (d >= startOfToday) {
+        todayAmount += amt;
+      }
+      if (d >= startOfMonth) {
+        monthAmount += amt;
+      }
+      categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + amt;
+    }
+
+    res.json({
+      success: true,
+      expenses,
+      total,
+      summary: {
+        totalAmount,
+        todayAmount,
+        monthAmount,
+        totalCount: allForSummary.length,
+        categoryTotals,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/admin/expenses - Record new Business Expense
+router.post('/expenses', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { title, amount, category, paymentMethod, date, referenceNumber, notes } = req.body;
+
+    if (!title || !title.trim()) {
+      throw new AppError('Expense title/description is required.', 400);
+    }
+    const numAmount = Number(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      throw new AppError('A valid expense amount greater than 0 is required.', 400);
+    }
+
+    const expense = await Expense.create({
+      title: title.trim(),
+      amount: numAmount,
+      category: category || 'miscellaneous',
+      paymentMethod: paymentMethod || 'cash',
+      date: date ? new Date(date) : new Date(),
+      referenceNumber: referenceNumber ? referenceNumber.trim() : undefined,
+      notes: notes ? notes.trim() : undefined,
+      loggedBy: req.user?._id,
+      loggedByName: req.user?.name || 'Administrator',
+    });
+
+    await logAudit({
+      user: req.user,
+      action: 'CREATE_EXPENSE',
+      entityType: 'expense',
+      entityId: String(expense._id),
+      details: `Recorded expense "${expense.title}" - PKR ${numAmount.toLocaleString()} (${expense.category})`,
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Expense of PKR ${numAmount.toLocaleString()} recorded successfully.`,
+      expense,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/expenses/:id - Delete an Expense
+router.delete('/expenses/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const expense = await Expense.findById(id);
+    if (!expense) {
+      throw new AppError('Expense not found.', 404);
+    }
+
+    await Expense.findByIdAndDelete(id);
+
+    await logAudit({
+      user: req.user,
+      action: 'DELETE_EXPENSE',
+      entityType: 'expense',
+      entityId: String(expense._id),
+      details: `Deleted expense "${expense.title}" - PKR ${Number(expense.amount).toLocaleString()}`,
+      ipAddress: req.ip,
+    });
+
+    res.json({
+      success: true,
+      message: 'Expense deleted successfully.',
+    });
   } catch (err) {
     next(err);
   }
