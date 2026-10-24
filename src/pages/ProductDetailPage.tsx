@@ -381,13 +381,6 @@ export const ProductDetailPage: React.FC = () => {
                     ({product.reviewCount && product.reviewCount > 0 ? product.reviewCount : 28} verified reviews)
                   </a>
                 </div>
-
-                <span className="text-neutral-300">•</span>
-
-                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-700 bg-neutral-100 px-2.5 py-1 rounded-full">
-                  <span className="text-amber-600">🔥</span>
-                  <span>{(product.soldCount && product.soldCount > 0 ? product.soldCount : 48)} pieces sold</span>
-                </div>
               </div>
 
               {/* Price Display: Our Price & Market Price (Strike-through) */}

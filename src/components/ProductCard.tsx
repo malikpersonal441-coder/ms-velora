@@ -220,26 +220,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
           >
             {product.name}
           </Link>
-
-          {/* Rating & Sold Quantity */}
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1 text-[11px] font-semibold text-[#0D0D0D]">
-              <Star className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
-              <span>{(product.averageRating && product.averageRating > 0 ? product.averageRating : 4.9).toFixed(1)}</span>
-              <span className="text-neutral-400 font-normal">
-                ({product.reviewCount && product.reviewCount > 0 ? product.reviewCount : 28})
-              </span>
-            </div>
-
-            <div className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-full">
-              <span className="text-amber-600">🔥</span>
-              <span>{(product.soldCount && product.soldCount > 0 ? product.soldCount : 35)} sold</span>
-            </div>
-          </div>
         </div>
 
-        {/* Pricing: After (Sale) & Before (Original) + Stock Status */}
-        <div className="pt-2 border-t border-neutral-100 flex items-baseline justify-between gap-2">
+        {/* Pricing: After (Sale) & Before (Original) */}
+        <div className="pt-2 border-t border-neutral-100">
           <div>
             {hasSale ? (
               <div className="flex items-baseline gap-2 flex-wrap">
@@ -257,6 +241,17 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
                 {formatProductPrice(product.price, symbol)}
               </span>
             )}
+          </div>
+        </div>
+
+        {/* Rating + Stock Status */}
+        <div className="mt-1.5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1 text-[11px] font-semibold text-[#0D0D0D]">
+            <Star className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
+            <span>{(product.averageRating && product.averageRating > 0 ? product.averageRating : 4.9).toFixed(1)}</span>
+            <span className="text-neutral-400 font-normal">
+              ({product.reviewCount && product.reviewCount > 0 ? product.reviewCount : 28})
+            </span>
           </div>
 
           <span
