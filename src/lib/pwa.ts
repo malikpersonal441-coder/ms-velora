@@ -61,7 +61,9 @@ const urlBase64ToUint8Array = (b64: string) => {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 };
 
-const topicKey = (t: PushTopic) => `bfs_push_${t}`;
+const sameBytes = (a: Uint8Array, b: Uint8Array) => a.length === b.length && a.every((v, i) => v === b[i]);
+
+const topicKey =(t: PushTopic) => `bfs_push_${t}`;
 
 export function isSubscribedLocally(topic: PushTopic) {
   try {
@@ -92,13 +94,26 @@ export async function subscribePush(topic: PushTopic): Promise<void> {
   const keyRes = await apiRequest('/api/push/public-key');
   if (!keyRes.enabled || !keyRes.publicKey) throw new Error('Notifications are not set up on the server yet.');
 
-  const reg = await navigator.serviceWorker.ready;
-  const sub =
-    (await reg.pushManager.getSubscription()) ||
-    (await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(keyRes.publicKey),
-    }));
+  // `ready` never resolves if the service worker failed to register, so don't hang forever
+  if (!navigator.serviceWorker.controller) await navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+  const reg = await Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('App service is still loading. Refresh the page and try again.')), 10000)
+    ),
+  ]);
+
+  const serverKey = urlBase64ToUint8Array(keyRes.publicKey);
+  let sub = await reg.pushManager.getSubscription();
+  // A subscription made with an older server key can never receive pushes — replace it
+  const oldKey = sub?.options.applicationServerKey;
+  if (sub && (!oldKey || !sameBytes(new Uint8Array(oldKey), serverKey))) {
+    await sub.unsubscribe().catch(() => undefined);
+    sub = null;
+  }
+  if (!sub) {
+    sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: serverKey });
+  }
 
   await apiRequest('/api/push/subscribe', {
     method: 'POST',
