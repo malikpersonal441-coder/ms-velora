@@ -86,12 +86,12 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
       jazzcash: {
         enabled: { type: Boolean, default: true },
         accountTitle: { type: String, default: 'MS Velora', trim: true, maxlength: 80 },
-        accountNumber: { type: String, default: '0300 0000000', trim: true, maxlength: 40 },
+        accountNumber: { type: String, default: '0308 5060106', trim: true, maxlength: 40 },
       },
       easypaisa: {
         enabled: { type: Boolean, default: true },
         accountTitle: { type: String, default: 'MS Velora', trim: true, maxlength: 80 },
-        accountNumber: { type: String, default: '0300 0000000', trim: true, maxlength: 40 },
+        accountNumber: { type: String, default: '0308 5060106', trim: true, maxlength: 40 },
       },
       instructions: {
         type: String,
