@@ -132,7 +132,7 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#C5A059] shrink-0" />
-                <span>{settings?.contactEmail || 'concierge@msvelora.pk'}</span>
+                <span>{settings?.contactEmail || 'msvelora@gmail.com'}</span>
               </div>
             </div>
           </div>

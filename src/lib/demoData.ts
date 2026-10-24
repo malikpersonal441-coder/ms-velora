@@ -185,7 +185,7 @@ export const demoSettings = {
   enableCod: true,
   enableOnlinePayment: false,
   enableBankTransfer: true,
-  contactEmail: 'concierge@example.com',
+  contactEmail: 'msvelora@gmail.com',
   contactPhone: '+92 308 5060106',
   // Placeholder store contact & WhatsApp number — set the real one in admin settings
   whatsappNumber: '+92 308 5060106',
