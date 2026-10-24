@@ -45,7 +45,7 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
   return (
     <div className="relative overflow-hidden">
       <div
-        className="relative -mt-4 h-[320px] sm:h-[380px] lg:h-[400px] [perspective:1800px] select-none"
+        className="relative mt-6 h-[340px] sm:h-[400px] lg:h-[420px] [perspective:1800px] [perspective-origin:50%_50%] select-none"
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
           if (touchX.current === null) return;
@@ -55,11 +55,11 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
         }}
       >
         {/* Floor reflection glow */}
-        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[70%] h-16 rounded-[50%] bg-[radial-gradient(ellipse,rgba(197,160,89,0.35),transparent_70%)] blur-xl" />
+        <div className="absolute left-1/2 bottom-2 -translate-x-1/2 w-[60%] h-12 rounded-[50%] bg-[radial-gradient(ellipse,rgba(197,160,89,0.35),transparent_70%)] blur-xl" />
 
         <div
           className="absolute left-1/2 top-1/2 w-0 h-0 [transform-style:preserve-3d] transition-transform duration-[1400ms] ease-[cubic-bezier(0.45,0,0.2,1)]"
-          style={{ transform: `translateZ(${-radius}px) rotateX(-6deg) rotateY(${angle}deg)` }}
+          style={{ transform: `translateZ(${-radius}px) rotateY(${angle}deg)` }}
         >
           {items.map((p, i) => {
             const isFront = i === front;
@@ -88,7 +88,7 @@ export const Showcase3D: React.FC<{ products: Product[] }> = ({ products }) => {
       </div>
 
       {/* Caption for the spotlit piece */}
-      <div className="mt-1 text-center min-h-[88px]" aria-live="polite">
+      <div className="mt-4 text-center min-h-[88px]" aria-live="polite">
         <p className="text-[10px] uppercase tracking-[0.4em] text-[#9E7B36] font-semibold">{active.brand}</p>
         <Link
           to={`/product/${active.slug}`}

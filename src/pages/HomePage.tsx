@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
-  Copy,
   Sparkles,
   ShieldCheck,
   Clock,
@@ -14,6 +13,7 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
 import { SectionHeading } from '../components/SectionHeading';
 import { Showcase3D } from '../components/Showcase3D';
+import { NewArrivalAlerts } from '../components/NewArrivalAlerts';
 import { Reveal } from '../components/Reveal';
 import { Product } from '../types';
 
@@ -45,11 +45,6 @@ export const HomePage: React.FC = () => {
     brandStory: true,
     customerReviews: true,
     newsletter: true,
-  };
-
-  const handleCopyCoupon = (code: string) => {
-    navigator.clipboard.writeText(code);
-    addToast(`Privilege code "${code}" copied to clipboard!`, 'success');
   };
 
   return (
@@ -100,6 +95,9 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* D. New-arrival alerts */}
+      <NewArrivalAlerts />
 
       {/* E. Best Sellers */}
       {visibility.bestSellers && (
@@ -181,16 +179,6 @@ export const HomePage: React.FC = () => {
                     {homepage.promoBanner.ctaText || 'Explore Limited Edition'}
                   </Link>
 
-                  {homepage.promoBanner.couponHighlight && (
-                    <button
-                      type="button"
-                      onClick={() => handleCopyCoupon(homepage.promoBanner.couponHighlight!)}
-                      className="px-5 py-3.5 rounded border border-dashed border-[#C5A059]/60 bg-[#FAF8F5] hover:border-[#C5A059] text-xs font-mono-code text-[#0D0D0D] flex items-center gap-2.5 transition-colors"
-                    >
-                      <span>USE CODE: {homepage.promoBanner.couponHighlight}</span>
-                      <Copy className="w-3.5 h-3.5 text-[#9E7B36]" />
-                    </button>
-                  )}
                 </div>
               </div>
 
