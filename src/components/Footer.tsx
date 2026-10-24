@@ -128,7 +128,7 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#C5A059] shrink-0" />
-                <a href={`tel:${(settings?.contactPhone || '+92 300 0000000').replace(/[^+\d]/g, '')}`} className="hover:text-[#C5A059] transition-colors">{settings?.contactPhone || '+92 300 0000000'}</a>
+                <a href={`tel:${(settings?.contactPhone || '+92 308 5060106').replace(/[^+\d]/g, '')}`} className="hover:text-[#C5A059] transition-colors">{settings?.contactPhone || '+92 308 5060106'}</a>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#C5A059] shrink-0" />

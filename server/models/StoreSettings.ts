@@ -105,8 +105,8 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
       default: 'Meezan Bank Limited — Account Title: MS Velora — IBAN: (add your IBAN in admin settings)',
     },
     contactEmail: { type: String, default: 'concierge@msvelora.pk' },
-    contactPhone: { type: String, default: '+92 300 0000000' },
-    whatsappNumber: { type: String, default: '+92 300 0000000' },
+    contactPhone: { type: String, default: '+92 308 5060106' },
+    whatsappNumber: { type: String, default: '+92 308 5060106' },
     whatsappOrderingEnabled: { type: Boolean, default: true },
     // Placeholders: {name} {orderNumber} {total} {items} {city} {courier} {tracking} {storeName} {paymentMethod}
     whatsappTemplates: {

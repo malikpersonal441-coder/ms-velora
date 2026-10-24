@@ -1008,7 +1008,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-[#C5A059] shrink-0" />
-                <a href={`tel:${(settings?.contactPhone || '+92 300 0000000').replace(/[^+\d]/g, '')}`} className="hover:text-[#9E7B36] transition-colors">{settings?.contactPhone || '+92 300 0000000'}</a>
+                <a href={`tel:${(settings?.contactPhone || '+92 308 5060106').replace(/[^+\d]/g, '')}`} className="hover:text-[#9E7B36] transition-colors">{settings?.contactPhone || '+92 308 5060106'}</a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[#C5A059] shrink-0" />

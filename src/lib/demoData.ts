@@ -186,9 +186,9 @@ export const demoSettings = {
   enableOnlinePayment: false,
   enableBankTransfer: true,
   contactEmail: 'concierge@example.com',
-  contactPhone: '+92 300 0000000',
+  contactPhone: '+92 308 5060106',
   // Placeholder store contact & WhatsApp number — set the real one in admin settings
-  whatsappNumber: '+92 300 0000000',
+  whatsappNumber: '+92 308 5060106',
   socialLinks: { instagram: '', facebook: '', youtube: '', tiktok: '' },
 } as unknown as StoreSettings;
 
