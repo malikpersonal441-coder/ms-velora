@@ -1003,7 +1003,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
                 <MapPin className="w-5 h-5 text-[#C5A059] shrink-0 mt-0.5" />
                 <span>
                   {settings?.showroomAddress ||
-                    'Lahore, Pakistan'}
+                    'G-11/1 Markaz, Islamabad, Pakistan'}
                 </span>
               </div>
               <div className="flex items-center gap-3">

@@ -43,7 +43,7 @@ export const Footer: React.FC = () => {
                 <MapPin className="w-4 h-4 text-[#C5A059] shrink-0 mt-0.5" />
                 <span>
                   {settings?.showroomAddress ||
-                    'Suite 402, MM Alam Road Luxury Galleria, Gulberg III, Lahore, Pakistan'}
+                    'G-11/1 Markaz, Islamabad, Pakistan'}
                 </span>
               </div>
               <div className="flex items-center gap-2.5">

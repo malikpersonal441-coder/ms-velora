@@ -2825,6 +2825,18 @@ export const AdminDashboardPage: React.FC = () => {
                       className="w-full px-3 py-2 border border-neutral-300 rounded"
                     />
                   </div>
+                  <div className="sm:col-span-2">
+                    <label className="font-semibold block mb-1">Store Address</label>
+                    <input
+                      type="text"
+                      value={storeSettings.showroomAddress || ''}
+                      onChange={(e) =>
+                        setStoreSettings({ ...storeSettings, showroomAddress: e.target.value })
+                      }
+                      placeholder="G-11/1 Markaz, Islamabad, Pakistan"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-6 text-xs pt-2">

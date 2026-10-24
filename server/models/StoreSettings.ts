@@ -149,7 +149,7 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     },
     showroomAddress: {
       type: String,
-      default: 'Lahore, Pakistan',
+      default: 'G-11/1 Markaz, Islamabad, Pakistan',
     },
     socialLinks: {
       instagram: { type: String, default: 'https://instagram.com/msvelora' },
