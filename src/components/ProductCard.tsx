@@ -222,8 +222,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
           </Link>
         </div>
 
-        {/* Pricing: After (Sale) & Before (Original) */}
-        <div className="pt-2 border-t border-neutral-100">
+        {/* Pricing: After (Sale) & Before (Original) + Rating above Stock Status */}
+        <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
           <div>
             {hasSale ? (
               <div className="flex items-baseline gap-2 flex-wrap">
@@ -242,10 +242,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
               </span>
             )}
           </div>
-        </div>
 
-        {/* Rating + Stock Status */}
-        <div className="mt-1.5 flex items-center justify-between gap-2">
+        <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-1 text-[11px] font-semibold text-[#0D0D0D]">
             <Star className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
             <span>{(product.averageRating && product.averageRating > 0 ? product.averageRating : 4.9).toFixed(1)}</span>
@@ -269,6 +267,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
               ? `Only ${product.stock} left`
               : 'In Stock'}
           </span>
+        </div>
         </div>
       </div>
     </div>
