@@ -2980,171 +2980,213 @@ export const AdminDashboardPage: React.FC = () => {
       {/* ======================================= */}
       {/* PRODUCT CREATE / EDIT MODAL */}
       {/* ======================================= */}
-      {isProductModalOpen && editingProduct && (
-        <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
-              <h2 className="font-serif-luxury text-2xl font-bold">
-                {editingProduct._id ? 'Edit Jewellery' : 'Add Jewellery'}
-              </h2>
+      {isProductModalOpen && editingProduct && (() => {
+        const field = 'w-full px-3.5 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-[#0D0D0D] placeholder:text-neutral-400 transition focus:outline-none focus:border-[#C5A059] focus:ring-4 focus:ring-[#C5A059]/15';
+        const label = 'block mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500';
+        const card = 'rounded-2xl border border-neutral-200/80 bg-white p-5 sm:p-6';
+        const sectionTitle = (Icon: React.ElementType, title: string, hint?: string) => (
+          <div className="flex items-start gap-3 mb-5">
+            <span className="w-9 h-9 rounded-xl bg-[#C5A059]/15 text-[#9E7B36] flex items-center justify-center shrink-0">
+              <Icon className="w-4 h-4" />
+            </span>
+            <div>
+              <h3 className="font-serif-luxury text-lg font-semibold leading-tight text-[#0D0D0D]">{title}</h3>
+              {hint && <p className="text-xs text-neutral-500 mt-0.5">{hint}</p>}
+            </div>
+          </div>
+        );
+        const market = Number(editingProduct.price) || 0;
+        const selling = Number(editingProduct.salePrice) || 0;
+        const discount = market > 0 && selling > 0 && selling < market ? Math.round(((market - selling) / market) * 100) : 0;
+        const flags = [
+          { key: 'featured', label: 'Featured', hint: 'Show on the homepage' },
+          { key: 'bestSeller', label: 'Best Seller', hint: 'Adds a best-seller badge' },
+          { key: 'newArrival', label: 'New Arrival', hint: 'Lists under New Arrivals' },
+        ] as const;
+        const specs = [
+          { key: 'movement', label: 'Type', placeholder: 'e.g. Bangle, Choker' },
+          { key: 'caseMaterial', label: 'Metal', placeholder: 'e.g. 18k gold plated' },
+          { key: 'crystal', label: 'Stones', placeholder: 'e.g. Pearls, Zircon' },
+        ] as const;
+
+        return (
+        <div className="fixed inset-0 z-50 bg-[#0D0D0D]/70 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-6">
+          <form
+            onSubmit={handleSaveProduct}
+            className="bg-[#FAF8F5] w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[92vh] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between gap-4 px-5 sm:px-8 py-5 bg-white border-b border-neutral-200/80">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="w-11 h-11 rounded-2xl bg-[#0D0D0D] text-[#C5A059] flex items-center justify-center shrink-0">
+                  <Gem className="w-5 h-5" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="font-serif-luxury text-2xl font-bold leading-tight truncate">
+                    {editingProduct._id ? 'Edit Jewellery' : 'Add Jewellery'}
+                  </h2>
+                  <p className="text-xs text-neutral-500 truncate">
+                    {editingProduct._id ? editingProduct.name : 'Fill in the details and add photos to publish a new piece.'}
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsProductModalOpen(false)}
-                className="p-1.5 text-neutral-500 hover:text-black"
+                aria-label="Close"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-500 hover:text-black hover:bg-neutral-100 transition-colors shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="font-bold block mb-1">Jewellery Title *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingProduct.name || ''}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, name: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold block mb-1">Product Code (auto if blank)</label>
-                  <input
-                    type="text"
-                    value={editingProduct.sku || ''}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, sku: e.target.value.toUpperCase() })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded font-mono-code"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold block mb-1">Gender</label>
-                  <select
-                    value={editingProduct.gender || 'Women'}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, gender: e.target.value as any })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white"
-                  >
-                    <option value="Men">Men</option>
-                    <option value="Women">Women</option>
-                    <option value="Unisex">Unisex</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-bold block mb-1 flex items-center justify-between">
-                    <span>Market / Retail Price (PKR)</span>
-                    <span className="text-[10px] text-neutral-400 font-normal">Shows crossed-out ~~Rs.~~</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    placeholder="e.g. 4500 (Market Price)"
-                    value={editingProduct.price || ''}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, price: Number(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded font-mono-code"
-                  />
-                  <span className="text-[10px] text-neutral-500 mt-0.5 block">Original market price with strike-through</span>
-                </div>
-                <div>
-                  <label className="font-bold block mb-1 flex items-center justify-between">
-                    <span>Our Selling Price (PKR) *</span>
-                    <span className="text-[10px] text-emerald-600 font-bold">Customer Pays</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    placeholder="e.g. 3499 (Discounted)"
-                    value={editingProduct.salePrice ?? ''}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        salePrice: e.target.value ? Number(e.target.value) : null,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-[#C5A059] focus:ring-2 focus:ring-[#C5A059]/40 rounded font-mono-code font-bold bg-[#FAF8F5]"
-                  />
-                  <span className="text-[10px] text-neutral-500 mt-0.5 block">Actual price the customer pays at checkout</span>
-                </div>
-                <div>
-                  <label className="font-bold block mb-1">Stock Quantity *</label>
-                  <input
-                    type="number"
-                    required
-                    min={0}
-                    value={editingProduct.stock ?? 0}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, stock: Number(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded font-mono-code"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold block mb-1">Status</label>
-                  <select
-                    value={editingProduct.status || 'published'}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, status: e.target.value as any })
-                    }
-                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white"
-                  >
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </div>
-              </div>
-
-                            {/* Product Photos & Gallery */}
-              <div className="space-y-3 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-200 pb-3">
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-5">
+              {/* Basic details */}
+              <section className={card}>
+                {sectionTitle(Gem, 'Basic Details', 'Name and identity of the piece')}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className={label}>Jewellery Title *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Golden Daisy Bloom Bracelet"
+                      value={editingProduct.name || ''}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                      className={field}
+                    />
+                  </div>
                   <div>
-                    <h4 className="font-bold text-sm text-[#0D0D0D] flex items-center gap-2">
-                      <span>Jewellery Photos & Gallery</span>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#C5A059]/20 text-[#9E7B36]">
-                        {((editingProduct.images?.length || 0) || (editingProduct.mainImage ? 1 : 0))} Photo{((editingProduct.images?.length || 0) || (editingProduct.mainImage ? 1 : 0)) === 1 ? '' : 's'}
-                      </span>
-                    </h4>
-                    <p className="text-[11px] text-neutral-500 mt-0.5">
-                      Upload multiple photos at once. The photo marked as Main appears in the storefront cards.
-                    </p>
+                    <label className={label}>Product Code</label>
+                    <input
+                      type="text"
+                      placeholder="Auto-generated if blank"
+                      value={editingProduct.sku || ''}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, sku: e.target.value.toUpperCase() })}
+                      className={`${field} font-mono-code`}
+                    />
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <label
-                      className={`px-4 py-2 bg-[#0D0D0D] hover:bg-[#C5A059] text-white hover:text-black rounded-lg cursor-pointer inline-flex items-center gap-2 text-xs font-bold transition-colors shadow-sm ${
-                        isUploadingMultiple ? 'opacity-60 pointer-events-none' : ''
-                      }`}
-                    >
-                      {isUploadingMultiple ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          <span>Uploading ({uploadProgress?.current}/{uploadProgress?.total})…</span>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>+ Upload Photos (Multiple)</span>
-                        </>
-                      )}
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleMultipleImagesUpload}
-                        className="hidden"
-                        disabled={isUploadingMultiple}
-                      />
-                    </label>
+                  <div>
+                    <label className={label}>Gender</label>
+                    <div className="grid grid-cols-3 gap-1 p-1 bg-neutral-100 rounded-xl">
+                      {(['Women', 'Men', 'Unisex'] as const).map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => setEditingProduct({ ...editingProduct, gender: g as any })}
+                          className={`py-2 rounded-lg text-sm font-semibold transition-all ${
+                            (editingProduct.gender || 'Women') === g ? 'bg-white text-[#0D0D0D] shadow-sm' : 'text-neutral-500 hover:text-[#0D0D0D]'
+                          }`}
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
+              </section>
 
-                {/* Photo Gallery Grid */}
+              {/* Pricing & stock */}
+              <section className={card}>
+                {sectionTitle(Boxes, 'Pricing & Stock', 'Prices are in PKR')}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={label}>Market Price</label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-neutral-400">Rs.</span>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="4500"
+                        value={editingProduct.price || ''}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
+                        className={`${field} pl-11 font-mono-code`}
+                      />
+                    </div>
+                    <p className="text-[11px] text-neutral-500 mt-1.5">Shown crossed out on the store</p>
+                  </div>
+                  <div>
+                    <label className={label}>Selling Price *</label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-[#9E7B36] font-semibold">Rs.</span>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="3499"
+                        value={editingProduct.salePrice ?? ''}
+                        onChange={(e) =>
+                          setEditingProduct({ ...editingProduct, salePrice: e.target.value ? Number(e.target.value) : null })
+                        }
+                        className={`${field} pl-11 font-mono-code font-bold border-[#C5A059]/60 bg-[#FFFDF8]`}
+                      />
+                    </div>
+                    <p className="text-[11px] text-neutral-500 mt-1.5">What the customer pays at checkout</p>
+                  </div>
+                  <div>
+                    <label className={label}>Stock Quantity *</label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      value={editingProduct.stock ?? 0}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, stock: Number(e.target.value) })}
+                      className={`${field} font-mono-code`}
+                    />
+                  </div>
+                  <div>
+                    <label className={label}>Status</label>
+                    <select
+                      value={editingProduct.status || 'published'}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, status: e.target.value as any })}
+                      className={field}
+                    >
+                      <option value="published">Published (visible in store)</option>
+                      <option value="draft">Draft (hidden)</option>
+                      <option value="archived">Archived</option>
+                    </select>
+                  </div>
+                </div>
+                {discount > 0 && (
+                  <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+                    <span className="text-sm text-emerald-800">
+                      Customer saves <strong className="font-mono-code">Rs. {(market - selling).toLocaleString()}</strong>
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold">{discount}% OFF</span>
+                  </div>
+                )}
+              </section>
+
+              {/* Photos */}
+              <section className={card}>
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  {sectionTitle(ImageIcon, 'Photos', 'The photo marked Main shows on product cards')}
+                  <label
+                    className={`self-start px-4 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-white hover:text-black rounded-xl cursor-pointer inline-flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0 ${
+                      isUploadingMultiple ? 'opacity-60 pointer-events-none' : ''
+                    }`}
+                  >
+                    {isUploadingMultiple ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Uploading ({uploadProgress?.current}/{uploadProgress?.total})…</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Photos</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleMultipleImagesUpload}
+                      className="hidden"
+                      disabled={isUploadingMultiple}
+                    />
+                  </label>
+                </div>
                 {(() => {
                   const gallery = (editingProduct.images && editingProduct.images.length > 0)
                     ? editingProduct.images
@@ -3246,128 +3288,94 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
                   );
                 })()}
-              </div>
+              </section>
 
-              {/* Specifications */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#FAF8F5] border border-black/5">
-                <div>
-                  <label className="font-semibold block mb-1">Type</label>
-                  <input
-                    type="text"
-                    value={editingProduct.specifications?.movement || ''}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        specifications: {
-                          ...(editingProduct.specifications as any),
-                          movement: e.target.value,
-                        },
-                      })
-                    }
-                    className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded"
-                  />
+              {/* Details */}
+              <section className={card}>
+                {sectionTitle(Layers, 'Details', 'Shown on the product page')}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {specs.map((s) => (
+                    <div key={s.key}>
+                      <label className={label}>{s.label}</label>
+                      <input
+                        type="text"
+                        placeholder={s.placeholder}
+                        value={(editingProduct.specifications as any)?.[s.key] || ''}
+                        onChange={(e) =>
+                          setEditingProduct({
+                            ...editingProduct,
+                            specifications: { ...(editingProduct.specifications as any), [s.key]: e.target.value },
+                          })
+                        }
+                        className={field}
+                      />
+                    </div>
+                  ))}
+                  <div className="sm:col-span-3">
+                    <label className={label}>Full Description *</label>
+                    <textarea
+                      rows={4}
+                      required
+                      placeholder="Describe the design, finish, size and how to style it…"
+                      value={editingProduct.description || ''}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                      className={`${field} resize-y leading-relaxed`}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="font-semibold block mb-1">Metal</label>
-                  <input
-                    type="text"
-                    value={editingProduct.specifications?.caseMaterial || ''}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        specifications: {
-                          ...(editingProduct.specifications as any),
-                          caseMaterial: e.target.value,
-                        },
-                      })
-                    }
-                    className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded"
-                  />
+              </section>
+
+              {/* Highlights */}
+              <section className={card}>
+                {sectionTitle(Star, 'Highlights', 'Where this piece is promoted')}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {flags.map((f) => {
+                    const on = Boolean(editingProduct[f.key]);
+                    return (
+                      <button
+                        key={f.key}
+                        type="button"
+                        role="switch"
+                        aria-checked={on}
+                        onClick={() => setEditingProduct({ ...editingProduct, [f.key]: !on })}
+                        className={`flex items-center justify-between gap-3 text-left px-4 py-3 rounded-xl border transition-all ${
+                          on ? 'border-[#C5A059] bg-[#C5A059]/10' : 'border-neutral-200 hover:border-neutral-300'
+                        }`}
+                      >
+                        <span>
+                          <span className="block text-sm font-semibold text-[#0D0D0D]">{f.label}</span>
+                          <span className="block text-[11px] text-neutral-500">{f.hint}</span>
+                        </span>
+                        <span className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${on ? 'bg-[#C5A059]' : 'bg-neutral-300'}`}>
+                          <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${on ? 'left-5' : 'left-1'}`} />
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div>
-                  <label className="font-semibold block mb-1">Stones</label>
-                  <input
-                    type="text"
-                    value={editingProduct.specifications?.crystal || ''}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        specifications: {
-                          ...(editingProduct.specifications as any),
-                          crystal: e.target.value,
-                        },
-                      })
-                    }
-                    className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded"
-                  />
-                </div>
-              </div>
+              </section>
+            </div>
 
-              <div>
-                <label className="font-bold block mb-1">Full Description *</label>
-                <textarea
-                  rows={3}
-                  required
-                  value={editingProduct.description || ''}
-                  onChange={(e) =>
-                    setEditingProduct({ ...editingProduct, description: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-neutral-300 rounded"
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-6 pt-1">
-                <label className="flex items-center gap-2 font-semibold">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(editingProduct.featured)}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, featured: e.target.checked })
-                    }
-                  />
-                  <span>Featured</span>
-                </label>
-                <label className="flex items-center gap-2 font-semibold">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(editingProduct.bestSeller)}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, bestSeller: e.target.checked })
-                    }
-                  />
-                  <span>Best Seller</span>
-                </label>
-                <label className="flex items-center gap-2 font-semibold">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(editingProduct.newArrival)}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, newArrival: e.target.checked })
-                    }
-                  />
-                  <span>New Arrival</span>
-                </label>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setIsProductModalOpen(false)}
-                  className="px-5 py-2.5 border border-neutral-300 rounded-lg font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] rounded-lg font-bold uppercase tracking-wider"
-                >
-                  Save Jewellery
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-5 sm:px-8 py-4 bg-white border-t border-neutral-200/80">
+              <button
+                type="button"
+                onClick={() => setIsProductModalOpen(false)}
+                className="px-5 py-3 rounded-xl text-sm font-semibold text-neutral-600 hover:bg-neutral-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-7 py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] rounded-xl text-sm font-bold uppercase tracking-wider transition-colors shadow-lg"
+              >
+                {editingProduct._id ? 'Save Changes' : 'Add Jewellery'}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+        );
+      })()}
 
       {/* ======================================= */}
       {/* INVENTORY ADJUSTMENT MODAL */}
