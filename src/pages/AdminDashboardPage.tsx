@@ -4,6 +4,7 @@ import { InstallAppButton } from '../components/AppActions';
 import {
   LayoutDashboard,
   Gem,
+  Sparkles,
   Boxes,
   ShoppingBag,
   Users,
@@ -3341,6 +3342,65 @@ export const AdminDashboardPage: React.FC = () => {
                       onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
                       className={`${field} resize-y leading-relaxed`}
                     />
+                  </div>
+                </div>
+              </section>
+
+              {/* Virtual try-on */}
+              <section className={card}>
+                {sectionTitle(Sparkles, 'Virtual Try-On', 'Optional: a transparent PNG of just the jewellery gives the cleanest try-on')}
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  <div className="w-24 h-24 rounded-xl border border-dashed border-neutral-300 bg-[repeating-conic-gradient(#f3efe6_0_25%,#fff_0_50%)] bg-[length:16px_16px] flex items-center justify-center overflow-hidden shrink-0">
+                    {editingProduct.tryOnImage ? (
+                      <img src={editingProduct.tryOnImage} alt="Try-on preview" className="max-w-full max-h-full object-contain" />
+                    ) : (
+                      <span className="text-[10px] text-neutral-400 text-center px-2">No PNG — auto cut-out used</span>
+                    )}
+                  </div>
+                  <div className="flex-1 w-full space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Paste a transparent PNG link, or upload one"
+                      value={editingProduct.tryOnImage || ''}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, tryOnImage: e.target.value.trim() })}
+                      className={field}
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      <label className="px-4 py-2 rounded-xl border border-neutral-200 hover:border-[#C5A059] text-xs font-semibold cursor-pointer inline-flex items-center gap-2">
+                        <Upload className="w-3.5 h-3.5" /> Upload PNG
+                        <input
+                          type="file"
+                          accept="image/png,image/webp"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            e.target.value = '';
+                            if (!file) return;
+                            // Uploaded as is so the transparency is kept
+                            const fd = new FormData();
+                            fd.append('image', file);
+                            try {
+                              const res = await apiRequest('/api/admin/upload', { method: 'POST', body: fd });
+                              if (res.success && res.url) setEditingProduct((prev) => (prev ? { ...prev, tryOnImage: res.url } : prev));
+                            } catch (err: any) {
+                              addToast(err.message || 'Upload failed.', 'error');
+                            }
+                          }}
+                        />
+                      </label>
+                      {editingProduct.tryOnImage && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct({ ...editingProduct, tryOnImage: '' })}
+                          className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-500 hover:text-red-600"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-neutral-500">
+                      Crop tightly around the piece. Earrings: one earring, hanging point at the top. Rings and bracelets: the band seen from the front.
+                    </p>
                   </div>
                 </div>
               </section>

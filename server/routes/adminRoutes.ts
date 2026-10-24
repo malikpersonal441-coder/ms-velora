@@ -259,6 +259,8 @@ const productPayloadSchema = z.object({
   shortDescription: z.string().optional().default(''),
   description: z.string().min(10, 'Detailed product description is required'),
   mainImage: z.string().min(1, 'Main product image is required'),
+  // Optional transparent PNG used by the virtual try-on overlay
+  tryOnImage: z.string().max(1000).optional().default(''),
   images: z
     .array(
       z.object({

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { sized } from '../lib/img';
+import { kindForProduct } from '../lib/tryon/kinds';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
+  Sparkles,
   ShoppingBag,
   Heart,
   Share2,
@@ -547,6 +549,17 @@ export const ProductDetailPage: React.FC = () => {
                 >
                   Buy Now
                 </button>
+
+                {/* Virtual try-on */}
+                {kindForProduct(product) && (
+                  <Link
+                    to={`/virtual-try-on?product=${product.slug}`}
+                    className="flex-1 min-w-[140px] py-3 px-5 border border-[#C5A059] text-[#0D0D0D] hover:bg-[#C5A059]/10 font-semibold text-xs uppercase tracking-[0.2em] rounded-lg transition-colors inline-flex items-center justify-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#9E7B36]" />
+                    Try It On
+                  </Link>
+                )}
 
                 {/* Wishlist */}
                 <button

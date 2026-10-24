@@ -48,6 +48,7 @@ export interface IProduct {
   shortDescription: string;
   description: string;
   mainImage: string;
+  tryOnImage?: string;
   images: IProductImage[];
   specifications: IProductSpecifications;
   variants: IProductVariant[];
@@ -129,6 +130,7 @@ const ProductSchema = new Schema<IProduct>(
     shortDescription: { type: String, default: '', trim: true },
     description: { type: String, required: true },
     mainImage: { type: String, required: true },
+    tryOnImage: { type: String, default: '', trim: true },
     images: { type: [ProductImageSchema], default: [] },
     specifications: { type: ProductSpecificationsSchema, default: () => ({}) },
     variants: { type: [ProductVariantSchema], default: [] },
