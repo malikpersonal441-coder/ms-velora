@@ -232,7 +232,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
                   {formatProductPrice(product.salePrice, symbol)}
                 </span>
                 {/* Before Price (Market price crossed out) */}
-                <span className="text-xs sm:text-sm text-neutral-400 line-through decoration-red-500/70 decoration-[1.5px] font-mono-code" title="Market Price">
+                <span className="text-xs sm:text-sm text-neutral-400 price-was font-mono-code" title="Market Price">
                   {formatProductPrice(product.price, symbol)}
                 </span>
               </div>

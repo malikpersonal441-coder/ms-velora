@@ -398,7 +398,7 @@ export const ProductDetailPage: React.FC = () => {
                     <span className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold block mb-0.5">
                       Market Price
                     </span>
-                    <span className="text-xl text-neutral-400 line-through decoration-red-500/70 decoration-[2px] font-mono-code">
+                    <span className="text-xl text-neutral-400 price-was font-mono-code">
                       {formatPrice(regularPrice, symbol)}
                     </span>
                   </div>

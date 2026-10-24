@@ -217,13 +217,6 @@ export const Navbar: React.FC = () => {
                     <ChevronRight className="w-4 h-4 text-[#C5A059]" />
                   </Link>
                 ))}
-                <Link
-                  to="/track-order"
-                  className="flex items-center justify-between py-3.5 px-3 rounded hover:bg-neutral-50 text-sm uppercase tracking-[0.15em] border-b border-black/5 text-[#9E7B36] font-semibold"
-                >
-                  <span>Track Your Order</span>
-                  <ChevronRight className="w-4 h-4 text-[#C5A059]" />
-                </Link>
               </div>
 
               <div className="p-5 border-t border-black/5 bg-[#FCFBF8] space-y-3">
@@ -231,12 +224,6 @@ export const Navbar: React.FC = () => {
                   <PushToggleButton topic="new-arrivals" onLabel="New Arrivals" offLabel="Alerts On" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60 !px-3 !tracking-[0.1em]" />
                   <InstallAppButton label="Install" className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] hover:bg-[#C5A059]/10 text-[#0D0D0D] text-xs uppercase tracking-[0.18em] font-semibold transition-colors disabled:opacity-60 !px-3 !tracking-[0.1em]" />
                 </div>
-                <Link
-                  to="/track-order"
-                  className="block w-full py-3 px-4 bg-[#C5A059] hover:bg-[#DFBD78] text-[#0D0D0D] font-semibold text-xs uppercase tracking-[0.16em] text-center rounded transition-colors"
-                >
-                  Track Your Order
-                </Link>
               </div>
             </motion.aside>
           </>

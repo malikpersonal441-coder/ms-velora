@@ -103,11 +103,6 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2.5 text-sm text-neutral-600">
               <li>
-                <Link to="/track-order" className="hover:text-[#C5A059] transition-colors">
-                  Track Your Order
-                </Link>
-              </li>
-              <li>
                 <Link to="/wishlist" className="hover:text-[#C5A059] transition-colors">
                   Wishlist
                 </Link>

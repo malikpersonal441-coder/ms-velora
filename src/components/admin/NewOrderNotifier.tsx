@@ -423,17 +423,26 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
         )}
       </button>
 
-      {/* Floating Side Order Notification (Desktop Bottom-Right / Mobile Floating Banner) */}
+      {/* New order popup, centred over the admin panel */}
       <AnimatePresence>
         {alert && (
+          <motion.div
+            key="new-order-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-[#0D0D0D]/60 backdrop-blur-sm"
+            onClick={dismissAlert}
+          >
           <motion.aside
-            initial={{ opacity: 0, y: 30, scale: 0.95, x: 20 }}
-            animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95, x: 30 }}
+            initial={{ opacity: 0, y: 24, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 350, damping: 26 }}
-            className="fixed z-[250] bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:w-[420px] max-w-[calc(100vw-24px)] rounded-2xl bg-white text-left shadow-[0_25px_65px_-15px_rgba(13,13,13,0.45)] border-2 border-[#C5A059] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[440px] rounded-2xl bg-white text-left shadow-[0_25px_65px_-15px_rgba(13,13,13,0.45)] border-2 border-[#C5A059] overflow-hidden"
             role="alertdialog"
-            aria-modal="false"
+            aria-modal="true"
             aria-labelledby="new-order-side-title"
           >
             {/* Top Accent Strip with Sound Indicator & Close */}
@@ -533,6 +542,7 @@ export const NewOrderNotifier: React.FC<Props> = ({ onOpenOrder, onNewCount }) =
               </div>
             </div>
           </motion.aside>
+          </motion.div>
         )}
       </AnimatePresence>
 

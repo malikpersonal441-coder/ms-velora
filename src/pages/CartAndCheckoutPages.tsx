@@ -895,10 +895,10 @@ export const OrderConfirmationPage: React.FC = () => {
       <div className="max-w-3xl mx-auto px-4 py-24 text-center space-y-4">
         <h1 className="font-serif-luxury text-3xl font-semibold">Order Not Found</h1>
         <Link
-          to="/track-order"
+          to="/shop"
           className="inline-block px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest rounded"
         >
-          Look Up Another Order
+          Continue Shopping
         </Link>
       </div>
     );
@@ -1086,12 +1086,6 @@ export const OrderConfirmationPage: React.FC = () => {
           </div>
 
           <div className="pt-4 flex flex-wrap items-center justify-between gap-4 no-print">
-            <Link
-              to={`/track-order?orderNumber=${order.orderNumber}`}
-              className="px-6 py-3 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded"
-            >
-              Track Order Status
-            </Link>
             <Link
               to="/shop"
               className="px-6 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs uppercase tracking-widest font-semibold rounded"

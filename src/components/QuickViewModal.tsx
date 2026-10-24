@@ -120,7 +120,7 @@ export const QuickViewModal: React.FC = () => {
                       <span className="text-2xl font-bold text-[#0D0D0D] font-mono-code">
                         {formatProductPrice(salePrice, symbol)}
                       </span>
-                      <span className="text-sm text-neutral-400 line-through font-mono-code">
+                      <span className="text-sm text-neutral-400 price-was font-mono-code">
                         {formatProductPrice(regularPrice, symbol)}
                       </span>
                     </>
