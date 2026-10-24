@@ -1459,7 +1459,9 @@ router.post('/orders', async (req: Request, res: Response, next: NextFunction) =
       items: z
         .array(
           z.object({
-            productId: z.string().regex(/^[a-f\d]{24}$/i),
+            productId: z.string().regex(/^[a-f\d]{24}$/i).optional(),
+            name: z.string().optional(),
+            isSurpriseGift: z.boolean().optional(),
             variantSku: z.string().optional(),
             quantity: z.number().int().min(1).max(999),
             unitPrice: z.number().min(0).optional(),
@@ -1486,7 +1488,7 @@ router.post('/orders', async (req: Request, res: Response, next: NextFunction) =
       (await StoreSettings.findOne({ key: 'default' })) || new StoreSettings({ key: 'default' });
 
     const lines: {
-      product: mongoose.Types.ObjectId;
+      product?: mongoose.Types.ObjectId;
       name: string;
       slug: string;
       brand: string;
@@ -1502,6 +1504,24 @@ router.post('/orders', async (req: Request, res: Response, next: NextFunction) =
     }[] = [];
 
     for (const item of data.items) {
+      if (!item.productId) {
+        // Custom item or Surprise Gift
+        const unitPrice = item.unitPrice !== undefined ? item.unitPrice : 0;
+        lines.push({
+          name: item.name || (item.isSurpriseGift ? 'Surprise Gift (Complimentary)' : 'Special Item'),
+          slug: 'surprise-gift',
+          brand: 'MS Velora',
+          sku: item.isSurpriseGift ? 'SURPRISE-GIFT' : 'CUSTOM-ITEM',
+          image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=400&q=80',
+          unitPrice,
+          quantity: item.quantity,
+          subtotal: unitPrice * item.quantity,
+          previousStock: 0,
+          newStock: 0,
+        });
+        continue;
+      }
+
       const prod = await Product.findById(item.productId);
       if (!prod || prod.status === 'archived') throw new AppError('One of the selected products no longer exists.', 400);
 

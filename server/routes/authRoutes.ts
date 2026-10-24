@@ -501,13 +501,14 @@ router.get(
       const productMap = new Map<string, { productId: string; name: string; slug: string; image: string; orderNumber: string }>();
       for (const order of deliveredOrders) {
         for (const item of order.items) {
+          if (!item.product) continue;
           const pid = String(item.product);
           if (!productMap.has(pid)) {
             productMap.set(pid, {
               productId: pid,
               name: item.name,
-              slug: item.slug,
-              image: item.image,
+              slug: item.slug || '',
+              image: item.image || '',
               orderNumber: order.orderNumber,
             });
           }

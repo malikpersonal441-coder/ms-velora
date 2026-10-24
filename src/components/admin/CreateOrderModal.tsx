@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { X, Search, Plus, Minus, Trash2, Truck, Bike, Store, Zap } from 'lucide-react';
+import { X, Search, Plus, Minus, Trash2, Truck, Bike, Store, Zap, Gift } from 'lucide-react';
 import { apiRequest, formatPrice } from '../../lib/api';
 import type { Order, Product } from '../../types';
 import { COURIERS, DELIVERY_METHODS, DeliverySettings, ShippingMethod, defaultDeliveryCharge } from './deliveryOptions';
@@ -9,7 +9,9 @@ const CHANNELS = ['Phone call', 'WhatsApp', 'Instagram', 'Facebook', 'TikTok', '
 
 interface Line {
   key: string;
-  product: Product;
+  product?: Product;
+  customName?: string;
+  isSurpriseGift?: boolean;
   variantSku?: string;
   quantity: number;
   unitPrice: number;
@@ -21,8 +23,10 @@ const listPrice = (p: Product, variantSku?: string) => {
   const sale = v && v.salePrice !== undefined ? v.salePrice : p.salePrice;
   return sale && sale > 0 && sale < regular ? sale : regular;
 };
-const stockOf = (p: Product, variantSku?: string) =>
-  variantSku ? p.variants.find((x) => x.sku === variantSku)?.stock ?? 0 : p.stock;
+const stockOf = (p?: Product, variantSku?: string) => {
+  if (!p) return 999;
+  return variantSku ? p.variants.find((x) => x.sku === variantSku)?.stock ?? 0 : p.stock;
+};
 
 interface Props {
   onClose: () => void;
@@ -92,6 +96,19 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
     setQuery('');
     setResults([]);
   };
+
+  const addSurpriseGift = () => {
+    setLines((ls) => [
+      ...ls,
+      {
+        key: `surprise-${Date.now()}`,
+        customName: 'Surprise Gift (Complimentary)',
+        isSurpriseGift: true,
+        quantity: 1,
+        unitPrice: 0,
+      },
+    ]);
+  };
   const updateLine = (key: string, patch: Partial<Line>) =>
     setLines((ls) => ls.map((l) => (l.key === key ? { ...l, ...patch } : l)));
 
@@ -112,7 +129,9 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
         body: JSON.stringify({
           customer: { fullName, phone, email, streetAddress: street, city, notes },
           items: lines.map((l) => ({
-            productId: l.product._id,
+            productId: l.product ? l.product._id : undefined,
+            name: l.product ? l.product.name : (l.customName || 'Surprise Gift'),
+            isSurpriseGift: Boolean(l.isSurpriseGift),
             variantSku: l.variantSku,
             quantity: l.quantity,
             unitPrice: l.unitPrice,
@@ -186,54 +205,100 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
               )}
             </div>
 
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={addSurpriseGift}
+                className="px-3 py-1.5 rounded-lg border border-[#C5A059] bg-[#FAF8F5] hover:bg-[#C5A059] text-[#0D0D0D] text-[11px] font-bold flex items-center gap-1.5 transition-colors shadow-xs"
+              >
+                <Gift className="w-3.5 h-3.5 text-[#9E7B36]" />
+                <span>+ Add Surprise Gift (Free / Custom)</span>
+              </button>
+            </div>
+
             {lines.length === 0 ? (
               <p className="p-4 text-center text-neutral-400 border border-dashed border-neutral-300 rounded-lg">No products added yet.</p>
             ) : (
               <ul className="space-y-2">
                 {lines.map((l) => {
                   const stock = stockOf(l.product, l.variantSku);
-                  const short = deductStock && l.quantity > stock;
+                  const short = Boolean(l.product && deductStock && l.quantity > stock);
                   return (
                     <li key={l.key} className={`flex flex-wrap items-center gap-3 p-2.5 rounded-lg border ${short ? 'border-red-300 bg-red-50' : 'border-black/10'}`}>
-                      <img src={l.product.mainImage} alt="" className="w-10 h-10 rounded object-cover" />
+                      {l.product ? (
+                        <img src={l.product.mainImage} alt="" className="w-10 h-10 rounded object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-[#C5A059]/15 text-[#9E7B36] flex items-center justify-center shrink-0">
+                          <Gift className="w-5 h-5" />
+                        </div>
+                      )}
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold truncate">{l.product.name}</p>
-                        {l.product.variants.length > 0 ? (
-                          <select
-                            value={l.variantSku}
-                            onChange={(e) => updateLine(l.key, { variantSku: e.target.value, unitPrice: listPrice(l.product, e.target.value) })}
-                            className="mt-1 px-2 py-1 border border-neutral-300 rounded bg-white"
-                          >
-                            {l.product.variants.map((v) => (
-                              <option key={v.sku} value={v.sku}>
-                                {v.name} ({v.stock} left)
-                              </option>
-                            ))}
-                          </select>
+                        {l.product ? (
+                          <>
+                            <p className="font-semibold truncate">{l.product.name}</p>
+                            {l.product.variants.length > 0 ? (
+                              <select
+                                value={l.variantSku}
+                                onChange={(e) => updateLine(l.key, { variantSku: e.target.value, unitPrice: listPrice(l.product, e.target.value) })}
+                                className="mt-1 px-2 py-1 border border-neutral-300 rounded bg-white"
+                              >
+                                {l.product.variants.map((v) => (
+                                  <option key={v.sku} value={v.sku}>
+                                    {v.name} ({v.stock} left)
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <p className={short ? 'text-red-700' : 'text-neutral-500'}>{stock} in stock</p>
+                            )}
+                          </>
                         ) : (
-                          <p className={short ? 'text-red-700' : 'text-neutral-500'}>{stock} in stock</p>
+                          <>
+                            <input
+                              type="text"
+                              value={l.customName || 'Surprise Gift'}
+                              onChange={(e) => updateLine(l.key, { customName: e.target.value })}
+                              placeholder="Surprise Gift or Custom Item"
+                              className="font-semibold text-xs px-2 py-1 border border-neutral-300 rounded w-full"
+                            />
+                            <span className="text-[10px] text-amber-700 font-bold block mt-0.5">Surprise / Complimentary Gift</span>
+                          </>
                         )}
                       </div>
-                      <div className="inline-flex items-center border border-neutral-300 rounded">
-                        <button type="button" className="p-1.5" aria-label="Decrease" onClick={() => updateLine(l.key, { quantity: Math.max(1, l.quantity - 1) })}>
+                      <div className="inline-flex items-center border border-neutral-300 rounded bg-white overflow-hidden">
+                        <button type="button" className="p-1.5 hover:bg-neutral-100" aria-label="Decrease" onClick={() => updateLine(l.key, { quantity: Math.max(1, l.quantity - 1) })}>
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="w-7 text-center font-semibold tabular-nums">{l.quantity}</span>
-                        <button type="button" className="p-1.5" aria-label="Increase" onClick={() => updateLine(l.key, { quantity: l.quantity + 1 })}>
+                        <input
+                          type="number"
+                          min={1}
+                          max={999}
+                          value={l.quantity}
+                          onChange={(e) => updateLine(l.key, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
+                          className="w-12 text-center font-bold text-xs tabular-nums border-x border-neutral-300 py-1 focus:outline-none"
+                          aria-label="Quantity"
+                        />
+                        <button type="button" className="p-1.5 hover:bg-neutral-100" aria-label="Increase" onClick={() => updateLine(l.key, { quantity: l.quantity + 1 })}>
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
                       <label className="flex items-center gap-1">
-                        <span className="text-neutral-500">Rs.</span>
+                        <span className="text-neutral-500 text-[11px]">Rs.</span>
                         <input
                           type="number"
                           min={0}
                           value={l.unitPrice}
                           onChange={(e) => updateLine(l.key, { unitPrice: Math.max(0, Number(e.target.value)) })}
-                          className="w-24 px-2 py-1.5 border border-neutral-300 rounded font-mono-code"
+                          className="w-20 px-2 py-1.5 border border-neutral-300 rounded font-mono-code text-xs"
                           aria-label="Unit price"
                         />
                       </label>
+                      <div className="text-right min-w-20">
+                        <span className="block text-[10px] text-neutral-400 uppercase font-semibold">Sub-price</span>
+                        <span className="font-bold text-[#0D0D0D] font-mono-code text-xs">
+                          {formatPrice(l.unitPrice * l.quantity)}
+                        </span>
+                      </div>
                       <button type="button" onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))} className="p-1.5 text-neutral-400 hover:text-red-600" aria-label="Remove">
                         <Trash2 className="w-4 h-4" />
                       </button>

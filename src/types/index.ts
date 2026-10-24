@@ -299,17 +299,18 @@ export interface CartSummary {
 }
 
 export interface OrderItem {
-  product: string;
+  product?: string;
   name: string;
-  slug: string;
-  brand: string;
-  sku: string;
+  slug?: string;
+  brand?: string;
+  sku?: string;
   variantSku?: string;
   variantName?: string;
-  image: string;
+  image?: string;
   unitPrice: number;
   quantity: number;
   subtotal: number;
+  isSurpriseGift?: boolean;
 }
 
 export interface Order {

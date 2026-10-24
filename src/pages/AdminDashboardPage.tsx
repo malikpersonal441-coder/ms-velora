@@ -1903,7 +1903,15 @@ export const AdminDashboardPage: React.FC = () => {
                         <td className="p-3.5 text-right whitespace-nowrap">
                           <span className="font-semibold text-[13px] text-[#0D0D0D] tabular-nums">{formatPrice(o.totalAmount)}</span>
                           <p className="text-[11px] text-neutral-500">
-                            {o.items.length} item{o.items.length > 1 ? 's' : ''}
+                            {(() => {
+                              const totalUnits = (o.items || []).reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+                              return (
+                                <>
+                                  <strong className="text-neutral-800 font-bold">{totalUnits} pc{totalUnits > 1 ? 's' : ''}</strong>
+                                  <span className="text-neutral-400"> ({o.items.length} {o.items.length > 1 ? 'products' : 'product'})</span>
+                                </>
+                              );
+                            })()}
                             <span className="mx-1 text-neutral-300">•</span>
                             {DELIVERY_LABEL[o.shippingMethod] || 'Courier'}
                           </p>
@@ -3597,6 +3605,75 @@ export const AdminDashboardPage: React.FC = () => {
                 >
                   <X className="w-5 h-5" />
                 </button>
+              </div>
+            </div>
+
+            {/* Ordered Items & Quantities Breakdown */}
+            <div className="bg-[#FAF8F5] rounded-xl border border-black/10 p-4 space-y-3">
+              <div className="flex items-center justify-between border-b border-black/5 pb-2">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-[#9E7B36] flex items-center gap-1.5">
+                  <Gem className="w-3.5 h-3.5" />
+                  <span>Ordered Items ({(selectedOrder.items || []).reduce((s, it) => s + (Number(it.quantity) || 1), 0)} Total Units)</span>
+                </span>
+                <span className="text-xs font-bold text-[#0D0D0D]">
+                  Subtotal: {formatPrice(selectedOrder.subtotal || selectedOrder.items?.reduce((s, i) => s + i.subtotal, 0) || 0)}
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                {(selectedOrder.items || []).map((item, idx) => (
+                  <div key={idx} className="bg-white rounded-lg p-2.5 border border-black/5 flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-11 h-11 rounded object-cover border border-black/5 shrink-0" />
+                      ) : (
+                        <div className="w-11 h-11 rounded bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 font-bold text-xs">
+                          GIFT
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-bold text-[#0D0D0D] truncate text-[13px]">{item.name}</p>
+                        <p className="text-[11px] text-neutral-500 font-mono-code">
+                          {item.sku || 'SKU'} {item.variantName ? `• ${item.variantName}` : ''}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 shrink-0 text-right">
+                      {/* Quantity Highlight Badge */}
+                      <div className="px-2.5 py-1 rounded-md bg-[#0D0D0D] text-[#FAF8F5] font-bold text-xs font-mono-code flex items-center gap-1 shadow-xs">
+                        <span className="text-[10px] text-neutral-400">Qty</span>
+                        <span className="text-[#DFBD78] font-black text-sm">{item.quantity}</span>
+                      </div>
+
+                      {/* Sub-price (Unit price) & Line Subtotal */}
+                      <div className="font-mono-code text-right min-w-24">
+                        <span className="text-neutral-500 text-[11px] block">
+                          {formatPrice(item.unitPrice)} ea
+                        </span>
+                        <span className="font-bold text-[#0D0D0D] text-[13px] block">
+                          {formatPrice(item.subtotal || item.unitPrice * item.quantity)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Order Financial Summary Bar */}
+              <div className="pt-2 border-t border-black/5 flex flex-wrap items-center justify-between text-xs text-neutral-600 gap-2">
+                <div className="flex items-center gap-3">
+                  <span>Shipping: <strong>{formatPrice(selectedOrder.shippingCost || 0)}</strong> ({DELIVERY_LABEL[selectedOrder.shippingMethod] || 'Standard'})</span>
+                  {selectedOrder.discountAmount > 0 && (
+                    <span className="text-emerald-700 font-semibold">Discount: -{formatPrice(selectedOrder.discountAmount)}</span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <span className="text-xs uppercase font-bold text-neutral-500 mr-2">Grand Total:</span>
+                  <span className="font-mono-code font-bold text-base text-[#0D0D0D]">
+                    {formatPrice(selectedOrder.totalAmount)}
+                  </span>
+                </div>
               </div>
             </div>
 

@@ -1,17 +1,18 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IOrderItem {
-  product: mongoose.Types.ObjectId;
+  product?: mongoose.Types.ObjectId;
   name: string;
-  slug: string;
-  brand: string;
-  sku: string;
+  slug?: string;
+  brand?: string;
+  sku?: string;
   variantSku?: string;
   variantName?: string;
-  image: string;
+  image?: string;
   unitPrice: number;
   quantity: number;
   subtotal: number;
+  isSurpriseGift?: boolean;
 }
 
 export interface IShippingAddress {
@@ -103,17 +104,18 @@ export interface IOrder extends Document {
 
 const OrderItemSchema = new Schema<IOrderItem>(
   {
-    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: false },
     name: { type: String, required: true },
-    slug: { type: String, required: true },
-    brand: { type: String, required: true },
-    sku: { type: String, required: true },
+    slug: { type: String, default: 'custom-item' },
+    brand: { type: String, default: 'MS Velora' },
+    sku: { type: String, default: 'CUSTOM' },
     variantSku: { type: String },
     variantName: { type: String },
-    image: { type: String, required: true },
+    image: { type: String, default: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=400&q=80' },
     unitPrice: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 1 },
     subtotal: { type: Number, required: true, min: 0 },
+    isSurpriseGift: { type: Boolean, default: false },
   },
   { _id: false }
 );
