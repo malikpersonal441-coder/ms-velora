@@ -162,10 +162,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
                 e.stopPropagation();
                 setQuickViewProduct(product);
               }}
-              className="py-2 px-2.5 rounded bg-white/90 hover:bg-[#C5A059] text-[#0D0D0D] hover:text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1 shrink-0"
+              className="py-1.5 px-2 rounded bg-white/90 hover:bg-[#C5A059] text-[#0D0D0D] hover:text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1 shrink-0"
               title="Open full view modal"
             >
-              <Eye className="w-3.5 h-3.5" />
+              <Eye className="w-3 h-3" />
               <span className="hidden sm:inline">View</span>
             </button>
             <button
@@ -173,7 +173,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
               disabled={isOutOfStock}
               onClick={handleAdd}
             aria-live="polite"
-            className={`w-full py-2 px-2 sm:px-4 rounded text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.16em] font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.97] ${
+            className={`w-full py-1.5 px-2 sm:px-3 rounded text-[9px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.14em] font-semibold whitespace-nowrap flex items-center justify-center gap-1.5 transition-all duration-300 shadow-md active:scale-[0.97] ${
               isOutOfStock
                 ? 'bg-neutral-400 text-white cursor-not-allowed'
                 : addState === 'added'
@@ -182,9 +182,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({ product }) => {
             }`}
           >
             {addState === 'added' ? (
-              <Check className="w-3.5 h-3.5 badge-pop" />
+              <Check className="w-3 h-3 badge-pop" />
             ) : (
-              <ShoppingBag className={`w-3.5 h-3.5 ${addState === 'flying' ? 'animate-bounce' : ''}`} />
+              <ShoppingBag className={`w-3 h-3 ${addState === 'flying' ? 'animate-bounce' : ''}`} />
             )}
             <span>
               {isOutOfStock
