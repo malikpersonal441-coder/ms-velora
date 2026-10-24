@@ -329,24 +329,21 @@ html, body {
 }
 
 
-/* Market price: a hand-drawn gold slash instead of a flat strike-through */
+/* Market price: a clean, centred gold strike-through */
 .price-was {
   position: relative;
   display: inline-block;
-  padding: 0 0.15em;
   text-decoration: none;
 }
 .price-was::after {
   content: '';
   position: absolute;
-  left: -0.1em;
-  right: -0.1em;
-  top: 52%;
-  height: 0.12em;
-  min-height: 1.5px;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(197, 160, 89, 0.2), #c5a059 25%, #9e7b36 75%, rgba(158, 123, 54, 0.2));
-  transform: rotate(-10deg);
-  transform-origin: center;
+  background: #b08d4a;
   pointer-events: none;
 }

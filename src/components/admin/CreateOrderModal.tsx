@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { X, Search, Plus, Minus, Trash2, Truck, Bike, Store, Zap, Gift } from 'lucide-react';
+import { X, Search, Plus, Minus, Trash2, Truck, Bike, Store, Zap, Gift, Package, ShoppingBag } from 'lucide-react';
 import { apiRequest, formatPrice } from '../../lib/api';
 import type { Order, Product } from '../../types';
 import { COURIERS, DELIVERY_METHODS, DeliverySettings, ShippingMethod, defaultDeliveryCharge } from './deliveryOptions';
@@ -159,88 +159,114 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
     }
   };
 
-  const input = 'w-full px-3 py-2 border border-neutral-300 rounded bg-white';
-  const label = 'font-bold block mb-1';
+  const input =
+    'w-full px-3.5 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-[#0D0D0D] placeholder:text-neutral-400 transition focus:outline-none focus:border-[#C5A059] focus:ring-4 focus:ring-[#C5A059]/15';
+  const label = 'block mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500';
+  const card = 'rounded-2xl border border-neutral-200/80 bg-white p-5 sm:p-6';
+  const heading = (n: number, title: string, hint?: string) => (
+    <div className="flex items-center gap-3 mb-5">
+      <span className="w-8 h-8 rounded-full bg-[#0D0D0D] text-[#C5A059] font-serif-luxury text-sm font-bold flex items-center justify-center shrink-0">{n}</span>
+      <div>
+        <h4 className="font-serif-luxury text-lg font-semibold leading-tight text-[#0D0D0D]">{title}</h4>
+        {hint && <p className="text-xs text-neutral-500">{hint}</p>}
+      </div>
+    </div>
+  );
+  const pill = (active: boolean) =>
+    `px-3.5 py-2 rounded-full text-xs font-semibold border transition-colors ${
+      active ? 'bg-[#0D0D0D] text-white border-[#0D0D0D]' : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#C5A059]'
+    }`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Create order">
-      <form onSubmit={submit} className="bg-white rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto text-xs">
-        <div className="sticky top-0 z-10 bg-white flex items-center justify-between px-6 py-4 border-b border-neutral-200">
-          <div>
-            <span className="text-[10px] uppercase tracking-widest text-[#9E7B36] font-bold">Manual order</span>
-            <h3 className="font-serif-luxury text-2xl font-bold text-[#0D0D0D]">Create Order</h3>
+    <div className="fixed inset-0 z-50 bg-[#0D0D0D]/70 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-6" role="dialog" aria-modal="true" aria-label="Create order">
+      <form onSubmit={submit} className="bg-[#FAF8F5] w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[92vh] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-4 px-5 sm:px-8 py-5 bg-white border-b border-neutral-200/80">
+          <div className="flex items-center gap-3">
+            <span className="w-11 h-11 rounded-2xl bg-[#0D0D0D] text-[#C5A059] flex items-center justify-center shrink-0">
+              <ShoppingBag className="w-5 h-5" />
+            </span>
+            <div>
+              <h3 className="font-serif-luxury text-2xl font-bold leading-tight text-[#0D0D0D]">Create Order</h3>
+              <p className="text-xs text-neutral-500">For orders taken by phone, WhatsApp, Instagram or in person</p>
+            </div>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 text-neutral-400 hover:text-black" aria-label="Close">
+          <button type="button" onClick={onClose} className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-500 hover:text-black hover:bg-neutral-100 transition-colors" aria-label="Close">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-5">
           {/* 1. Products */}
-          <section className="space-y-3">
-            <h4 className="font-bold uppercase tracking-wider">1. Products</h4>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search product by name or SKU…"
-                className={`${input} pl-9`}
-              />
-              {results.length > 0 && (
-                <ul className="absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-lg border border-black/10 bg-white shadow-xl divide-y divide-black/5">
-                  {results.map((p) => (
-                    <li key={p._id}>
-                      <button type="button" onClick={() => addProduct(p)} className="w-full flex items-center gap-3 p-2.5 text-left hover:bg-[#FAF8F5]">
-                        <img src={p.mainImage} alt="" className="w-9 h-9 rounded object-cover shrink-0" />
-                        <span className="min-w-0 flex-1">
-                          <span className="block font-semibold truncate">{p.name}</span>
-                          <span className="block text-neutral-500">{p.sku} • {p.stock} in stock{p.status !== 'published' ? ` • ${p.status}` : ''}</span>
-                        </span>
-                        <span className="font-semibold tabular-nums">{formatPrice(listPrice(p))}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
+          <section className={card}>
+            {heading(1, 'Products', 'Search your catalogue or add a free gift')}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search product by name or SKU…"
+                  className={`${input} pl-10`}
+                />
+                {results.length > 0 && (
+                  <ul className="absolute z-20 left-0 right-0 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-black/10 bg-white shadow-2xl p-1.5">
+                    {results.map((p) => (
+                      <li key={p._id}>
+                        <button type="button" onClick={() => addProduct(p)} className="w-full flex items-center gap-3 p-2 rounded-xl text-left hover:bg-[#FAF8F5]">
+                          <img src={p.mainImage} alt="" className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-semibold truncate text-[#0D0D0D]">{p.name}</span>
+                            <span className="block text-[11px] text-neutral-500">
+                              {p.sku} · {p.stock} in stock{p.status !== 'published' ? ` · ${p.status}` : ''}
+                            </span>
+                          </span>
+                          <span className="text-sm font-bold font-mono-code tabular-nums">{formatPrice(listPrice(p))}</span>
+                          <Plus className="w-4 h-4 text-[#9E7B36] shrink-0" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={addSurpriseGift}
-                className="px-3 py-1.5 rounded-lg border border-[#C5A059] bg-[#FAF8F5] hover:bg-[#C5A059] text-[#0D0D0D] text-[11px] font-bold flex items-center gap-1.5 transition-colors shadow-xs"
+                className="px-4 py-2.5 rounded-xl border border-dashed border-[#C5A059] text-[#9E7B36] hover:bg-[#C5A059]/10 text-xs font-bold inline-flex items-center justify-center gap-2 transition-colors shrink-0"
               >
-                <Gift className="w-3.5 h-3.5 text-[#9E7B36]" />
-                <span>+ Add Surprise Gift (Free / Custom)</span>
+                <Gift className="w-4 h-4" />
+                Add Free Gift
               </button>
             </div>
 
             {lines.length === 0 ? (
-              <p className="p-4 text-center text-neutral-400 border border-dashed border-neutral-300 rounded-lg">No products added yet.</p>
+              <div className="mt-4 py-8 text-center rounded-2xl border border-dashed border-neutral-300 bg-[#FAF8F5]">
+                <Package className="w-7 h-7 mx-auto text-neutral-300" />
+                <p className="mt-2 text-sm text-neutral-500">No products yet. Search above to add one.</p>
+              </div>
             ) : (
-              <ul className="space-y-2">
+              <ul className="mt-4 space-y-2">
                 {lines.map((l) => {
                   const stock = stockOf(l.product, l.variantSku);
                   const short = Boolean(l.product && deductStock && l.quantity > stock);
                   return (
-                    <li key={l.key} className={`flex flex-wrap items-center gap-3 p-2.5 rounded-lg border ${short ? 'border-red-300 bg-red-50' : 'border-black/10'}`}>
+                    <li key={l.key} className={`flex flex-wrap sm:flex-nowrap items-center gap-3 p-3 rounded-2xl border ${short ? 'border-red-300 bg-red-50' : 'border-neutral-200 bg-[#FAF8F5]'}`}>
                       {l.product ? (
-                        <img src={l.product.mainImage} alt="" className="w-10 h-10 rounded object-cover" />
+                        <img src={l.product.mainImage} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-[#C5A059]/15 text-[#9E7B36] flex items-center justify-center shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-[#C5A059]/15 text-[#9E7B36] flex items-center justify-center shrink-0">
                           <Gift className="w-5 h-5" />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
                         {l.product ? (
                           <>
-                            <p className="font-semibold truncate">{l.product.name}</p>
+                            <p className="text-sm font-semibold truncate text-[#0D0D0D]">{l.product.name}</p>
                             {l.product.variants.length > 0 ? (
                               <select
                                 value={l.variantSku}
-                                onChange={(e) => updateLine(l.key, { variantSku: e.target.value, unitPrice: listPrice(l.product, e.target.value) })}
-                                className="mt-1 px-2 py-1 border border-neutral-300 rounded bg-white"
+                                onChange={(e) => updateLine(l.key, { variantSku: e.target.value, unitPrice: listPrice(l.product!, e.target.value) })}
+                                className="mt-1 px-2 py-1 text-xs border border-neutral-200 rounded-lg bg-white"
                               >
                                 {l.product.variants.map((v) => (
                                   <option key={v.sku} value={v.sku}>
@@ -249,7 +275,9 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                                 ))}
                               </select>
                             ) : (
-                              <p className={short ? 'text-red-700' : 'text-neutral-500'}>{stock} in stock</p>
+                              <p className={`text-[11px] ${short ? 'text-red-700 font-semibold' : 'text-neutral-500'}`}>
+                                {short ? `Only ${stock} in stock` : `${stock} in stock`}
+                              </p>
                             )}
                           </>
                         ) : (
@@ -259,15 +287,15 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                               value={l.customName || 'Surprise Gift'}
                               onChange={(e) => updateLine(l.key, { customName: e.target.value })}
                               placeholder="Surprise Gift or Custom Item"
-                              className="font-semibold text-xs px-2 py-1 border border-neutral-300 rounded w-full"
+                              className="w-full text-sm font-semibold px-2.5 py-1.5 border border-neutral-200 rounded-lg bg-white"
                             />
-                            <span className="text-[10px] text-amber-700 font-bold block mt-0.5">Surprise / Complimentary Gift</span>
+                            <span className="text-[10px] text-[#9E7B36] font-bold uppercase tracking-wider block mt-1">Complimentary gift</span>
                           </>
                         )}
                       </div>
-                      <div className="inline-flex items-center border border-neutral-300 rounded bg-white overflow-hidden">
-                        <button type="button" className="p-1.5 hover:bg-neutral-100" aria-label="Decrease" onClick={() => updateLine(l.key, { quantity: Math.max(1, l.quantity - 1) })}>
-                          <Minus className="w-3 h-3" />
+                      <div className="inline-flex items-center rounded-full border border-neutral-200 bg-white">
+                        <button type="button" className="w-8 h-8 flex items-center justify-center hover:text-[#9E7B36]" aria-label="Decrease" onClick={() => updateLine(l.key, { quantity: Math.max(1, l.quantity - 1) })}>
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
                         <input
                           type="number"
@@ -275,31 +303,26 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                           max={999}
                           value={l.quantity}
                           onChange={(e) => updateLine(l.key, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
-                          className="w-12 text-center font-bold text-xs tabular-nums border-x border-neutral-300 py-1 focus:outline-none"
+                          className="w-9 text-center text-sm font-bold tabular-nums bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
                           aria-label="Quantity"
                         />
-                        <button type="button" className="p-1.5 hover:bg-neutral-100" aria-label="Increase" onClick={() => updateLine(l.key, { quantity: l.quantity + 1 })}>
-                          <Plus className="w-3 h-3" />
+                        <button type="button" className="w-8 h-8 flex items-center justify-center hover:text-[#9E7B36]" aria-label="Increase" onClick={() => updateLine(l.key, { quantity: l.quantity + 1 })}>
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                      <label className="flex items-center gap-1">
-                        <span className="text-neutral-500 text-[11px]">Rs.</span>
+                      <div className="relative w-28">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-neutral-400">Rs.</span>
                         <input
                           type="number"
                           min={0}
                           value={l.unitPrice}
                           onChange={(e) => updateLine(l.key, { unitPrice: Math.max(0, Number(e.target.value)) })}
-                          className="w-20 px-2 py-1.5 border border-neutral-300 rounded font-mono-code text-xs"
+                          className="w-full pl-8 pr-2 py-2 text-sm border border-neutral-200 rounded-lg bg-white font-mono-code"
                           aria-label="Unit price"
                         />
-                      </label>
-                      <div className="text-right min-w-20">
-                        <span className="block text-[10px] text-neutral-400 uppercase font-semibold">Sub-price</span>
-                        <span className="font-bold text-[#0D0D0D] font-mono-code text-xs">
-                          {formatPrice(l.unitPrice * l.quantity)}
-                        </span>
                       </div>
-                      <button type="button" onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))} className="p-1.5 text-neutral-400 hover:text-red-600" aria-label="Remove">
+                      <span className="w-24 text-right text-sm font-bold font-mono-code text-[#0D0D0D] tabular-nums">{formatPrice(l.unitPrice * l.quantity)}</span>
+                      <button type="button" onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))} className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-red-600 hover:bg-red-50" aria-label="Remove">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </li>
@@ -307,45 +330,47 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                 })}
               </ul>
             )}
-            <label className="inline-flex items-center gap-2 font-semibold">
-              <input type="checkbox" checked={deductStock} onChange={(e) => setDeductStock(e.target.checked)} />
+            <label className="mt-4 inline-flex items-center gap-2.5 text-sm text-neutral-700 cursor-pointer">
+              <input type="checkbox" checked={deductStock} onChange={(e) => setDeductStock(e.target.checked)} className="w-4 h-4 accent-[#9E7B36]" />
               Deduct these items from stock
             </label>
           </section>
 
           {/* 2. Customer */}
-          <section className="space-y-3">
-            <h4 className="font-bold uppercase tracking-wider">2. Customer</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <section className={card}>
+            {heading(2, 'Customer', 'Who is this order for?')}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={label}>Full name *</label>
-                <input required minLength={2} value={fullName} onChange={(e) => setFullName(e.target.value)} className={input} />
+                <input required minLength={2} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Customer name" className={input} />
               </div>
               <div>
                 <label className={label}>Phone *</label>
-                <input required minLength={5} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx xxxxxxx" className={input} />
+                <input required minLength={5} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx xxxxxxx" className={`${input} font-mono-code`} />
               </div>
               <div className="sm:col-span-2">
                 <label className={label}>Address {method !== 'pickup' && '*'}</label>
-                <input required={method !== 'pickup'} value={street} onChange={(e) => setStreet(e.target.value)} className={input} />
+                <input required={method !== 'pickup'} value={street} onChange={(e) => setStreet(e.target.value)} placeholder="House, street, area" className={input} />
               </div>
               <div>
                 <label className={label}>City {method !== 'pickup' && '*'}</label>
-                <input required={method !== 'pickup'} value={city} onChange={(e) => setCity(e.target.value)} className={input} />
+                <input required={method !== 'pickup'} value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Lahore" className={input} />
               </div>
               <div>
                 <label className={label}>Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="optional" className={input} />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Optional" className={input} />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className={label}>Order came from</label>
-                <select value={channel} onChange={(e) => setChannel(e.target.value)} className={input}>
+                <div className="flex flex-wrap gap-2">
                   {CHANNELS.map((c) => (
-                    <option key={c}>{c}</option>
+                    <button key={c} type="button" onClick={() => setChannel(c)} className={pill(channel === c)}>
+                      {c}
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className={label}>Customer note</label>
                 <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Gift wrap, landmark…" className={input} />
               </div>
@@ -353,8 +378,8 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
           </section>
 
           {/* 3. Delivery */}
-          <section className="space-y-3">
-            <h4 className="font-bold uppercase tracking-wider">3. Delivery</h4>
+          <section className={card}>
+            {heading(3, 'Delivery', 'How the parcel reaches the customer')}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {DELIVERY_METHODS.map((m) => {
                 const Icon = ICONS[m.value];
@@ -367,36 +392,44 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                       setMethod(m.value);
                       setCharge(null);
                     }}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-lg border text-center transition-colors ${
-                      active ? 'border-[#C5A059] bg-[#C5A059]/10 text-[#0D0D0D]' : 'border-neutral-300 text-neutral-600 hover:border-[#C5A059]'
+                    className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl border text-center transition-all ${
+                      active ? 'border-[#C5A059] bg-[#C5A059]/10 ring-4 ring-[#C5A059]/10' : 'border-neutral-200 hover:border-[#C5A059]/60'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-semibold">{m.label}</span>
-                    <span className="text-[10px] text-neutral-500">{m.hint}</span>
+                    <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${active ? 'bg-[#0D0D0D] text-[#C5A059]' : 'bg-neutral-100 text-neutral-500'}`}>
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <span className="text-sm font-semibold text-[#0D0D0D]">{m.label}</span>
+                    <span className="text-[10px] text-neutral-500 leading-tight">{m.hint}</span>
                   </button>
                 );
               })}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className={label}>Delivery charge (PKR)</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={deliveryCharge}
-                  onChange={(e) => setCharge(Math.max(0, Number(e.target.value)))}
-                  className={`${input} font-mono-code`}
-                />
+                <label className={label}>Delivery charge</label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-neutral-400">Rs.</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={deliveryCharge}
+                    onChange={(e) => setCharge(Math.max(0, Number(e.target.value)))}
+                    className={`${input} pl-11 font-mono-code`}
+                  />
+                </div>
                 {charge !== null && charge !== autoCharge && (
-                  <button type="button" onClick={() => setCharge(null)} className="mt-1 text-[#9E7B36] font-semibold">
+                  <button type="button" onClick={() => setCharge(null)} className="mt-1.5 text-xs text-[#9E7B36] font-semibold">
                     Reset to default ({formatPrice(autoCharge)})
                   </button>
                 )}
               </div>
               <div>
-                <label className={label}>Discount (PKR)</label>
-                <input type="number" min={0} value={discount} onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))} className={`${input} font-mono-code`} />
+                <label className={label}>Discount</label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-neutral-400">Rs.</span>
+                  <input type="number" min={0} value={discount} onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))} className={`${input} pl-11 font-mono-code`} />
+                </div>
               </div>
               {isCourier && (
                 <>
@@ -411,7 +444,7 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                   </div>
                   <div>
                     <label className={label}>Tracking number</label>
-                    <input value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="optional" className={`${input} font-mono-code`} />
+                    <input value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="Optional" className={`${input} font-mono-code`} />
                   </div>
                 </>
               )}
@@ -423,7 +456,7 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
                   </div>
                   <div>
                     <label className={label}>Rider phone</label>
-                    <input value={riderPhone} onChange={(e) => setRiderPhone(e.target.value)} placeholder="optional" className={input} />
+                    <input value={riderPhone} onChange={(e) => setRiderPhone(e.target.value)} placeholder="Optional" className={input} />
                   </div>
                 </>
               )}
@@ -431,58 +464,82 @@ export const CreateOrderModal: React.FC<Props> = ({ onClose, onCreated, onError 
           </section>
 
           {/* 4. Payment & status */}
-          <section className="space-y-3">
-            <h4 className="font-bold uppercase tracking-wider">4. Payment &amp; Status</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <section className={card}>
+            {heading(4, 'Payment & Status')}
+            <div className="space-y-4">
               <div>
                 <label className={label}>Payment method</label>
-                <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className={input}>
-                  <option value="cod">Cash on Delivery</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="jazzcash">JazzCash</option>
-                  <option value="easypaisa">EasyPaisa</option>
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    ['cod', 'Cash on Delivery'],
+                    ['bank_transfer', 'Bank Transfer'],
+                    ['jazzcash', 'JazzCash'],
+                    ['easypaisa', 'EasyPaisa'],
+                  ].map(([v, t]) => (
+                    <button key={v} type="button" onClick={() => setPaymentMethod(v)} className={pill(paymentMethod === v)}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={label}>Payment</label>
+                  <div className="grid grid-cols-2 gap-1 p-1 bg-neutral-100 rounded-xl">
+                    {(['pending', 'paid'] as const).map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setPaymentStatus(v)}
+                        className={`py-2 rounded-lg text-sm font-semibold transition-all ${
+                          paymentStatus === v ? (v === 'paid' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-[#0D0D0D] shadow-sm') : 'text-neutral-500'
+                        }`}
+                      >
+                        {v === 'paid' ? 'Paid' : 'Unpaid'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className={label}>Order status</label>
+                  <select value={status} onChange={(e) => setStatus(e.target.value)} className={input}>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped / out for delivery</option>
+                    <option value="delivered">Delivered (handed over)</option>
+                  </select>
+                </div>
               </div>
               <div>
-                <label className={label}>Payment</label>
-                <select value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value as 'pending' | 'paid')} className={input}>
-                  <option value="pending">Unpaid</option>
-                  <option value="paid">Paid</option>
-                </select>
-              </div>
-              <div>
-                <label className={label}>Order status</label>
-                <select value={status} onChange={(e) => setStatus(e.target.value)} className={input}>
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped / out for delivery</option>
-                  <option value="delivered">Delivered (handed over)</option>
-                </select>
-              </div>
-              <div className="sm:col-span-3">
                 <label className={label}>Internal note</label>
-                <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Recorded in the order history" className={input} />
+                <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Only you can see this — saved in the order history" className={input} />
               </div>
             </div>
           </section>
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-neutral-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="text-neutral-600 space-x-2">
-            <span>Items {formatPrice(subtotal)}</span>
-            {discount > 0 && <span>− {formatPrice(Math.min(discount, subtotal))}</span>}
-            <span>+ delivery {formatPrice(deliveryCharge)}</span>
-            <span className="block sm:inline font-bold text-base text-[#0D0D0D] tabular-nums">= {formatPrice(total)}</span>
+        {/* Footer: running total */}
+        <div className="bg-white border-t border-neutral-200/80 px-5 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-end justify-between sm:justify-start gap-5">
+            <div className="text-[11px] text-neutral-500 leading-relaxed">
+              <div>Items <span className="font-mono-code text-neutral-700">{formatPrice(subtotal)}</span></div>
+              {discount > 0 && <div>Discount <span className="font-mono-code text-emerald-700">−{formatPrice(Math.min(discount, subtotal))}</span></div>}
+              <div>Delivery <span className="font-mono-code text-neutral-700">{formatPrice(deliveryCharge)}</span></div>
+            </div>
+            <div>
+              <span className="block text-[10px] uppercase tracking-[0.16em] text-neutral-500 font-semibold">Total</span>
+              <span className="font-mono-code text-2xl font-bold text-[#0D0D0D] tabular-nums">{formatPrice(total)}</span>
+            </div>
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 border border-neutral-300 rounded-lg font-semibold">
+            <button type="button" onClick={onClose} className="flex-1 sm:flex-none px-5 py-3 rounded-xl text-sm font-semibold text-neutral-600 hover:bg-neutral-100 transition-colors">
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || lines.length === 0}
-              className="px-6 py-2.5 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] rounded-lg font-bold uppercase tracking-wider disabled:opacity-50"
+              className="flex-1 sm:flex-none px-7 py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] rounded-xl text-sm font-bold uppercase tracking-wider transition-colors shadow-lg disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-[#FAF8F5]"
             >
               {saving ? 'Creating…' : 'Create Order'}
             </button>
