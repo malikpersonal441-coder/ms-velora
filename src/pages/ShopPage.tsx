@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
   Search,
   SlidersHorizontal,
@@ -21,6 +21,8 @@ interface Facets {
   movements: string[];
   strapMaterials: string[];
   dialColors: string[];
+  metals?: string[];
+  stones?: string[];
   genders: string[];
   priceRange: { min: number; max: number };
 }
@@ -47,6 +49,9 @@ export const ShopPage: React.FC = () => {
     priceRange: { min: 0, max: 150000 },
   });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [fuzzy, setFuzzy] = useState(false);
+  const location = useLocation();
+  const isSearchPage = location.pathname === '/search';
 
   // Active filter values from URL query params
   const q = searchParams.get('q') || '';
@@ -57,6 +62,8 @@ export const ShopPage: React.FC = () => {
   const selectedMovement = searchParams.get('movement') || '';
   const selectedStrap = searchParams.get('strapMaterial') || '';
   const selectedDial = searchParams.get('dialColor') || '';
+  const selectedMetal = searchParams.get('metal') || '';
+  const selectedStone = searchParams.get('stone') || '';
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
   const inStock = searchParams.get('inStock') === 'true';
@@ -73,10 +80,12 @@ export const ShopPage: React.FC = () => {
   }, [q]);
 
   useEffect(() => {
-    document.title = 'Shop Jewellery — MS Velora';
-  }, []);
+    document.title = isSearchPage ? (q ? `“${q}” — Search — MS Velora` : 'Search — MS Velora') : 'Shop Jewellery — MS Velora';
+  }, [isSearchPage, q]);
 
+  const latestRequest = useRef(0);
   const fetchProducts = useCallback(async () => {
+    const requestId = ++latestRequest.current;
     try {
       setLoading(true);
       setError('');
@@ -84,15 +93,17 @@ export const ShopPage: React.FC = () => {
       if (!params.get('limit')) params.set('limit', '12');
 
       const res = await apiRequest(`/api/products?${params.toString()}`);
+      if (requestId !== latestRequest.current) return;
       if (res.success) {
         setProducts(res.products || []);
         setPagination(res.pagination);
+        setFuzzy(Boolean(res.fuzzy));
         if (res.facets) setFacets(res.facets);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load products.');
+      if (requestId === latestRequest.current) setError(err.message || 'Failed to load products.');
     } finally {
-      setLoading(false);
+      if (requestId === latestRequest.current) setLoading(false);
     }
   }, [searchParams]);
 
@@ -127,6 +138,8 @@ export const ShopPage: React.FC = () => {
   if (selectedMovement) activeChips.push({ label: `Type: ${selectedMovement}`, key: 'movement' });
   if (selectedStrap) activeChips.push({ label: `Finish: ${selectedStrap}`, key: 'strapMaterial' });
   if (selectedDial) activeChips.push({ label: `Colour: ${selectedDial}`, key: 'dialColor' });
+  if (selectedMetal) activeChips.push({ label: `Metal: ${selectedMetal}`, key: 'metal' });
+  if (selectedStone) activeChips.push({ label: `Stones: ${selectedStone}`, key: 'stone' });
   if (minPrice) activeChips.push({ label: `Min: Rs. ${Number(minPrice).toLocaleString()}`, key: 'minPrice' });
   if (maxPrice) activeChips.push({ label: `Max: Rs. ${Number(maxPrice).toLocaleString()}`, key: 'maxPrice' });
   if (inStock) activeChips.push({ label: 'In Stock Only', key: 'inStock' });
@@ -356,6 +369,54 @@ export const ShopPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Metal */}
+      {(facets.metals || []).length > 0 && (
+        <div className="space-y-2.5 pb-5 border-b border-neutral-200">
+          <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">Metal</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {(facets.metals || []).map((v) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={selectedMetal === v}
+                onClick={() => updateParam('metal', selectedMetal === v ? null : v)}
+                className={`px-2.5 py-1 rounded text-xs border ${
+                  selectedMetal === v
+                    ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D]'
+                    : 'bg-white text-neutral-700 border-neutral-200 hover:border-[#C5A059]'
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Stones */}
+      {(facets.stones || []).length > 0 && (
+        <div className="space-y-2.5 pb-5 border-b border-neutral-200">
+          <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">Stones</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {(facets.stones || []).map((v) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={selectedStone === v}
+                onClick={() => updateParam('stone', selectedStone === v ? null : v)}
+                className={`px-2.5 py-1 rounded text-xs border ${
+                  selectedStone === v
+                    ? 'bg-[#0D0D0D] text-[#FAF8F5] border-[#0D0D0D]'
+                    : 'bg-white text-neutral-700 border-neutral-200 hover:border-[#C5A059]'
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Price Range */}
       <div className="space-y-2.5">
         <h3 className="text-xs uppercase tracking-[0.18em] font-bold text-[#0D0D0D]">
@@ -395,13 +456,17 @@ export const ShopPage: React.FC = () => {
                 Home
               </Link>
               <span>/</span>
-              <span>Shop</span>
+              <span>{isSearchPage ? 'Search' : 'Shop'}</span>
             </div>
             <h1 className="font-serif-luxury text-4xl sm:text-5xl font-semibold text-[#0D0D0D]">
-              All Jewellery
+              {isSearchPage && q ? <>Results for “{q}”</> : isSearchPage ? 'Search Jewellery' : 'All Jewellery'}
             </h1>
             <p className="text-sm text-neutral-600 mt-2 max-w-xl">
-              Explore necklaces, earrings, rings, bangles and bridal sets with live availability.
+              {isSearchPage && q
+                ? loading
+                  ? 'Searching…'
+                  : `${pagination.total} ${pagination.total === 1 ? 'piece' : 'pieces'} found${fuzzy ? ' — showing close matches for your spelling' : ''}.`
+                : 'Explore necklaces, earrings, rings, bangles and bridal sets with live availability.'}
             </p>
           </div>
 

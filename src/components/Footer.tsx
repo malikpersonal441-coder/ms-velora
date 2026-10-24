@@ -69,11 +69,6 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/collections/bridal-couture" className="hover:text-[#C5A059] transition-colors">
-                  Bridal Couture
-                </Link>
-              </li>
-              <li>
                 <Link to="/collections/pearl-edit" className="hover:text-[#C5A059] transition-colors">
                   Pearl Edit
                 </Link>
@@ -108,6 +103,16 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/gift-options" className="hover:text-[#C5A059] transition-colors">
+                  Gift Options
+                </Link>
+              </li>
+              <li>
+                <Link to="/search" className="hover:text-[#C5A059] transition-colors">
+                  Search Jewellery
+                </Link>
+              </li>
+              <li>
                 <Link to="/shipping-returns" className="hover:text-[#C5A059] transition-colors">
                   Shipping & Returns Policy
                 </Link>
@@ -138,7 +143,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/shipping-returns" className="hover:text-[#C5A059] transition-colors">
-                  2-Year Official Warranty
+                  6-Month Official Warranty
                 </Link>
               </li>
             </ul>

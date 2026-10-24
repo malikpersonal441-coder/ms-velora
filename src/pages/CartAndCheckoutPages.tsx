@@ -28,6 +28,8 @@ import { Order } from '../types';
 import { customerOrderMessage, waLink } from '../lib/whatsapp';
 import { WalletPaymentModal, isWalletMethod } from '../components/WalletPaymentModal';
 import { OrderDetailsModal } from '../components/OrderDetailsModal';
+import { CartLineGift } from '../components/CartLineGift';
+import { OrderGiftNote } from '../components/OrderGiftNote';
 
 export const CartPage: React.FC = () => {
   const {
@@ -115,6 +117,7 @@ export const CartPage: React.FC = () => {
                 {item.stockWarning && (
                   <p className="text-xs text-amber-700 font-semibold">{item.stockWarning}</p>
                 )}
+                <CartLineGift item={item} />
               </div>
 
               <div className="flex items-center gap-4 self-end sm:self-center">
@@ -261,6 +264,12 @@ export const CartPage: React.FC = () => {
                   </span>
                 </div>
               )}
+              {(cartSummary.giftWrapAmount || 0) > 0 && (
+                  <div className="flex justify-between text-neutral-600">
+                    <span>Gift wrapping</span>
+                    <span className="font-mono-code">{formatPrice(cartSummary.giftWrapAmount || 0, symbol)}</span>
+                  </div>
+                )}
               <div className="flex justify-between text-neutral-600">
                 <span>Insured Delivery</span>
                 <span className="font-mono-code">
@@ -402,7 +411,12 @@ export const CheckoutPage: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({
           idempotencyKey,
-          items: rawCart,
+          items: rawCart.map((r) => {
+            const line = cartItems.find((c) => c.productId === r.productId && (c.variantSku || '') === (r.variantSku || ''));
+            if (!r.gift || !line?.giftError) return r;
+            const { gift: _refused, ...rest } = r;
+            return rest;
+          }),
           shippingAddress: {
             ...validatedAddress,
             country: 'Pakistan',
@@ -743,6 +757,7 @@ export const CheckoutPage: React.FC = () => {
                     <p className="text-xs text-neutral-500">
                       Qty: {item.quantity} {item.variantName ? `• ${item.variantName}` : ''}
                     </p>
+                    <CartLineGift item={item} readOnly compact />
                   </div>
                   <div className="font-mono-code text-xs font-bold">
                     {formatPrice(item.subtotal, symbol)}
@@ -797,6 +812,12 @@ export const CheckoutPage: React.FC = () => {
                   </span>
                 </div>
               )}
+              {(cartSummary.giftWrapAmount || 0) > 0 && (
+                  <div className="flex justify-between text-neutral-600">
+                    <span>Gift wrapping</span>
+                    <span className="font-mono-code">{formatPrice(cartSummary.giftWrapAmount || 0, symbol)}</span>
+                  </div>
+                )}
               <div className="flex justify-between text-neutral-600">
                 <span>Insured Shipping</span>
                 <span className="font-mono-code">
@@ -845,7 +866,7 @@ export const CheckoutPage: React.FC = () => {
 
             <div className="flex items-center justify-center gap-2 text-[11px] text-neutral-500">
               <ShieldCheck className="w-4 h-4 text-[#9E7B36]" />
-              <span>Secure checkout • 2-year warranty included</span>
+              <span>Secure checkout • 6-month warranty included</span>
             </div>
           </div>
         </div>
@@ -1035,6 +1056,7 @@ export const OrderConfirmationPage: React.FC = () => {
                       <p className="text-xs text-neutral-500">
                         Qty: {item.quantity} × {formatPrice(item.unitPrice)}
                       </p>
+                      <OrderGiftNote gift={item.gift} />
                     </div>
                   </div>
                   <div className="font-mono-code font-bold text-sm">
@@ -1070,6 +1092,12 @@ export const OrderConfirmationPage: React.FC = () => {
                 <div className="flex justify-between text-emerald-700 font-medium">
                   <span>Discount ({order.couponCode})</span>
                   <span className="font-mono-code">-{formatPrice(order.discountAmount)}</span>
+                </div>
+              )}
+              {(order.giftWrapAmount || 0) > 0 && (
+                <div className="flex justify-between text-neutral-600">
+                  <span>Gift wrapping</span>
+                  <span className="font-mono-code">{formatPrice(order.giftWrapAmount || 0)}</span>
                 </div>
               )}
               <div className="flex justify-between text-neutral-600">

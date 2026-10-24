@@ -20,7 +20,8 @@ import {
 import { useWhatsAppLink } from '../components/WhatsAppButton';
 import { z } from 'zod';
 import { apiRequest, formatPrice, formatProductPrice, formatDate } from '../lib/api';
-import { Product, Review } from '../types';
+import { CartGift, Product, Review } from '../types';
+import { GiftOptionsPicker, giftEligible } from '../components/GiftOptionsPicker';
 import { useStore } from '../context/StoreContext';
 import { flyToCart } from '../lib/flyToCart';
 import { ProductCard } from '../components/ProductCard';
@@ -59,6 +60,7 @@ export const ProductDetailPage: React.FC = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedVariantSku, setSelectedVariantSku] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
+  const [gift, setGift] = useState<CartGift | null>(null);
 
   // Review form state
   const [rating, setRating] = useState(5);
@@ -150,14 +152,14 @@ export const ProductDetailPage: React.FC = () => {
     if (!product || availableStock <= 0 || addState !== 'idle') return;
     setAddState('flying');
     await flyToCart(mainImageRef.current);
-    addToCart(product, quantity, selectedVariantSku, false);
+    addToCart(product, quantity, selectedVariantSku, false, gift || undefined);
     setAddState('added');
     setTimeout(() => setAddState('idle'), 2400);
   };
 
   const handleBuyNow = () => {
     if (!product || availableStock <= 0) return;
-    addToCart(product, quantity, selectedVariantSku, false);
+    addToCart(product, quantity, selectedVariantSku, false, gift || undefined);
     navigate('/checkout');
   };
 
@@ -475,6 +477,19 @@ export const ProductDetailPage: React.FC = () => {
                 )}
               </div>
 
+              {/* Optional gift wrap */}
+              {availableStock > 0 && settings?.giftOptions && giftEligible(settings.giftOptions, product) && (
+                <div>
+                  <GiftOptionsPicker
+                    cfg={settings.giftOptions}
+                    value={gift}
+                    onChange={setGift}
+                    quantity={quantity}
+                    symbol={settings.currencySymbol || 'Rs.'}
+                  />
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-3">
                 {/* Quantity Control */}
                 <div className="flex items-center border border-neutral-300 rounded-lg bg-[#FAF8F5]">
@@ -591,7 +606,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="p-3.5 rounded-lg bg-[#F3EFE6] flex items-start gap-2.5">
                 <ShieldCheck className="w-4 h-4 text-[#9E7B36] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold block text-[#0D0D0D]">2-Year Official Warranty</span>
+                  <span className="font-bold block text-[#0D0D0D]">6-Month Official Warranty</span>
                   <span className="text-neutral-600 text-[11px]">
                     Stamped MS Velora warranty card included.
                   </span>

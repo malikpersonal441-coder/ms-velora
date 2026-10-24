@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { buildTextFilter, normaliseQuery, nameRelevance, EFFECTIVE_PRICE } from '../utils/search';
 import mongoose from 'mongoose';
 import { z } from 'zod';
 import { Product } from '../models/Product';
@@ -10,6 +11,9 @@ import { requireAuth } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 
 const router = Router();
+
+// Store-only fields that must never reach shoppers through the public catalogue
+const PUBLIC_FIELDS = '-costPrice';
 
 // GET /api/products — Filtered, sorted, paginated product listing with dynamic facets
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -23,6 +27,8 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       movement,
       strapMaterial,
       dialColor,
+      metal,
+      stone,
       minPrice,
       maxPrice,
       inStock,
@@ -36,38 +42,19 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     } = req.query as Record<string, string | undefined>;
 
     const filter: Record<string, unknown> = { status: 'published' };
+    const list = (v?: string) => (v || '').split(',').map((s) => s.trim()).filter(Boolean);
 
-    if (q && q.trim()) {
-      const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(escaped, 'i');
-      filter.$or = [
-        { name: regex },
-        { brand: regex },
-        { model: regex },
-        { sku: regex },
-        { shortDescription: regex },
-        { tags: regex },
-      ];
-    }
-
-    if (brand && brand.trim()) {
-      const brands = brand.split(',').map((b) => b.trim()).filter(Boolean);
-      if (brands.length > 0) {
-        filter.brand = { $in: brands };
-      }
-    }
+    const brands = list(brand);
+    if (brands.length > 0) filter.brand = { $in: brands };
 
     if (category && category.trim()) {
       if (mongoose.isValidObjectId(category)) {
         filter.category = new (mongoose.Types.ObjectId as any)(category);
       } else {
         const catDoc = await Category.findOne({ slug: category.toLowerCase().trim() });
-        if (catDoc) {
-          filter.category = catDoc._id;
-        } else {
-          // No matching category slug
-          filter._id = null;
-        }
+        // No matching category slug matches nothing
+        if (catDoc) filter.category = catDoc._id;
+        else filter._id = null;
       }
     }
 
@@ -76,87 +63,69 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
         filter.collections = new (mongoose.Types.ObjectId as any)(collection);
       } else {
         const colDoc = await Collection.findOne({ slug: collection.toLowerCase().trim() });
-        if (colDoc) {
-          filter.collections = colDoc._id;
-        } else {
-          filter._id = null;
-        }
+        if (colDoc) filter.collections = colDoc._id;
+        else filter._id = null;
       }
     }
 
-    if (gender && gender.trim()) {
-      const genders = gender.split(',').map((g) => g.trim()).filter(Boolean);
-      if (genders.length > 0) {
-        filter.gender = { $in: genders };
-      }
+    const genders = list(gender);
+    if (genders.length > 0) filter.gender = { $in: genders };
+    for (const [param, field] of [
+      [movement, 'specifications.movement'],
+      [strapMaterial, 'specifications.strapMaterial'],
+      [dialColor, 'specifications.dialColor'],
+      [metal, 'specifications.caseMaterial'],
+      [stone, 'specifications.crystal'],
+    ] as const) {
+      const values = list(param);
+      if (values.length > 0) filter[field] = { $in: values };
     }
 
-    if (movement && movement.trim()) {
-      const movements = movement.split(',').map((m) => m.trim()).filter(Boolean);
-      if (movements.length > 0) {
-        filter['specifications.movement'] = { $in: movements };
-      }
-    }
-
-    if (strapMaterial && strapMaterial.trim()) {
-      const straps = strapMaterial.split(',').map((s) => s.trim()).filter(Boolean);
-      if (straps.length > 0) {
-        filter['specifications.strapMaterial'] = { $in: straps };
-      }
-    }
-
-    if (dialColor && dialColor.trim()) {
-      const dials = dialColor.split(',').map((d) => d.trim()).filter(Boolean);
-      if (dials.length > 0) {
-        filter['specifications.dialColor'] = { $in: dials };
-      }
-    }
-
-    if (minPrice || maxPrice) {
-      const min = minPrice ? Number(minPrice) : 0;
-      const max = maxPrice ? Number(maxPrice) : Number.MAX_SAFE_INTEGER;
-      // Match effective price (salePrice if present, else price)
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+    if ((minPrice && Number.isFinite(min)) || (maxPrice && Number.isFinite(max))) {
       filter.$expr = {
         $and: [
-          { $gte: [{ $ifNull: ['$salePrice', '$price'] }, min] },
-          { $lte: [{ $ifNull: ['$salePrice', '$price'] }, max] },
+          { $gte: [EFFECTIVE_PRICE, minPrice && Number.isFinite(min) ? min : 0] },
+          { $lte: [EFFECTIVE_PRICE, maxPrice && Number.isFinite(max) ? max : Number.MAX_SAFE_INTEGER] },
         ],
       };
     }
 
-    if (inStock === 'true') {
-      filter.stock = { $gt: 0 };
+    if (inStock === 'true') filter.stock = { $gt: 0 };
+    if (onSale === 'true') filter.salePrice = { $ne: null, $gt: 0 };
+    if (featured === 'true') filter.featured = true;
+    if (bestSeller === 'true') filter.bestSeller = true;
+    if (newArrival === 'true') filter.newArrival = true;
+
+    // Text search: every word must match; with no hits, retry tolerating one typo per word
+    const query = normaliseQuery(q);
+    let fuzzy = false;
+    let matchFilter = filter;
+    if (query) {
+      matchFilter = { ...filter, ...buildTextFilter(query) };
+      if ((await Product.countDocuments(matchFilter)) === 0) {
+        const fuzzyFilter = { ...filter, ...buildTextFilter(query, true) };
+        if ((await Product.countDocuments(fuzzyFilter)) > 0) {
+          matchFilter = fuzzyFilter;
+          fuzzy = true;
+        }
+      }
     }
 
-    if (onSale === 'true') {
-      filter.salePrice = { $ne: null, $gt: 0 };
-    }
-
-    if (featured === 'true') {
-      filter.featured = true;
-    }
-
-    if (bestSeller === 'true') {
-      filter.bestSeller = true;
-    }
-
-    if (newArrival === 'true') {
-      filter.newArrival = true;
-    }
-
-    let sortOption: Record<string, 1 | -1> = { featured: -1, createdAt: -1 };
+    let sortOption: Record<string, 1 | -1>;
     switch (sort) {
       case 'price_asc':
-        sortOption = { price: 1 };
+        sortOption = { effectivePrice: 1, _id: 1 };
         break;
       case 'price_desc':
-        sortOption = { price: -1 };
+        sortOption = { effectivePrice: -1, _id: 1 };
         break;
       case 'newest':
         sortOption = { createdAt: -1 };
         break;
       case 'popularity':
-        sortOption = { soldCount: -1, bestSeller: -1 };
+        sortOption = { soldCount: -1, bestSeller: -1, createdAt: -1 };
         break;
       case 'rating':
         sortOption = { averageRating: -1, reviewCount: -1 };
@@ -171,39 +140,50 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     const limitNum = Math.min(48, Math.max(1, parseInt(limit, 10) || 12));
     const skip = (pageNum - 1) * limitNum;
 
-    const [products, totalCount, allPublished] = await Promise.all([
-      Product.find(filter)
-        .populate('category', 'name slug')
-        .populate('collections', 'name slug')
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limitNum),
-      Product.countDocuments(filter),
-      Product.find({ status: 'published' }).select(
-        'brand gender price salePrice specifications.movement specifications.strapMaterial specifications.dialColor'
-      ),
+    // Sorting by the price the shopper pays needs a computed field, so page through ids in an aggregate
+    const [pageIds, totalCount, facetRows] = await Promise.all([
+      Product.aggregate<{ _id: mongoose.Types.ObjectId }>([
+        { $match: matchFilter },
+        { $addFields: { effectivePrice: EFFECTIVE_PRICE } },
+        { $sort: sortOption },
+        { $skip: skip },
+        { $limit: limitNum },
+        { $project: { _id: 1 } },
+      ]),
+      Product.countDocuments(matchFilter),
+      Product.aggregate([
+        { $match: { status: 'published' } },
+        {
+          $group: {
+            _id: null,
+            brands: { $addToSet: '$brand' },
+            movements: { $addToSet: '$specifications.movement' },
+            strapMaterials: { $addToSet: '$specifications.strapMaterial' },
+            dialColors: { $addToSet: '$specifications.dialColor' },
+            metals: { $addToSet: '$specifications.caseMaterial' },
+            stones: { $addToSet: '$specifications.crystal' },
+            min: { $min: EFFECTIVE_PRICE },
+            max: { $max: EFFECTIVE_PRICE },
+          },
+        },
+      ]),
     ]);
 
-    const brandsSet = new Set<string>();
-    const movementsSet = new Set<string>();
-    const strapsSet = new Set<string>();
-    const dialsSet = new Set<string>();
-    let minCatalogPrice = Infinity;
-    let maxCatalogPrice = 0;
+    const docs = await Product.find({ _id: { $in: pageIds.map((p) => p._id) } })
+      .select(PUBLIC_FIELDS)
+      .populate('category', 'name slug')
+      .populate('collections', 'name slug');
+    const byId = new Map(docs.map((d) => [String(d._id), d]));
+    const products = pageIds.map((p) => byId.get(String(p._id))).filter(Boolean);
 
-    for (const p of allPublished) {
-      if (p.brand) brandsSet.add(p.brand);
-      if (p.specifications?.movement) movementsSet.add(p.specifications.movement);
-      if (p.specifications?.strapMaterial) strapsSet.add(p.specifications.strapMaterial);
-      if (p.specifications?.dialColor) dialsSet.add(p.specifications.dialColor);
-      const effective = p.salePrice && p.salePrice > 0 ? p.salePrice : p.price;
-      if (effective < minCatalogPrice) minCatalogPrice = effective;
-      if (effective > maxCatalogPrice) maxCatalogPrice = effective;
-    }
+    const f = facetRows[0] || {};
+    const clean = (values?: unknown[]) =>
+      Array.from(new Set((values || []).filter((v): v is string => typeof v === 'string' && v.trim() !== '').map((v) => v.trim()))).sort();
 
     res.json({
       success: true,
       products,
+      fuzzy,
       pagination: {
         total: totalCount,
         page: pageNum,
@@ -211,17 +191,69 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
         totalPages: Math.ceil(totalCount / limitNum) || 1,
       },
       facets: {
-        brands: Array.from(brandsSet).sort(),
-        movements: Array.from(movementsSet).sort(),
-        strapMaterials: Array.from(strapsSet).sort(),
-        dialColors: Array.from(dialsSet).sort(),
+        brands: clean(f.brands),
+        movements: clean(f.movements),
+        strapMaterials: clean(f.strapMaterials),
+        dialColors: clean(f.dialColors),
+        metals: clean(f.metals),
+        stones: clean(f.stones),
         genders: ['Men', 'Women', 'Unisex'],
-        priceRange: {
-          min: minCatalogPrice === Infinity ? 0 : minCatalogPrice,
-          max: maxCatalogPrice,
-        },
+        priceRange: { min: f.min ?? 0, max: f.max ?? 0 },
       },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/products/by-ids?ids=a,b,c — current data for saved pieces (guest wishlist).
+// Only published products are returned; the caller treats missing ids as no longer available.
+router.get('/by-ids', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const ids = String(req.query.ids || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => mongoose.isValidObjectId(s))
+      .slice(0, 100);
+    if (ids.length === 0) {
+      res.json({ success: true, products: [] });
+      return;
+    }
+    const products = await Product.find({ _id: { $in: ids }, status: 'published' }).select(PUBLIC_FIELDS).populate('category', 'name slug');
+    res.json({ success: true, products });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/products/suggest?q= — lightweight live suggestions for the search bar
+router.get('/suggest', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const query = normaliseQuery(req.query.q as string | undefined);
+    if (query.length < 2) {
+      res.json({ success: true, products: [], categories: [], fuzzy: false });
+      return;
+    }
+    const select = 'name slug mainImage price salePrice stock category';
+    let fuzzy = false;
+    let products = await Product.find({ status: 'published', ...buildTextFilter(query) })
+      .select(select)
+      .populate('category', 'name slug')
+      .sort({ featured: -1, soldCount: -1 })
+      .limit(24);
+    if (products.length === 0) {
+      products = await Product.find({ status: 'published', ...buildTextFilter(query, true) })
+        .select(select)
+        .populate('category', 'name slug')
+        .sort({ featured: -1, soldCount: -1 })
+        .limit(6);
+      fuzzy = products.length > 0;
+    }
+    // Name matches first; the sort is stable, so featured/best-selling order holds within a tier
+    products = products.sort((a, b) => nameRelevance(b.name, query) - nameRelevance(a.name, query)).slice(0, 6);
+    const catRegex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const categories = await Category.find({ isActive: true, name: catRegex }).select('name slug').limit(4);
+    res.json({ success: true, products, categories, fuzzy });
   } catch (err) {
     next(err);
   }
@@ -232,11 +264,13 @@ router.get('/:slug', async (req: Request, res: Response, next: NextFunction) => 
   try {
     const slug = String(req.params.slug);
     let product = await Product.findOne({ slug: slug.toLowerCase(), status: 'published' })
+      .select(PUBLIC_FIELDS)
       .populate('category', 'name slug description')
       .populate('collections', 'name slug subtitle');
 
     if (!product && mongoose.isValidObjectId(slug)) {
       product = await Product.findOne({ _id: slug, status: 'published' })
+        .select(PUBLIC_FIELDS)
         .populate('category', 'name slug description')
         .populate('collections', 'name slug subtitle');
     }

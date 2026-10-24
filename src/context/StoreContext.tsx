@@ -9,6 +9,7 @@ import {
   Review,
   ValidatedCartItem,
   CartSummary,
+  CartGift,
 } from '../types';
 import { apiRequest } from '../lib/api';
 import { demoCategories, demoCollections, demoProducts, demoReviews } from '../lib/demoData';
@@ -23,6 +24,7 @@ export interface RawCartItem {
   productId: string;
   variantSku?: string;
   quantity: number;
+  gift?: CartGift;
 }
 
 interface StoreContextType {
@@ -44,6 +46,7 @@ interface StoreContextType {
   shippingMethod: 'standard' | 'express';
   wishlistIds: string[];
   wishlistProducts: Product[];
+  wishlistLoading: boolean;
   recentlyViewed: Product[];
   isCartOpen: boolean;
   isSearchOpen: boolean;
@@ -58,7 +61,10 @@ interface StoreContextType {
   refreshAuth: () => Promise<void>;
   refreshStorefront: () => Promise<void>;
   logout: () => Promise<void>;
-  addToCart: (product: Product, quantity?: number, variantSku?: string, openDrawer?: boolean) => void;
+  /** `gift` replaces the line's gift choice when given; omit it to keep the existing one. */
+  addToCart: (product: Product, quantity?: number, variantSku?: string, openDrawer?: boolean, gift?: CartGift) => void;
+  /** Sets or (with null) removes the gift choice for one cart line. */
+  setCartItemGift: (productId: string, variantSku: string | undefined, gift: CartGift | null) => void;
   updateCartQuantity: (productId: string, quantity: number, variantSku?: string) => void;
   removeFromCart: (productId: string, variantSku?: string) => void;
   clearCart: () => void;
@@ -66,6 +72,7 @@ interface StoreContextType {
   removeCoupon: () => void;
   toggleWishlist: (product: Product) => Promise<void>;
   isInWishlist: (productId: string) => boolean;
+  clearWishlist: () => void;
   recordRecentlyViewed: (product: Product) => void;
 }
 
@@ -118,13 +125,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [wishlistIds, setWishlistIds] = useState<string[]>(() => {
     try {
-      const saved = sessionStorage.getItem(WISHLIST_GUEST_KEY);
-      return saved ? JSON.parse(saved) : [];
+      const saved = localStorage.getItem(WISHLIST_GUEST_KEY) ?? sessionStorage.getItem(WISHLIST_GUEST_KEY);
+      const ids = saved ? JSON.parse(saved) : [];
+      return Array.isArray(ids) ? Array.from(new Set(ids.filter((x: unknown) => typeof x === 'string'))) : [];
     } catch {
       return [];
     }
   });
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>(() => {
     try {
       const saved = sessionStorage.getItem(RECENT_VIEWED_KEY);
@@ -196,6 +205,49 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     refreshAuth();
   }, [refreshStorefront, refreshAuth]);
 
+  // Guest wishlist: keep ids in localStorage and load current product data for them
+  useEffect(() => {
+    if (user) return;
+    try {
+      localStorage.setItem(WISHLIST_GUEST_KEY, JSON.stringify(wishlistIds));
+      sessionStorage.removeItem(WISHLIST_GUEST_KEY);
+    } catch {
+      // ignore storage errors
+    }
+  }, [wishlistIds, user]);
+
+  useEffect(() => {
+    if (authLoading || user) return;
+    const ids = wishlistIds;
+    if (ids.length === 0) return;
+    let cancelled = false;
+    setWishlistLoading(true);
+    apiRequest(`/api/products/by-ids?ids=${ids.join(',')}`)
+      .then((res) => {
+        if (cancelled || !res.success) return;
+        const found: Product[] = res.products || [];
+        const byId = new Map(found.map((p) => [p._id, p]));
+        setWishlistProducts(ids.map((id) => byId.get(id)).filter(Boolean) as Product[]);
+        const gone = ids.filter((id) => !byId.has(id));
+        if (gone.length > 0) {
+          setWishlistIds((prev) => prev.filter((id) => byId.has(id)));
+          addToast(
+            gone.length === 1
+              ? 'A saved piece is no longer available and was removed from your wishlist.'
+              : `${gone.length} saved pieces are no longer available and were removed from your wishlist.`,
+            'info'
+          );
+        }
+      })
+      .catch(() => undefined) // keep what we have; the page shows the saved ids again next visit
+      .finally(() => !cancelled && setWishlistLoading(false));
+    return () => {
+      cancelled = true;
+    };
+    // Load once per session start, not on every toggle (toggles update the list directly)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user]);
+
   // Persist non-sensitive cart item references in sessionStorage & validate on server
   useEffect(() => {
     try {
@@ -223,7 +275,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const res = await apiRequest('/api/cart/validate', {
           method: 'POST',
           body: JSON.stringify({
-            items: itemsToValidate,
+            items: itemsToValidate.map((i) => (i.gift ? i : { productId: i.productId, variantSku: i.variantSku, quantity: i.quantity })),
             couponCode: code || undefined,
             shippingMethod: method,
           }),
@@ -263,7 +315,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [rawCart, couponCode, shippingMethod, validateCartWithServer]);
 
   const addToCart = useCallback(
-    (product: Product, quantity = 1, variantSku?: string, openDrawer = true) => {
+    (product: Product, quantity = 1, variantSku?: string, openDrawer = true, gift?: CartGift) => {
       if (product.stock <= 0) {
         addToast(`${product.name} is currently out of stock.`, 'error');
         return;
@@ -276,7 +328,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (idx > -1) {
           const updated = [...prev];
           const nextQty = Math.min(product.stock, updated[idx].quantity + quantity);
-          updated[idx] = { ...updated[idx], quantity: nextQty };
+          updated[idx] = { ...updated[idx], quantity: nextQty, ...(gift ? { gift } : {}) };
           return updated;
         }
         return [
@@ -285,6 +337,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             productId: product._id,
             variantSku,
             quantity: Math.min(product.stock, quantity),
+            ...(gift ? { gift } : {}),
           },
         ];
       });
@@ -316,6 +369,21 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       );
     },
     []
+  );
+
+  const setCartItemGift = useCallback(
+    (productId: string, variantSku: string | undefined, gift: CartGift | null) => {
+      setRawCart((prev) =>
+        prev.map((i) => {
+          if (i.productId !== productId || (i.variantSku || '') !== (variantSku || '')) return i;
+          if (gift) return { ...i, gift };
+          const { gift: _removed, ...rest } = i;
+          return rest;
+        })
+      );
+      addToast(gift ? 'Gift options saved.' : 'Gift wrapping removed.', 'info');
+    },
+    [addToast]
   );
 
   const removeFromCart = useCallback(
@@ -396,11 +464,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setWishlistIds((prev) => {
           const exists = prev.includes(product._id);
           const next = exists ? prev.filter((id) => id !== product._id) : [...prev, product._id];
-          try {
-            sessionStorage.setItem(WISHLIST_GUEST_KEY, JSON.stringify(next));
-          } catch {
-            // ignore
-          }
           addToast(
             exists ? 'Removed from your wishlist.' : 'Saved to your wishlist.',
             exists ? 'info' : 'success'
@@ -415,6 +478,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     },
     [user, addToast]
   );
+
+  const clearWishlist = useCallback(() => {
+    setWishlistIds([]);
+    setWishlistProducts([]);
+    addToast('Your wishlist has been cleared.', 'info');
+  }, [addToast]);
 
   const isInWishlist = useCallback(
     (productId: string) => wishlistIds.includes(productId),
@@ -467,6 +536,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         shippingMethod,
         wishlistIds,
         wishlistProducts,
+        wishlistLoading,
         recentlyViewed,
         isCartOpen,
         isSearchOpen,
@@ -482,6 +552,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         refreshStorefront,
         logout,
         addToCart,
+        setCartItemGift,
         updateCartQuantity,
         removeFromCart,
         clearCart,
@@ -489,6 +560,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         removeCoupon,
         toggleWishlist,
         isInWishlist,
+        clearWishlist,
         recordRecentlyViewed,
       }}
     >

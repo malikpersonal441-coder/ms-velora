@@ -920,49 +920,6 @@ export const AccountDashboardPage: React.FC = () => {
   );
 };
 
-export const WishlistPage: React.FC = () => {
-  const { wishlistProducts } = useStore();
-
-  useEffect(() => {
-    document.title = 'Wishlist — MS Velora';
-  }, []);
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
-      <div className="mb-8">
-        <span className="text-xs uppercase tracking-[0.22em] text-[#9E7B36] font-semibold">
-          Curated Favorites
-        </span>
-        <h1 className="font-serif-luxury text-4xl font-semibold text-[#0D0D0D]">
-          Your Wishlist ({wishlistProducts.length})
-        </h1>
-      </div>
-
-      {wishlistProducts.length === 0 ? (
-        <div className="bg-white p-14 rounded-2xl border border-black/8 text-center space-y-4">
-          <Heart className="w-10 h-10 text-[#C5A059] mx-auto" />
-          <h2 className="font-serif-luxury text-2xl font-semibold">Your Wishlist is Empty</h2>
-          <p className="text-sm text-neutral-500 max-w-md mx-auto">
-            Click the heart icon on any piece in our catalog to save it here for comparison.
-          </p>
-          <Link
-            to="/shop"
-            className="inline-block px-7 py-3.5 bg-[#0D0D0D] text-[#FAF8F5] text-xs uppercase tracking-widest font-semibold rounded"
-          >
-            Explore Jewellery
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
-          {wishlistProducts.map((p) => (
-            <ProductCard key={p._id} product={p} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'contact' }> = ({
   type,
 }) => {
@@ -1103,7 +1060,7 @@ export const PolicyPage: React.FC<{ type: 'shipping' | 'privacy' | 'terms' | 'co
                   'We offer a 7-day inspection and exchange guarantee from the date of delivery for unworn jewellery in its original box.'}
               </p>
               <h3 className="font-serif-luxury text-xl font-bold text-[#0D0D0D]">
-                3. 2-Year Official Mechanical & Movement Warranty
+                3. 6-Month Official Mechanical & Movement Warranty
               </h3>
               <p>
                 Every piece purchased from MS Velora is covered by our plating and craftsmanship warranty.

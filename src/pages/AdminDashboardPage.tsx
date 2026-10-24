@@ -38,6 +38,8 @@ import {
 import { Smartphone, BellRing } from 'lucide-react';
 import { subscribePush, isSubscribedLocally, pushSupported } from '../lib/pwa';
 import { WhatsAppCenter } from '../components/admin/WhatsAppCenter';
+import { OrderGiftNote } from '../components/OrderGiftNote';
+import { GiftSettingsPanel } from '../components/admin/GiftSettingsPanel';
 import { ExpensesPanel } from '../components/admin/ExpensesPanel';
 import { ChangePasswordPanel } from '../components/admin/ChangePasswordPanel';
 import { NewOrderNotifier } from '../components/admin/NewOrderNotifier';
@@ -2950,6 +2952,12 @@ export const AdminDashboardPage: React.FC = () => {
                   </label>
                 </div>
 
+                <GiftSettingsPanel
+                  value={storeSettings.giftOptions}
+                  onChange={(giftOptions) => setStoreSettings({ ...storeSettings, giftOptions })}
+                  categories={adminCategories}
+                />
+
                 <button
                   type="submit"
                   className="px-6 py-3 bg-[#0D0D0D] hover:bg-[#C5A059] text-[#FAF8F5] hover:text-[#0D0D0D] text-xs uppercase tracking-widest font-bold rounded transition-colors"
@@ -3648,6 +3656,7 @@ export const AdminDashboardPage: React.FC = () => {
                         <p className="text-[11px] text-neutral-500 font-mono-code">
                           {item.sku || 'SKU'} {item.variantName ? `• ${item.variantName}` : ''}
                         </p>
+                        <OrderGiftNote gift={item.gift} />
                       </div>
                     </div>
 
@@ -3678,6 +3687,9 @@ export const AdminDashboardPage: React.FC = () => {
                   <span>Shipping: <strong>{formatPrice(selectedOrder.shippingCost || 0)}</strong> ({DELIVERY_LABEL[selectedOrder.shippingMethod] || 'Standard'})</span>
                   {selectedOrder.discountAmount > 0 && (
                     <span className="text-emerald-700 font-semibold">Discount: -{formatPrice(selectedOrder.discountAmount)}</span>
+                  )}
+                  {(selectedOrder.giftWrapAmount || 0) > 0 && (
+                    <span className="text-[#7A5E27] font-semibold">Gift wrap: {formatPrice(selectedOrder.giftWrapAmount || 0)}</span>
                   )}
                 </div>
                 <div className="text-right">

@@ -198,7 +198,7 @@ export const QuickViewModal: React.FC = () => {
                       : 'Currently Out of Stock'}
                   </span>
                   <span className="flex items-center gap-1 text-neutral-500">
-                    <ShieldCheck className="w-4 h-4 text-[#C5A059]" /> 2-Year Warranty
+                    <ShieldCheck className="w-4 h-4 text-[#C5A059]" /> 6-Month Warranty
                   </span>
                 </div>
 

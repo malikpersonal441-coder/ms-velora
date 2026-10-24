@@ -1744,7 +1744,7 @@ router.put('/orders/:id/delivery', async (req: Request, res: Response, next: Nex
     }
 
     const prevTotal = order.totalAmount;
-    order.totalAmount = Math.max(0, order.subtotal - order.discountAmount) + order.shippingCost + (order.taxAmount || 0);
+    order.totalAmount = Math.max(0, order.subtotal - order.discountAmount) + order.shippingCost + (order.taxAmount || 0) + (order.giftWrapAmount || 0);
     if (order.totalAmount !== prevTotal) changes.push(`total Rs. ${prevTotal} → Rs. ${order.totalAmount}`);
 
     const note = `Delivery adjusted: ${changes.join('; ')}.`;
@@ -2555,6 +2555,30 @@ router.put('/settings', async (req: Request, res: Response, next: NextFunction) 
     let settings = await StoreSettings.findOne({ key: 'default' });
     if (!settings) {
       settings = new StoreSettings({ key: 'default' });
+    }
+
+    if (req.body?.giftOptions !== undefined) {
+      const gift = z
+        .object({
+          enabled: z.boolean(),
+          messageMaxLength: z.number().int().min(20).max(500),
+          eligibleCategories: z.array(z.string().refine((id) => mongoose.isValidObjectId(id), 'Invalid category')).max(100),
+          packages: z
+            .array(
+              z.object({
+                key: z.string().trim().toLowerCase().regex(/^[a-z0-9-]{1,40}$/, 'Package keys use letters, numbers and dashes'),
+                name: z.string().trim().min(1, 'Every gift package needs a name').max(60),
+                description: z.string().trim().max(240).default(''),
+                price: z.number().min(0).max(1_000_000),
+                isActive: z.boolean().default(true),
+                isPremium: z.boolean().default(false),
+              })
+            )
+            .max(20)
+            .refine((ps) => new Set(ps.map((p) => p.key)).size === ps.length, 'Two gift packages have the same key'),
+        })
+        .parse(req.body.giftOptions);
+      req.body.giftOptions = gift;
     }
 
     Object.assign(settings, req.body);

@@ -1,5 +1,62 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface IGiftPackage {
+  key: string;
+  name: string;
+  description: string;
+  /** Charge per piece, in store currency. 0 = complimentary. */
+  price: number;
+  isActive: boolean;
+  /** Premium upgrades are shown as such on the product page. */
+  isPremium: boolean;
+}
+
+export interface IGiftOptions {
+  enabled: boolean;
+  messageMaxLength: number;
+  eligibleCategories: mongoose.Types.ObjectId[];
+  packages: IGiftPackage[];
+}
+
+const GiftPackageSchema = new Schema<IGiftPackage>(
+  {
+    key: { type: String, required: true, trim: true, lowercase: true, maxlength: 40 },
+    name: { type: String, required: true, trim: true, maxlength: 60 },
+    description: { type: String, default: '', trim: true, maxlength: 240 },
+    price: { type: Number, default: 0, min: 0 },
+    isActive: { type: Boolean, default: true },
+    isPremium: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
+
+export const DEFAULT_GIFT_PACKAGES: IGiftPackage[] = [
+  {
+    key: 'signature',
+    name: 'Signature Gift Box',
+    description: 'Our ivory MS Velora box with a satin ribbon and a handwritten-style message card.',
+    price: 0,
+    isActive: true,
+    isPremium: false,
+  },
+  {
+    key: 'velvet',
+    name: 'Velvet Keepsake Box',
+    description: 'A soft velvet jewellery box with gold foil lid, made to be kept long after the gift is opened.',
+    price: 500,
+    isActive: true,
+    isPremium: true,
+  },
+  {
+    key: 'luxe',
+    name: 'Luxe Hamper Wrap',
+    description: 'Velvet box inside a gold-trimmed hamper with dried florals and a wax-sealed card.',
+    price: 1200,
+    isActive: true,
+    isPremium: true,
+  },
+];
+
 export interface IStoreSettings extends Document {
   key: string;
   storeName: string;
@@ -30,6 +87,7 @@ export interface IStoreSettings extends Document {
   contactPhone: string;
   whatsappNumber: string;
   whatsappOrderingEnabled: boolean;
+  giftOptions: IGiftOptions;
   whatsappTemplates: {
     orderPlaced: string;
     confirmed: string;
@@ -108,6 +166,16 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     contactPhone: { type: String, default: '+92 308 5060106' },
     whatsappNumber: { type: String, default: '+92 308 5060106' },
     whatsappOrderingEnabled: { type: Boolean, default: true },
+    giftOptions: {
+      enabled: { type: Boolean, default: true },
+      messageMaxLength: { type: Number, default: 150, min: 20, max: 500 },
+      // Empty = every category is eligible
+      eligibleCategories: { type: [Schema.Types.ObjectId], ref: 'Category', default: [] },
+      packages: {
+        type: [GiftPackageSchema],
+        default: () => DEFAULT_GIFT_PACKAGES,
+      },
+    },
     // Placeholders: {name} {orderNumber} {total} {items} {city} {courier} {tracking} {storeName} {paymentMethod}
     whatsappTemplates: {
       orderPlaced: {

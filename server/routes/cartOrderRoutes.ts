@@ -13,6 +13,7 @@ import { AppError } from '../middleware/errorHandler';
 import { evaluateCoupon, generateOrderNumber } from '../utils/helpers';
 import { getNextOrderNumber } from '../models/Counter';
 import { env } from '../config/env';
+import { giftInputSchema, resolveGift, type ResolvedGift } from '../utils/gift';
 
 const router = Router();
 
@@ -20,6 +21,7 @@ const cartItemInputSchema = z.object({
   productId: z.string().min(1),
   variantSku: z.string().optional(),
   quantity: z.number().int().min(1).max(20),
+  gift: giftInputSchema.optional(),
 });
 
 const validateCartSchema = z.object({
@@ -87,9 +89,12 @@ router.post(
         subtotal: number;
         categoryId?: string;
         stockWarning?: string;
+        gift?: ResolvedGift;
+        giftError?: string;
       }[] = [];
 
       let subtotal = 0;
+      let giftWrapAmount = 0;
 
       for (const reqItem of data.items) {
         if (!mongoose.isValidObjectId(reqItem.productId)) continue;
@@ -122,6 +127,9 @@ router.post(
         const cappedQty = Math.min(reqItem.quantity, Math.max(0, availableStock));
         const lineSubtotal = effectivePrice * cappedQty;
         subtotal += lineSubtotal;
+        // An unavailable gift option is dropped and reported, never silently charged
+        const giftResult = resolveGift(settings, product.category ? String(product.category) : undefined, reqItem.gift, cappedQty);
+        if (giftResult.gift) giftWrapAmount += giftResult.gift.charge;
 
         validatedItems.push({
           productId: String(product._id),
@@ -146,6 +154,8 @@ router.post(
               : reqItem.quantity > availableStock
               ? `Only ${availableStock} unit(s) available in stock`
               : undefined,
+          gift: giftResult.gift,
+          giftError: giftResult.error,
         });
       }
 
@@ -186,7 +196,7 @@ router.post(
         settings.taxPercentage > 0
           ? Math.round((discountedSubtotal * settings.taxPercentage) / 100)
           : 0;
-      const totalAmount = discountedSubtotal + shippingCost + taxAmount;
+      const totalAmount = discountedSubtotal + shippingCost + taxAmount + giftWrapAmount;
 
       // Persist cart for authenticated user
       if (req.user) {
@@ -219,6 +229,7 @@ router.post(
           shippingCost,
           freeShippingThreshold: settings.freeShippingThreshold,
           taxAmount,
+          giftWrapAmount,
           totalAmount,
           currency: settings.currency,
           currencySymbol: settings.currencySymbol,
@@ -347,9 +358,11 @@ router.post(
         categoryId?: string;
         previousStock: number;
         newStock: number;
+        gift?: ResolvedGift;
       }[] = [];
 
       let subtotal = 0;
+      let giftWrapAmount = 0;
 
       for (const item of data.items) {
         if (!mongoose.isValidObjectId(item.productId)) {
@@ -473,6 +486,15 @@ router.post(
         const unitPrice = unitSale && unitSale > 0 && unitSale < unitRegular ? unitSale : unitRegular;
         const lineSubtotal = unitPrice * item.quantity;
         subtotal += lineSubtotal;
+        // Throwing here rolls back the stock already deducted for this order
+        const giftResult = resolveGift(
+          settings,
+          updatedProduct.category ? String(updatedProduct.category) : undefined,
+          item.gift,
+          item.quantity
+        );
+        if (giftResult.error) throw new AppError(`${updatedProduct.name}: ${giftResult.error}`, 400);
+        if (giftResult.gift) giftWrapAmount += giftResult.gift.charge;
 
         orderItems.push({
           product: updatedProduct._id as mongoose.Types.ObjectId,
@@ -489,6 +511,7 @@ router.post(
           categoryId: updatedProduct.category ? String(updatedProduct.category) : undefined,
           previousStock,
           newStock,
+          gift: giftResult.gift,
         });
       }
 
@@ -539,7 +562,7 @@ router.post(
         settings.taxPercentage > 0
           ? Math.round((discountedSubtotal * settings.taxPercentage) / 100)
           : 0;
-      const totalAmount = discountedSubtotal + shippingCost + taxAmount;
+      const totalAmount = discountedSubtotal + shippingCost + taxAmount + giftWrapAmount;
 
       const orderNumber = await getNextOrderNumber();
 
@@ -561,6 +584,7 @@ router.post(
           unitPrice: i.unitPrice,
           quantity: i.quantity,
           subtotal: i.subtotal,
+          gift: i.gift,
         })),
         shippingAddress: data.shippingAddress,
         shippingMethod: data.shippingMethod,
@@ -569,6 +593,7 @@ router.post(
         couponCode: appliedCouponCode,
         shippingCost,
         taxAmount,
+        giftWrapAmount,
         totalAmount,
         currency: settings.currency,
         paymentMethod: data.paymentMethod,

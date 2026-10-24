@@ -41,9 +41,8 @@ const OrderConfirmationPage = lazy(() =>
 const TrackOrderPage = lazy(() =>
   import('./pages/CartAndCheckoutPages').then((m) => ({ default: m.TrackOrderPage }))
 );
-const WishlistPage = lazy(() =>
-  import('./pages/AccountAndStaticPages').then((m) => ({ default: m.WishlistPage }))
-);
+const WishlistPage = lazy(() => import('./pages/WishlistPage'));
+const GiftOptionsPage = lazy(() => import('./pages/GiftOptionsPage'));
 const PolicyPage = lazy(() =>
   import('./pages/AccountAndStaticPages').then((m) => ({ default: m.PolicyPage }))
 );
@@ -110,6 +109,7 @@ const AppShell: React.FC = () => {
           <Routes location={location}>
             <Route path="/" element={<HomePage />} />
             <Route path="/shop" element={<ShopPage />} />
+            <Route path="/search" element={<ShopPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/collections/:slug" element={<CollectionDetailPage />} />
             <Route path="/product/:slug" element={<ProductDetailPage />} />
@@ -126,6 +126,7 @@ const AppShell: React.FC = () => {
             <Route path="/forgot-password" element={<Navigate to="/" replace />} />
             <Route path="/account" element={<Navigate to="/" replace />} />
             <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/gift-options" element={<GiftOptionsPage />} />
             <Route path="/shipping-returns" element={<PolicyPage type="shipping" />} />
             <Route path="/privacy-policy" element={<PolicyPage type="privacy" />} />
             <Route path="/terms" element={<PolicyPage type="terms" />} />

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Tag, ArrowRight, Truck } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { formatPrice } from '../lib/api';
+import { CartLineGift } from './CartLineGift';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -179,6 +180,7 @@ export const CartDrawer: React.FC = () => {
                             {item.stockWarning}
                           </p>
                         )}
+                        <CartLineGift item={item} compact />
                       </div>
 
                       <div className="flex items-center justify-between pt-2">
@@ -276,6 +278,12 @@ export const CartDrawer: React.FC = () => {
                       </span>
                     </div>
                   )}
+                  {(cartSummary.giftWrapAmount || 0) > 0 && (
+                  <div className="flex justify-between text-neutral-600">
+                    <span>Gift wrapping</span>
+                    <span className="font-mono-code">{formatPrice(cartSummary.giftWrapAmount || 0, symbol)}</span>
+                  </div>
+                )}
                   <div className="flex justify-between text-neutral-600">
                     <span>Estimated Insured Shipping</span>
                     <span className="font-mono-code">

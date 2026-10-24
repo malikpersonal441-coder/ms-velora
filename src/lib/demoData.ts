@@ -58,7 +58,7 @@ const specs = (o: Partial<Product['specifications']> = {}): Product['specificati
   dialColor: 'Champagne Gold',
   crystal: 'AAA+ Cubic Zirconia & Synthetic Pearls',
   waterResistance: 'Keep away from moisture & perfume',
-  warranty: '1-Year Plating & Polish Warranty',
+  warranty: '6-Month Plating & Polish Warranty',
   origin: 'Handcrafted in Pakistan',
   ...o,
 });

@@ -39,7 +39,7 @@ export const DeliveryAdjustPanel: React.FC<Props> = ({ order, onSaved, onError }
     setCity(order.shippingAddress.city);
   }, [order]);
 
-  const newTotal = Math.max(0, order.subtotal - Math.min(discount, order.subtotal)) + charge + (order.taxAmount || 0);
+  const newTotal = Math.max(0, order.subtotal - Math.min(discount, order.subtotal)) + charge + (order.taxAmount || 0) + (order.giftWrapAmount || 0);
   const isCourier = method === 'standard' || method === 'express';
 
   const save = async () => {

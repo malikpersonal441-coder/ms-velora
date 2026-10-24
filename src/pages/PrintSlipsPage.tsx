@@ -87,6 +87,11 @@ const Slip: React.FC<{ order: Order; from: ShipFrom; color: boolean }> = ({ orde
                 </span>
               </p>
               {a.notes && <p className="mt-2 text-[10.5px] italic text-neutral-700">Note: {a.notes}</p>}
+              {order.items.some((i) => i.gift) && (
+                <p className="mt-1.5 text-[11px] font-bold uppercase">
+                  🎁 Gift wrap: {order.items.filter((i) => i.gift).map((i) => `${i.gift!.packageName}${i.gift!.recipientName ? ` (for ${i.gift!.recipientName})` : ''}`).join(', ')}
+                </p>
+              )}
             </div>
             {/* FROM sits directly under SHIP TO */}
             <div className="mx-4 border-t border-dashed border-neutral-400 pt-2 pb-2">

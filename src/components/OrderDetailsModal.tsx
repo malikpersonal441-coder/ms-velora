@@ -4,6 +4,7 @@ import { X, Package, Truck, CheckCircle2, Home, ClipboardCheck, XCircle, CreditC
 import { Order } from '../types';
 import { formatPrice, formatDateTime } from '../lib/api';
 import { useStore } from '../context/StoreContext';
+import { OrderGiftNote } from './OrderGiftNote';
 
 interface OrderDetailsModalProps {
   isOpen: boolean;
@@ -180,6 +181,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, on
                       <p className="text-xs text-neutral-500 mt-0.5">
                         {item.variantName ? `${item.variantName} · ` : ''}Qty {item.quantity} × {formatPrice(item.unitPrice, symbol)}
                       </p>
+                      <OrderGiftNote gift={item.gift} symbol={symbol} />
                     </div>
                     <p className="font-mono-code text-sm font-bold text-[#0D0D0D] shrink-0">
                       {formatPrice(item.subtotal ?? item.unitPrice * item.quantity, symbol)}
@@ -196,6 +198,12 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, on
                   <div className="flex justify-between text-emerald-700">
                     <span>Discount{order.couponCode ? ` (${order.couponCode})` : ''}</span>
                     <span className="font-mono-code">−{formatPrice(order.discountAmount, symbol)}</span>
+                  </div>
+                )}
+                {(order.giftWrapAmount || 0) > 0 && (
+                  <div className="flex justify-between text-neutral-600">
+                    <span>Gift wrapping</span>
+                    <span className="font-mono-code">{formatPrice(order.giftWrapAmount || 0, symbol)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-neutral-600">

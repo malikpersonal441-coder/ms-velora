@@ -13,6 +13,15 @@ export interface IOrderItem {
   quantity: number;
   subtotal: number;
   isSurpriseGift?: boolean;
+  /** Gift wrap chosen by the customer for this line (priced by the server). */
+  gift?: {
+    packageKey: string;
+    packageName: string;
+    unitPrice: number;
+    recipientName?: string;
+    message?: string;
+    charge: number;
+  };
 }
 
 export interface IShippingAddress {
@@ -76,6 +85,8 @@ export interface IOrder extends Document {
   couponCode?: string;
   shippingCost: number;
   taxAmount: number;
+  /** Sum of gift-wrap charges across items; included in totalAmount. */
+  giftWrapAmount?: number;
   totalAmount: number;
   currency: string;
   paymentMethod: 'cod' | 'online_card' | 'bank_transfer' | 'jazzcash' | 'easypaisa' | 'online';
@@ -116,6 +127,20 @@ const OrderItemSchema = new Schema<IOrderItem>(
     quantity: { type: Number, required: true, min: 1 },
     subtotal: { type: Number, required: true, min: 0 },
     isSurpriseGift: { type: Boolean, default: false },
+    gift: {
+      type: new Schema(
+        {
+          packageKey: { type: String, required: true },
+          packageName: { type: String, required: true },
+          unitPrice: { type: Number, required: true, min: 0 },
+          recipientName: { type: String, default: '', maxlength: 60 },
+          message: { type: String, default: '', maxlength: 500 },
+          charge: { type: Number, required: true, min: 0 },
+        },
+        { _id: false }
+      ),
+      default: undefined,
+    },
   },
   { _id: false }
 );
@@ -173,6 +198,7 @@ const OrderSchema = new Schema<IOrder>(
     couponCode: { type: String, uppercase: true, trim: true },
     shippingCost: { type: Number, default: 0, min: 0 },
     taxAmount: { type: Number, default: 0, min: 0 },
+    giftWrapAmount: { type: Number, default: 0, min: 0 },
     totalAmount: { type: Number, required: true, min: 0 },
     currency: { type: String, default: 'PKR' },
     paymentMethod: {

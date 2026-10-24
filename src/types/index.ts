@@ -189,6 +189,41 @@ export interface HomepageContent {
   };
 }
 
+export interface GiftPackage {
+  key: string;
+  name: string;
+  description: string;
+  /** Charge per piece; 0 = complimentary. */
+  price: number;
+  isActive: boolean;
+  isPremium: boolean;
+}
+
+export interface GiftOptionsSettings {
+  enabled: boolean;
+  messageMaxLength: number;
+  /** Category ids; empty = every category is eligible. */
+  eligibleCategories: string[];
+  packages: GiftPackage[];
+}
+
+/** Gift choice the shopper makes for a cart line (the server prices it). */
+export interface CartGift {
+  packageKey: string;
+  recipientName?: string;
+  message?: string;
+}
+
+/** Gift details priced by the server, on a validated cart line or an order item. */
+export interface ResolvedGift {
+  packageKey: string;
+  packageName: string;
+  unitPrice: number;
+  recipientName?: string;
+  message?: string;
+  charge: number;
+}
+
 export interface StoreSettings {
   storeName: string;
   tagline: string;
@@ -211,6 +246,7 @@ export interface StoreSettings {
   contactPhone: string;
   whatsappNumber: string;
   whatsappOrderingEnabled?: boolean;
+  giftOptions?: GiftOptionsSettings;
   mobileWallets?: MobileWallets;
   shipFrom?: { name: string; address: string; city: string; phone: string };
   whatsappTemplates?: WhatsAppTemplates;
@@ -282,6 +318,9 @@ export interface ValidatedCartItem {
   availableStock: number;
   subtotal: number;
   stockWarning?: string;
+  gift?: ResolvedGift;
+  /** Set when the requested gift option could not be applied (it was not charged). */
+  giftError?: string;
 }
 
 export interface CartSummary {
@@ -293,6 +332,7 @@ export interface CartSummary {
   shippingCost: number;
   freeShippingThreshold: number;
   taxAmount: number;
+  giftWrapAmount?: number;
   totalAmount: number;
   currency: string;
   currencySymbol: string;
@@ -311,6 +351,7 @@ export interface OrderItem {
   quantity: number;
   subtotal: number;
   isSurpriseGift?: boolean;
+  gift?: ResolvedGift;
 }
 
 export interface Order {
@@ -338,6 +379,7 @@ export interface Order {
   couponCode?: string;
   shippingCost: number;
   taxAmount: number;
+  giftWrapAmount?: number;
   totalAmount: number;
   currency: string;
   paymentMethod: 'cod' | 'online_card' | 'bank_transfer' | 'jazzcash' | 'easypaisa' | 'online';
